@@ -1,0 +1,74 @@
+<div
+  class="min-h-dvh bg-vibe-canvas px-5 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-[calc(env(safe-area-inset-top)+1.25rem)] text-vibe-ink selection:bg-vibe-mint/30 dark:bg-vibe-night dark:text-vibe-paper"
+>
+  <header class="mx-auto flex w-full max-w-lg items-center justify-between py-2">
+    <div class="flex items-center gap-3">
+      <span
+        class="grid size-11 place-items-center rounded-[14px] bg-vibe-ink text-sm font-black text-vibe-mint ring-1 ring-vibe-mint/30 dark:bg-vibe-surface-dark"
+        aria-hidden="true"
+      >
+        V
+      </span>
+      <div>
+        <p class="text-lg font-bold tracking-[-0.02em]">VibePing</p>
+        <p class="text-sm text-vibe-muted dark:text-vibe-sage">Tín hiệu riêng tư</p>
+      </div>
+    </div>
+    <span class="flex items-center gap-2 text-sm font-semibold">
+      <span
+        class="size-2.5 rounded-full"
+        [class.bg-vibe-mint]="connectivity.state() === 'online'"
+        [class.bg-vibe-amber]="connectivity.state() === 'loading'"
+        [class.bg-vibe-coral]="connectivity.state() === 'offline'"
+        aria-hidden="true"
+      ></span>
+      {{ connectivity.view().label }}
+    </span>
+  </header>
+
+  <main class="mx-auto w-full max-w-lg pt-12">
+    <section aria-labelledby="connection-heading" aria-live="polite">
+      <div class="mb-5 flex items-center gap-4">
+        <span
+          class="grid size-16 shrink-0 place-items-center rounded-full border border-vibe-rule bg-vibe-surface dark:border-vibe-rule-dark dark:bg-vibe-surface-dark"
+          aria-hidden="true"
+        >
+          <span
+            class="size-5 rounded-full bg-vibe-mint shadow-[0_6px_20px_rgba(69,211,149,0.34)]"
+          ></span>
+        </span>
+        <div>
+          <h1
+            id="connection-heading"
+            class="text-balance text-2xl font-bold leading-tight tracking-[-0.025em]"
+          >
+            {{ connectivity.view().title }}
+          </h1>
+          <p class="mt-2 max-w-[32rem] text-base leading-6 text-vibe-muted dark:text-vibe-sage">
+            {{ connectivity.view().detail }}
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-8 border-y border-vibe-rule py-5 dark:border-vibe-rule-dark">
+        <div class="flex items-start justify-between gap-6">
+          <div>
+            <h2 class="text-base font-semibold">Đường truyền trực tiếp</h2>
+            <p class="mt-1 text-sm leading-5 text-vibe-muted dark:text-vibe-sage">
+              Dữ liệu được giữ trên laptop và đi trong mạng riêng của bạn.
+            </p>
+          </div>
+          <span
+            class="mt-0.5 shrink-0 rounded-full bg-vibe-mint-soft px-3 py-1.5 text-xs font-bold text-vibe-green dark:bg-vibe-mint/15 dark:text-vibe-mint"
+          >
+            Riêng tư
+          </span>
+        </div>
+      </div>
+
+      @if (connectivity.lastSync()) {
+        <p class="mt-5 text-sm text-vibe-muted dark:text-vibe-sage">Cập nhật vừa xong</p>
+      }
+    </section>
+  </main>
+</div>

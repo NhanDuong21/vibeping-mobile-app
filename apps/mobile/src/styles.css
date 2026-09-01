@@ -1,0 +1,66 @@
+@import '@ionic/angular/css/core.css';
+@import '@ionic/angular/css/normalize.css';
+@import '@ionic/angular/css/structure.css';
+@import '@ionic/angular/css/typography.css';
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --color-vibe-canvas: #f3f7f4;
+  --color-vibe-surface: #ffffff;
+  --color-vibe-ink: #10251c;
+  --color-vibe-muted: #587065;
+  --color-vibe-rule: #d7e2dc;
+  --color-vibe-night: #07140f;
+  --color-vibe-surface-dark: #10241b;
+  --color-vibe-paper: #f3f8f5;
+  --color-vibe-sage: #9fb9aa;
+  --color-vibe-rule-dark: #274236;
+  --color-vibe-mint: #45d395;
+  --color-vibe-mint-soft: #d9f8e8;
+  --color-vibe-green: #17643f;
+  --color-vibe-amber: #c78a2e;
+  --color-vibe-coral: #ce655f;
+}
+
+:root {
+  color-scheme: light dark;
+  font-family: var(--font-sans);
+  background: var(--color-vibe-canvas);
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+  background: var(--color-vibe-canvas);
+}
+
+::selection {
+  color: var(--color-vibe-ink);
+  background: rgb(69 211 149 / 35%);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-vibe-mint);
+  outline-offset: 3px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root,
+  html,
+  body {
+    background: var(--color-vibe-night);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

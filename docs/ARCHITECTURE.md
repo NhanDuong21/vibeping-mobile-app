@@ -1,6 +1,6 @@
 # Architecture
 
-This document describes the V1 target. The current repository contains only Gate 0 and Gate 1 spikes; `apps/mobile` and `apps/desktop` do not exist yet.
+This document describes the V1 target and its current production foundation. Gate 0 and Gate 1 remain isolated regression spikes; `apps/mobile` and `apps/desktop` contain the generated-contract PWA and loopback-only Rust/SQLite host.
 
 ## System context
 
@@ -38,8 +38,8 @@ codex app-server → signed-in Codex services
 
 - **Mobile shell:** present Vietnamese operational state, request notification permission after a tap, cache recent reads, and reconnect.
 - **Application use cases:** derive events, attention severity, allowance state, retry policy, and API results.
-- **SQLite stores:** own durable activities, device state, notification outbox, delivery attempts, settings, and migrations in later phases.
-- **Codex adapters:** accept explicit event sources later and read dynamic allowance windows through App Server.
+- **SQLite stores:** currently own bootstrap/runtime metadata; later phases add durable activities, device state, notification outbox, delivery attempts, and settings through feature-owned stores.
+- **Codex adapters:** Gate 1 proves dynamic allowance windows through App Server; production ingestion is added in its roadmap phase.
 - **Delivery adapters:** serve REST/SSE and encrypt Web Push without leaking provider details into domain code.
 - **Runtime host:** manual lifecycle, localhost binding, Tailscale verification, logs, and graceful shutdown.
 
@@ -51,7 +51,7 @@ The PWA loads a REST snapshot from Windows, replaces stale IndexedDB cache entri
 
 ### Background notification
 
-A domain event creates a durable outbox record in the same transaction as its source state. A worker encrypts a minimal Vietnamese payload and sends Web Push. Success marks the attempt; retryable failures schedule backoff; 404/410 invalidates the device subscription and asks the user to enable notifications again. The outbox is a future production responsibility; Gate 0 validates encryption, identity persistence, and restart behavior only.
+A domain event creates a durable outbox record in the same transaction as its source state. A worker encrypts a minimal Vietnamese payload and sends Web Push. Success marks the attempt; retryable failures schedule backoff; 404/410 invalidates the device subscription and asks the user to enable notifications again. The outbox is introduced in the notification phase; Gate 0 validates encryption, identity persistence, and restart behavior only.
 
 ### Codex allowance
 
@@ -61,7 +61,7 @@ The Rust adapter spawns `codex app-server`, completes `initialize`/`initialized`
 
 SQLite on Windows is authoritative. IndexedDB stores only replaceable mobile projections plus sync metadata. VAPID private material and the push subscription are local encrypted-delivery state outside source control. Production secrets should use Windows file ACLs and, where justified, DPAPI; Gate 0 limits itself to a single-user local app-data directory.
 
-## Target folder shape for later phases
+## Production folder shape
 
 ```text
 apps/
@@ -70,8 +70,9 @@ apps/
   mobile/
     src/app/<feature>/{data,state,ui}/
 contracts/
-  source/              # one API contract authority
+  openapi/             # exported OpenAPI contract authority
   generated/           # generated Rust/TypeScript artifacts
+  scripts/             # generation and freshness checks
 ```
 
 Feature internals remain private. `main.rs` composes adapters and lifecycle only. Angular pages coordinate state and interactions only. Generated contracts are never edited by hand.

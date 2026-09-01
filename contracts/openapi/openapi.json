@@ -1,0 +1,146 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "VibePing API",
+    "description": "",
+    "license": {
+      "name": "MIT OR Apache-2.0",
+      "identifier": "MIT OR Apache-2.0"
+    },
+    "version": "1.0.0-rc.1"
+  },
+  "paths": {
+    "/api/v1/bootstrap": {
+      "get": {
+        "tags": [
+          "http"
+        ],
+        "operationId": "bootstrap",
+        "responses": {
+          "200": {
+            "description": "Initial client snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BootstrapResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "tags": [
+          "http"
+        ],
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "Application health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stream": {
+      "get": {
+        "tags": [
+          "http"
+        ],
+        "operationId": "stream",
+        "responses": {
+          "200": {
+            "description": "Foreground live event stream",
+            "content": {
+              "text/event-stream": {}
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BootstrapResponse": {
+        "type": "object",
+        "required": [
+          "serverTime",
+          "connection",
+          "cursor"
+        ],
+        "properties": {
+          "connection": {
+            "$ref": "#/components/schemas/ConnectionSnapshot"
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "serverTime": {
+            "type": "string"
+          }
+        }
+      },
+      "ConnectionSnapshot": {
+        "type": "object",
+        "required": [
+          "desktop",
+          "codex",
+          "privateConnection"
+        ],
+        "properties": {
+          "codex": {
+            "type": "string"
+          },
+          "desktop": {
+            "type": "string"
+          },
+          "privateConnection": {
+            "type": "string"
+          }
+        }
+      },
+      "ErrorEnvelope": {
+        "type": "object",
+        "required": [
+          "code",
+          "requestId"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "requestId": {
+            "type": "string"
+          }
+        }
+      },
+      "HealthResponse": {
+        "type": "object",
+        "required": [
+          "status",
+          "service",
+          "version"
+        ],
+        "properties": {
+          "service": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

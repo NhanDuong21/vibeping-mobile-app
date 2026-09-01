@@ -1,8 +1,8 @@
-# VibePing — validation gates
+# VibePing — personal release-candidate build
 
-VibePing will be a personal-production tool that notifies one user's iPhone when Codex finishes, needs attention, leaves final tests failing, has a preview ready, or approaches a usage allowance. This repository is not VibePing v1.0 yet.
+VibePing is a personal-production tool that notifies one user's iPhone when Codex finishes, needs attention, leaves final tests failing, has a preview ready, or approaches a usage allowance. This repository is building toward a personal release candidate; it is not a declared stable v1.0 release.
 
-The repository currently contains only the foundation and two integration spikes. Gate 0 validates standards-based iPhone Web Push from a stable, private Tailscale Serve HTTPS origin. Gate 1 validates reading the signed-in Codex account's rate-limit windows through the official Codex App Server protocol. Building the Angular/Ionic app or the production Rust desktop process before these risks are proven would hide the questions the gates need to answer.
+Gate 0 preserves the proven standards-based iPhone Web Push path from a stable private Tailscale Serve origin. Gate 1 preserves the proven signed-in Codex allowance path through the official App Server protocol. The production Angular/Ionic PWA and Rust/SQLite process now build on that evidence without replacing either spike.
 
 ## Current status
 
@@ -11,6 +11,7 @@ The repository currently contains only the foundation and two integration spikes
 | Phase 0 | COMPLETE | Product, architecture, quality, and security foundations are in place. |
 | Gate 0 | PASS | A physical iPhone received the Lock Screen push from the stable private origin before and after a Rust restart without reinstalling or resubscribing. |
 | Gate 1 | PASS | The real signed-in ChatGPT account returned sanitized allowance windows through Codex App Server. |
+| Phase 1 | COMPLETE | The generated-contract Angular/Ionic PWA is embedded in a loopback-only Rust/SQLite process with REST, SSE, PWA caching, browser E2E coverage, and release builds. |
 
 ## Constraints
 
@@ -22,6 +23,19 @@ Run all local checks:
 
 ```powershell
 .\scripts\check.ps1
+```
+
+Generate the API contract and start the production shell on a development port:
+
+```powershell
+pnpm run generate:contracts
+.\scripts\dev.ps1
+```
+
+Run the production browser suite after building the release executable:
+
+```powershell
+pnpm run e2e
 ```
 
 Start the Gate 0 server and private Tailscale Serve origin:
@@ -40,4 +54,4 @@ Gate 0 passed on 2026-09-02 after the human observed delivery on the physical iP
 
 The first Gate 0 start may open Tailscale's official consent page. Approve Serve/HTTPS once, then run the start command again. This does not enable Funnel.
 
-See [PRODUCT.md](PRODUCT.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and the two files under [docs/validation](docs/validation) for durable decisions and evidence.
+See [PRODUCT.md](PRODUCT.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/execution](docs/execution), and [docs/validation](docs/validation) for durable decisions, execution evidence, and manual acceptance boundaries.

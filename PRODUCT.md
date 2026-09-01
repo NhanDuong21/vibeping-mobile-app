@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-The V1 mobile client is a Home Screen PWA built later with Angular 22, Ionic Angular 9, Tailwind CSS, Angular Signals, RxJS, and IndexedDB as a cache only. The Windows source-of-truth process is a Rust 1.98 modular monolith backed by SQLite. This phase deliberately uses isolated Rust and vanilla-PWA spikes instead of scaffolding either final application.
+The V1 mobile client is a Home Screen PWA built with Angular 22, Ionic Angular 9, Tailwind CSS, Angular Signals, and RxJS; IndexedDB is introduced only as a replaceable cache. The Windows source-of-truth process is a Rust 1.98 modular monolith backed by SQLite. The production applications build on the preserved Gate 0 and Gate 1 spikes, which remain regression evidence for the two riskiest integrations.
 
 ## Audience and operating context
 

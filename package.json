@@ -1,22 +1,39 @@
 {
-  "name": "vibeping-validation-gates",
-  "version": "0.0.0",
+  "name": "vibeping-workspace",
+  "version": "1.0.0-rc.1",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.15.1",
   "scripts": {
-    "build": "pnpm run build:gate0",
+    "build": "pnpm run build:mobile",
+    "build:mobile": "pnpm --filter vibeping-mobile build",
     "build:gate0": "tailwindcss -i ./spikes/tailscale-web-push/web/tailwind.input.css -o ./spikes/tailscale-web-push/web/generated/app.css --minify",
     "check:js": "node --check ./spikes/tailscale-web-push/web/app.js && node --check ./spikes/tailscale-web-push/web/sw.js && node --check ./spikes/tailscale-web-push/web/readiness.js && node --check ./spikes/tailscale-web-push/web/push-helpers.js",
     "check:pwa": "node ./spikes/tailscale-web-push/tests/verify-pwa.mjs",
-    "test": "node --test ./spikes/tailscale-web-push/tests/*.test.mjs"
+    "e2e": "playwright test",
+    "test": "pnpm run test:gate0 && pnpm run test:mobile",
+    "test:gate0": "node --test ./spikes/tailscale-web-push/tests/*.test.mjs",
+    "test:mobile": "pnpm --filter vibeping-mobile test",
+    "lint": "pnpm --filter vibeping-mobile lint",
+    "typecheck": "pnpm --filter vibeping-mobile typecheck",
+    "generate:contracts": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./contracts/scripts/generate.ps1",
+    "check:contracts": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./contracts/scripts/check-fresh.ps1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.62.1",
     "@tailwindcss/cli": "4.3.3",
     "css-select": "7.0.0",
     "css-tree": "3.2.1",
     "domutils": "4.0.2",
     "htmlparser2": "12.0.0",
-    "tailwindcss": "4.3.3"
+    "openapi-typescript": "7.13.0",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

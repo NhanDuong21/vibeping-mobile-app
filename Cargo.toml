@@ -1,5 +1,6 @@
 [workspace]
 members = [
+  "apps/desktop",
   "spikes/tailscale-web-push",
   "spikes/codex-rate-limits",
 ]

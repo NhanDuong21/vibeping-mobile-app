@@ -5,7 +5,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$extensions = @('.rs', '.ts', '.js', '.mjs', '.html', '.css', '.ps1')
+$extensions = @('.rs', '.ts', '.js', '.mjs', '.html', '.css', '.scss', '.ps1')
 $forbiddenNames = @('utils.ts', 'utils.rs', 'helpers.ts', 'helpers.rs', 'common.service.ts')
 $excludedSegments = @('.git', '.agents', 'target', 'node_modules', 'generated', 'dist')
 $failures = [System.Collections.Generic.List[string]]::new()
@@ -75,6 +75,10 @@ foreach ($file in $files) {
         $failures.Add("Forbidden catch-all filename: $relative")
     }
 
+    if ($relative -match '^apps/mobile/src/app/.+\.(css|scss)$') {
+        $failures.Add("Component stylesheet is forbidden; use Tailwind utilities: $relative")
+    }
+
     $lines = @(Get-Content -LiteralPath $file.FullName)
     $lineCount = $lines.Count
     if ($file.Name -eq 'main.rs') {
@@ -87,6 +91,15 @@ foreach ($file in $files) {
         $failures.Add("Source file exceeds 500 lines ($lineCount): $relative")
     } elseif ($lineCount -gt 350) {
         $warnings.Add("Source file exceeds 350 lines ($lineCount): $relative")
+    }
+
+    $content = $lines -join "`n"
+    if ($relative -match '^apps/mobile/src/app/features/.+/ui/.+\.ts$' -and
+        $content -match 'HttpClient|indexedDB|EventSource|PushManager') {
+        $failures.Add("Angular UI component owns integration logic: $relative")
+    }
+    if ($relative -match '^apps/desktop/' -and $content -match '0\.0\.0\.0') {
+        $failures.Add("Production desktop source contains a non-loopback bind: $relative")
     }
 }
 
