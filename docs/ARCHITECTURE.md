@@ -55,7 +55,9 @@ A domain event creates a durable outbox record in the same transaction as its so
 
 ### Codex allowance
 
-The Rust adapter spawns `codex app-server`, completes `initialize`/`initialized`, reads `account/read`, calls `account/rateLimits/read`, and normalizes every returned primary/secondary window. Notifications such as `account/rateLimits/updated` will feed the same normalization path later. No Codex thread or turn is needed.
+The supervised Rust adapter spawns the persisted compatible Codex executable as `app-server`, completes `initialize`/`initialized`, verifies supported account state through `account/read`, and calls `account/rateLimits/read`. It retains a long-lived JSONL session, reacts to `account/rateLimits/updated`, refreshes after relevant Codex completion, accepts serialized manual refresh, polls every ten minutes, and restarts an unexpectedly exited child with bounded backoff. No Codex thread or turn is needed.
+
+Normalization accepts any available primary/secondary windows, hashes internal bucket identifiers, clamps remaining percentage, derives safe Vietnamese duration labels when a returned name is unsafe, and never estimates prompts remaining. SQLite keeps the last successful projection through reader failures. Low, critical, and exhausted transitions are recorded at most once per window/reset cycle; each transaction writes the alert state, activity, and eligible push jobs together.
 
 ### Codex attention
 

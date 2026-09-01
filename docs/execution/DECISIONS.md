@@ -43,3 +43,9 @@ Gate 0 migration is deliberately copy-only. Production creates a timestamped bac
 Completion comes from the documented user-level `notify` array. Current work, permission attention, final test state, and reliable preview evidence come from documented lifecycle hooks. VibePing merges only its owned user-level handlers, forwards a pre-existing notifier, leaves project/plugin hooks such as Impeccable untouched, and requires the normal `/hooks` review. It never passes the trust-bypass flag.
 
 Hook payloads are normalized before they reach IPC. The durable schema contains hashed session/turn keys, the sanitized project leaf, a closed signal, and time only. Transcript files are never opened and raw prompt/tool content is never stored. Post-tool test classification is advisory turn state: an intermediate failure never notifies; only an unresolved failure at Stop/completion becomes an attention event.
+
+## 2026-09-02 — Supervised allowance through the official App Server
+
+Production ports Gate 1's documented `initialize`, `initialized`, `account/read`, and `account/rateLimits/read` flow into one long-lived supervised child. Update notifications, completion refresh, serialized manual refresh, and a ten-minute fallback poll share one reader. Unexpected exits use 1/5/20/60-second bounded backoff; stale last-good data remains visible and activity/push ingestion continues independently.
+
+Internal limit IDs are SHA-256 keys only. A returned human label is accepted only when bounded and free of identifier/credential patterns; otherwise the duration supplies the Vietnamese label. Alert state is keyed by hashed window plus reset timestamp, so low, critical, and exhausted advance once per cycle without altering the real account for tests.

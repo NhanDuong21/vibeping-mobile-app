@@ -66,6 +66,32 @@
       }
     </section>
 
+    <section class="mt-11" aria-labelledby="allowance-heading">
+      <div class="flex items-end justify-between gap-4 border-b border-vibe-rule pb-3 dark:border-vibe-rule-dark">
+        <h2 id="allowance-heading" class="text-lg font-bold tracking-[-0.02em]">Hạn mức Codex</h2>
+        <a routerLink="/usage-limits" class="min-h-11 content-center text-sm font-bold text-vibe-green dark:text-vibe-mint">
+          Xem chi tiết
+        </a>
+      </div>
+      @if (usage.summary().length) {
+        <div class="grid grid-cols-2 gap-4 py-5">
+          @for (window of usage.summary(); track window.windowKey) {
+            <div class="min-w-0">
+              <p class="truncate text-sm font-semibold text-vibe-muted dark:text-vibe-sage">{{ window.label }}</p>
+              <p class="mt-1 text-2xl font-black tabular-nums">{{ usage.percentLabel(window) }}</p>
+              <p class="mt-1 text-xs font-semibold">{{ usage.statusLabel(window) }}</p>
+            </div>
+          }
+        </div>
+      } @else if (usage.state() === 'unavailable') {
+        <p class="py-5 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
+          Chưa đọc được hạn mức Codex. Báo công việc vẫn hoạt động bình thường.
+        </p>
+      } @else {
+        <p class="py-5 text-sm text-vibe-muted dark:text-vibe-sage">Đang đọc các chu kỳ hiện có.</p>
+      }
+    </section>
+
     <section class="mt-12" aria-labelledby="recent-heading">
       <div class="flex items-end justify-between gap-4 border-b border-vibe-rule pb-3 dark:border-vibe-rule-dark">
         <h2 id="recent-heading" class="text-lg font-bold tracking-[-0.02em]">Hoạt động gần đây</h2>

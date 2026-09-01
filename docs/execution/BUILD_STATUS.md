@@ -5,7 +5,7 @@
 - **Stable private origin:** discovered at runtime; intentionally not repeated in tracked documentation
 - **Gate 0:** PASS and still running on `127.0.0.1:8787` during early development
 - **Gate 1:** PASS
-- **Current phase:** Phase 5 ready to begin
+- **Current phase:** Phase 6 ready to begin
 - **Overall state:** IN_PROGRESS
 
 ## Phase ledger
@@ -15,8 +15,8 @@
 | 1 | COMPLETE | `8a4c1d2eed7b9c8a5e9ae023d8b9d667155b641a` | Angular/Ionic/Tailwind PWA; generated OpenAPI/TypeScript contract; loopback-only Rust/SQLite host; REST bootstrap/health, SSE, SPA fallback, embedded assets, PWA/offline shell, CI and architecture gates | `scripts/check.ps1`: contract freshness, Angular lint/typecheck/build, 3 unit tests, 6 Gate 0 JS tests, full Rust fmt/clippy/tests, production release builds, 6 Playwright light/dark E2E tests, architecture and hygiene | Live in-app browser at mobile widths; final 390 px screenshot; no overflow, failed initial requests, console warnings, or errors; deep-link refresh and offline shell confirmed | Physical iPhone work is outside this phase and remains pending |
 | 2 | COMPLETE | `05dbb235af2bad0323a9182b6fbd38eec9a982a9` | Public start/run/stop/restart/status/doctor/open commands; no-window background launch; single-instance lock; durable intent; private token control; stale-state and crash recovery; local SQLite/log/spool paths; Tailscale/Serve/Funnel doctor; PS 5.1 wrapper | 9 lifecycle/database unit tests, lifecycle CLI integration (double start/stop, restart-from-stopped, forced crash, stale recovery, path with spaces), 2 walking-skeleton integration tests, clippy `-D warnings`, release build, architecture and hygiene | Real release executable exercised on port 8790 with actual Tailscale state; PID changed after restart; graceful stop removed runtime metadata and listener; wrapper executed under Windows PowerShell 5.1 | Gate 0 remains the live Serve target until the reversible Phase 10 cutover |
 | 3 | COMPLETE | `38aca8cd2f46b93494a33c9a0137a76a50c6ecf7` | One-time hashed owner pairing bound to Tailscale Serve identity; install and permission onboarding; persistent VAPID identity; non-destructive Gate 0 backup/import; subscription lifecycle; transactional push outbox with delayed tests, bounded retries/TTL and stale handling; Angular notification click routing | 18 production Rust unit tests, lifecycle/API integration, generated-contract freshness, Angular lint/typecheck/build, 3 Angular unit tests, 16 light/dark Playwright tests, architecture and hygiene | Onboarding states exercised in mobile browser automation; Gate 0 remains live and Funnel remains off | Physical iPhone delivery against the production process remains pending until the Phase 10 cutover |
-| 4 | COMPLETE | Pending next checkpoint | Safe Codex executable selection; idempotent notify/hook merge with backup, coexistence and removal; privacy-normalized loopback IPC and crash spool; persisted turn/activity state; deduplicated push jobs; SSE and current-work activity UI | 24 Rust unit tests including classifier, state, dedupe, IPC, spool and installer merge; generated contract; Angular lint/typecheck/build and 4 unit tests; isolated install/status/repair/remove exercise | `/hooks` review remains a required morning action; real hook delivery is not claimed before trust | Physical iPhone display remains pending until Phase 10 cutover |
-| 5 | PENDING | — | — | — | — | — |
+| 4 | COMPLETE | `4d57124c65b852f07b352dbe40b7639ecbe2627b` | Safe Codex executable selection; idempotent notify/hook merge with backup, coexistence and removal; privacy-normalized loopback IPC and crash spool; persisted turn/activity state; deduplicated push jobs; SSE and current-work activity UI | 24 Rust unit tests including classifier, state, dedupe, IPC, spool and installer merge; generated contract; Angular lint/typecheck/build and 4 unit tests; isolated install/status/repair/remove exercise | `/hooks` review remains a required morning action; real hook delivery is not claimed before trust | Physical iPhone display remains pending until Phase 10 cutover |
+| 5 | COMPLETE | Pending next checkpoint | Supervised official App Server session; supported account classification; dynamic primary/secondary normalization; update/completion/manual/poll refresh; persistence and stale fallback; per-cycle low/critical/exhausted events and push jobs; REST/SSE; allowance summary/detail UI | 35 Rust tests total including allowance/account/protocol/restart/concurrency/alert and owner-boundary tests; 6 Angular tests; generated-contract freshness; lint/typecheck/build; 20 light/dark Playwright tests | Real signed-in account returned three normalized windows; ignored SQLite scan contained no email/token pattern; Impeccable Shape/Implement/Critique/Harden/Adapt applied | Physical iPhone display and low-alert simulation remain pending until final acceptance |
 | 6 | PENDING | — | — | — | — | — |
 | 7 | PENDING | — | — | — | — | — |
 | 8 | PENDING | — | — | — | — | — |
@@ -25,11 +25,11 @@
 
 ## Next phase
 
-Begin Phase 5 allowance ingestion and presentation through the already-proven official App Server path without changing the live Serve mapping.
+Begin Phase 6 durable activity reconciliation and offline mobile experience without changing the live Serve mapping.
 
 ## Exact resume point
 
-After committing Phase 4, finalize its hash in this ledger. Then port the Gate 1 allowance adapter, dynamic windows, SSE reconciliation, safe simulation, and deduplicated stage events while leaving Gate 0 live.
+After committing Phase 5, finalize its hash in this ledger. Then add activity pagination/detail/read state, IndexedDB projections, offline/stale reconciliation, navigation, and safe service-worker update handling while leaving Gate 0 live.
 
 ## Commit-record convention
 

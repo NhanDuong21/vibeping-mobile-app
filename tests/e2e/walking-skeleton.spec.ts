@@ -10,7 +10,11 @@ test.describe('production walking skeleton', () => {
       if (message.type() === 'error') errors.push(message.text());
     });
     const failedRequests: string[] = [];
-    page.on('requestfailed', (request) => failedRequests.push(request.url()));
+    page.on('requestfailed', (request) => {
+      if (!request.failure()?.errorText.includes('ERR_ABORTED')) {
+        failedRequests.push(request.url());
+      }
+    });
     page.on('response', (response) => {
       if (response.status() >= 400) failedRequests.push(response.url());
     });
@@ -24,10 +28,14 @@ test.describe('production walking skeleton', () => {
       { width: 430, height: 932 },
     ]) {
       await page.setViewportSize(viewport);
+      const activity = page.waitForResponse('**/api/v1/activity');
+      const allowance = page.waitForResponse('**/api/v1/usage-limits');
       await page.goto(`/activity?viewport=${viewport.width}`);
       await expect(
         page.getByRole('heading', { name: 'Bạn có thể rời laptop' }),
       ).toBeVisible();
+      expect((await activity).ok()).toBe(true);
+      expect((await allowance).ok()).toBe(true);
       const widths = await page.evaluate(() => ({
         client: document.documentElement.clientWidth,
         scroll: document.documentElement.scrollWidth,
@@ -121,5 +129,66 @@ test.describe('production walking skeleton', () => {
     await expect(page.getByRole('heading', { name: 'Codex đang làm việc' })).toBeVisible();
     await expect(page.getByText('Cần xác nhận')).toBeVisible();
     await expect(page.getByText('Mở laptop để xem và quyết định.')).toBeVisible();
+  });
+
+  test('shows dynamic allowance windows and supports an explicit refresh', async ({
+    page,
+  }) => {
+    const snapshot = {
+      state: 'available',
+      readAt: '2026-09-02T00:00:00Z',
+      windows: [
+        {
+          windowKey: 'hashed-window',
+          label: 'Lượt dùng 5 giờ',
+          windowKind: 'primary',
+          remainingPercent: 19,
+          durationMinutes: 300,
+          resetsAt: 2_000_000_000,
+          reached: false,
+        },
+        {
+          windowKey: 'hashed-week',
+          label: 'Hạn mức tuần',
+          windowKind: 'secondary',
+          remainingPercent: 62,
+          durationMinutes: 10_080,
+          resetsAt: 2_000_100_000,
+          reached: false,
+        },
+      ],
+      cursor: '1',
+    };
+    await page.route(/\/api\/v1\/usage-limits$/, (route) =>
+      route.fulfill({ contentType: 'application/json', body: JSON.stringify(snapshot) }),
+    );
+    await page.route('**/api/v1/pairing/status', (route) =>
+      route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({
+          state: 'paired', ownerMatch: true, privateIdentityReady: true,
+          codeExpiresAt: null, csrfToken: 'test-csrf',
+        }),
+      }),
+    );
+    await page.route(/\/api\/v1\/usage-limits\/refresh$/, (route) => {
+      return route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify(snapshot),
+      });
+    });
+
+    await page.goto('/usage-limits');
+    await expect(page.getByRole('heading', { name: 'Các chu kỳ đang dùng' })).toBeVisible();
+    await expect(page.getByRole('progressbar', { name: 'Lượt dùng 5 giờ' })).toHaveAttribute(
+      'aria-valuenow',
+      '19',
+    );
+    await expect(page.getByText('Sắp thấp')).toBeVisible();
+    const refreshRequest = page.waitForRequest('**/api/v1/usage-limits/refresh');
+    await page.getByRole('button', { name: 'Cập nhật' }).click();
+    await refreshRequest;
+    await expect(page.getByRole('button', { name: 'Cập nhật' })).toBeEnabled();
+    await expect(page.getByText(/prompt còn dùng được/)).toBeVisible();
   });
 });

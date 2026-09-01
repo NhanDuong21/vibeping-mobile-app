@@ -7,6 +7,7 @@ mod model;
 mod store;
 
 pub use classifier::normalize;
+pub(crate) use installer::runtime_executable;
 pub use model::{ActivityEvent, ActivitySnapshot, CodexIngress, CodexSignal, CurrentWork};
 pub use store::ActivityStore;
 

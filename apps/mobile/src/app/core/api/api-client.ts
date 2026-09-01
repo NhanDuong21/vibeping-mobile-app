@@ -14,6 +14,7 @@ export type SubscriptionResponseDto =
   components['schemas']['SubscriptionResponse'];
 export type TestPushResponseDto = components['schemas']['TestPushResponse'];
 export type ActivitySnapshotDto = components['schemas']['ActivitySnapshot'];
+export type UsageLimitsSnapshotDto = components['schemas']['UsageLimitsSnapshot'];
 
 @Injectable({ providedIn: 'root' })
 export class ApiClient {
@@ -25,6 +26,18 @@ export class ApiClient {
 
   activity(): Observable<ActivitySnapshotDto> {
     return this.#http.get<ActivitySnapshotDto>('/api/v1/activity');
+  }
+
+  usageLimits(): Observable<UsageLimitsSnapshotDto> {
+    return this.#http.get<UsageLimitsSnapshotDto>('/api/v1/usage-limits');
+  }
+
+  refreshUsageLimits(csrfToken: string): Observable<UsageLimitsSnapshotDto> {
+    return this.#http.post<UsageLimitsSnapshotDto>(
+      '/api/v1/usage-limits/refresh',
+      null,
+      mutationOptions(csrfToken),
+    );
   }
 
   pairingStatus(): Observable<PairingStatusDto> {

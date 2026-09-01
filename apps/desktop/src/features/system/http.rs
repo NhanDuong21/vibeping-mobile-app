@@ -52,12 +52,16 @@ pub async fn stream(
     State(state): State<Arc<ApplicationState>>,
 ) -> Sse<impl futures_core::Stream<Item = Result<Event, Infallible>>> {
     let mut activity = state.activity_events.subscribe();
+    let mut usage = state.usage_events.subscribe();
     let events = async_stream::stream! {
         yield Ok(Event::default().event("connected").data("{\"type\":\"system.connected\"}"));
         loop {
             tokio::select! {
                 result = activity.recv() => if let Ok(data) = result {
                     yield Ok(Event::default().event("activity").data(data));
+                },
+                result = usage.recv() => if let Ok(data) = result {
+                    yield Ok(Event::default().event("allowance").data(data));
                 },
                 _ = tokio::time::sleep(Duration::from_secs(15)) => {
                     yield Ok(Event::default().event("heartbeat").data("{\"type\":\"system.heartbeat\"}"));

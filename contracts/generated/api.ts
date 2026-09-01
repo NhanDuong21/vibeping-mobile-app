@@ -164,6 +164,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/usage-limits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_limits"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/usage-limits/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["refresh_limits"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -258,6 +290,25 @@ export interface components {
             queued: number;
             sendAfter: string;
             state: string;
+        };
+        UsageLimitWindow: {
+            /** Format: int64 */
+            durationMinutes: number;
+            label: string;
+            reached: boolean;
+            /** Format: double */
+            remainingPercent: number;
+            /** Format: int64 */
+            resetsAt: number;
+            windowKey: string;
+            windowKind: string;
+        };
+        UsageLimitsSnapshot: {
+            cursor: string;
+            /** Format: date-time */
+            readAt?: string | null;
+            state: string;
+            windows: components["schemas"]["UsageLimitWindow"][];
         };
     };
     responses: never;
@@ -536,6 +587,53 @@ export interface operations {
                 content: {
                     "text/event-stream": unknown;
                 };
+            };
+        };
+    };
+    get_limits: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Latest normalized Codex allowance */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageLimitsSnapshot"];
+                };
+            };
+        };
+    };
+    refresh_limits: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Refreshed Codex allowance */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageLimitsSnapshot"];
+                };
+            };
+            /** @description Codex allowance reader unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

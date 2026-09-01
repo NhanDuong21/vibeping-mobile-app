@@ -18,6 +18,7 @@ use crate::features::{
         dto::{BootstrapResponse, ConnectionSnapshot, ErrorEnvelope, HealthResponse},
         http,
     },
+    usage_limits::{UsageLimitWindow, UsageLimitsSnapshot, http as usage_limits_http},
 };
 
 #[derive(OpenApi)]
@@ -28,6 +29,8 @@ use crate::features::{
         http::bootstrap,
         http::stream,
         activity_http::activity,
+        usage_limits_http::get_limits,
+        usage_limits_http::refresh_limits,
         pairing_http::status,
         pairing_http::claim,
         notifications_http::public_key,
@@ -53,7 +56,9 @@ use crate::features::{
         ActionResponse,
         ActivityEvent,
         ActivitySnapshot,
-        CurrentWork
+        CurrentWork,
+        UsageLimitWindow,
+        UsageLimitsSnapshot
     ))
 )]
 pub struct ApiDoc;

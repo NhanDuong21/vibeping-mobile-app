@@ -143,6 +143,16 @@ struct CodexExecutable {
     source: String,
 }
 
+pub(crate) fn runtime_executable() -> Result<PathBuf> {
+    let paths = local_paths()?;
+    if let Some(state) = read_state(&paths)?
+        && probe(&state.codex_path, &["app-server", "--help"]).is_ok()
+    {
+        return Ok(state.codex_path);
+    }
+    Ok(resolve_codex(None)?.path)
+}
+
 fn resolve_codex(override_path: Option<PathBuf>) -> Result<CodexExecutable> {
     let candidates = match override_path {
         Some(path) => vec![(path, "chỉ định".to_string())],

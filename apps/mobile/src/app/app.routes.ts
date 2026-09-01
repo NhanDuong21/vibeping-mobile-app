@@ -21,6 +21,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'usage-limits',
+    loadComponent: () =>
+      import('./features/usage-limits/ui/usage-limits-page').then(
+        (module) => module.UsageLimitsPage,
+      ),
+  },
+  {
     path: 'settings/notifications',
     loadComponent: () =>
       import('./features/onboarding/ui/onboarding-page').then(
