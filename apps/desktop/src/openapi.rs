@@ -1,6 +1,7 @@
 use utoipa::OpenApi;
 
 use crate::features::{
+    codex_attention::{ActivityEvent, ActivitySnapshot, CurrentWork, http as activity_http},
     notifications::{
         dto::{
             ActionResponse, BrowserSubscription, PublicKeyResponse, SubscriptionKeys,
@@ -26,6 +27,7 @@ use crate::features::{
         http::health,
         http::bootstrap,
         http::stream,
+        activity_http::activity,
         pairing_http::status,
         pairing_http::claim,
         notifications_http::public_key,
@@ -48,7 +50,10 @@ use crate::features::{
         SubscriptionResponse,
         TestPushRequest,
         TestPushResponse,
-        ActionResponse
+        ActionResponse,
+        ActivityEvent,
+        ActivitySnapshot,
+        CurrentWork
     ))
 )]
 pub struct ApiDoc;

@@ -1,3 +1,4 @@
+pub mod codex_attention;
 pub mod lifecycle;
 pub mod notifications;
 pub mod pairing;

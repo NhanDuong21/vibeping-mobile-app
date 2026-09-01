@@ -12,12 +12,15 @@ Assets include activity history, Codex allowance state, SQLite data, VAPID priva
 - **Stolen subscription material:** it reveals a provider endpoint and encryption keys. Mitigation: never log/commit/export it, store locally, and invalidate on 404/410.
 - **VAPID key disclosure:** it would let an attacker impersonate this application server to its subscriptions. Mitigation: persist outside the repository, never print it, redact logs, and require explicit deletion.
 - **Codex credential disclosure:** reading auth files or copying tokens would expand trust. Mitigation: use App Server stdio only; never read credentials, cookies, email, or auth headers.
+- **Codex content disclosure:** hook payloads may contain prompts, tool arguments, tool output, transcript paths, and full working paths. Mitigation: classify bounded input in memory at the hook boundary; persist and spool only hashes, a project leaf name, closed signal types, and timestamps; never parse transcript files.
+- **Hook configuration takeover:** replacing user hooks or notify commands could break other integrations. Mitigation: timestamped local backups, formatting-preserving TOML merge, owned JSON hook entries, idempotent install/repair, previous-notify forwarding, and ownership-checked removal. Codex `/hooks` review remains mandatory.
+- **Local IPC forgery:** a local caller could attempt to inject attention events. Mitigation: ephemeral loopback-only control address, per-run random token, 64 KiB JSON bound, closed normalized schema, and no HTTP ingestion route. Same-user malware remains a residual local risk.
 - **Notification abuse:** repeated or deceptive pushes erode trust. Mitigation: stable tags, minimal payloads, deduplication/quiet policy later, explicit test action, and no claim of device display from provider acceptance.
 - **Log leakage:** errors may contain endpoints, keys, email, or paths. Mitigation: stable error codes, structured redaction, bounded stderr capture, and sanitized export only.
 
 ## Availability
 
-Laptop sleep, Tailscale disconnection, iPhone offline state, provider throttling, stale subscriptions, and Codex timeouts are expected failures. Retry is bounded and visible. No failure opens a public route or deletes durable identity automatically.
+Laptop sleep, Tailscale disconnection, iPhone offline state, provider throttling, stale subscriptions, Codex timeouts, and a crashed VibePing process are expected failures. Push retry and the sanitized Codex crash spool are bounded and visible. No failure opens a public route or deletes durable identity automatically.
 
 ## Residual risk
 

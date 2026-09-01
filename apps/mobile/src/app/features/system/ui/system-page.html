@@ -26,48 +26,82 @@
     </span>
   </header>
 
-  <main class="mx-auto w-full max-w-lg pt-12">
-    <section aria-labelledby="connection-heading" aria-live="polite">
-      <div class="mb-5 flex items-center gap-4">
-        <span
-          class="grid size-16 shrink-0 place-items-center rounded-full border border-vibe-rule bg-vibe-surface dark:border-vibe-rule-dark dark:bg-vibe-surface-dark"
-          aria-hidden="true"
+  <main class="mx-auto w-full max-w-lg pb-10 pt-10">
+    <section aria-labelledby="activity-heading" aria-live="polite">
+      <p class="text-sm font-bold uppercase tracking-[0.16em] text-vibe-green dark:text-vibe-mint">
+        Trạng thái Codex
+      </p>
+      <h1
+        id="activity-heading"
+        class="mt-3 text-balance text-[2rem] font-bold leading-[1.12] tracking-[-0.035em]"
+      >
+        {{ activity.headline() }}
+      </h1>
+
+      @if (activity.current(); as current) {
+        <div
+          class="mt-7 rounded-[22px] border border-vibe-rule bg-vibe-surface p-5 shadow-[0_18px_50px_rgba(16,37,28,0.06)] dark:border-vibe-rule-dark dark:bg-vibe-surface-dark"
         >
-          <span
-            class="size-5 rounded-full bg-vibe-mint shadow-[0_6px_20px_rgba(69,211,149,0.34)]"
-          ></span>
-        </span>
-        <div>
-          <h1
-            id="connection-heading"
-            class="text-balance text-2xl font-bold leading-tight tracking-[-0.025em]"
-          >
-            {{ connectivity.view().title }}
-          </h1>
-          <p class="mt-2 max-w-[32rem] text-base leading-6 text-vibe-muted dark:text-vibe-sage">
-            {{ connectivity.view().detail }}
-          </p>
-        </div>
-      </div>
-
-      <div class="mt-8 border-y border-vibe-rule py-5 dark:border-vibe-rule-dark">
-        <div class="flex items-start justify-between gap-6">
-          <div>
-            <h2 class="text-base font-semibold">Đường truyền trực tiếp</h2>
-            <p class="mt-1 text-sm leading-5 text-vibe-muted dark:text-vibe-sage">
-              Dữ liệu được giữ trên laptop và đi trong mạng riêng của bạn.
-            </p>
+          <div class="flex items-start gap-4">
+            <span
+              class="mt-1 grid size-10 shrink-0 place-items-center rounded-full bg-vibe-mint-soft dark:bg-vibe-mint/15"
+              aria-hidden="true"
+            >
+              <span class="size-3 rounded-full bg-vibe-mint"></span>
+            </span>
+            <div class="min-w-0">
+              <p class="truncate text-lg font-bold">{{ current.projectName }}</p>
+              <p class="mt-1 text-sm leading-5 text-vibe-muted dark:text-vibe-sage">
+                {{ current.state === 'waiting' ? 'Đang chờ bạn xác nhận trên laptop.' : 'Đang được xử lý trên laptop.' }}
+              </p>
+            </div>
           </div>
-          <span
-            class="mt-0.5 shrink-0 rounded-full bg-vibe-mint-soft px-3 py-1.5 text-xs font-bold text-vibe-green dark:bg-vibe-mint/15 dark:text-vibe-mint"
-          >
-            Riêng tư
-          </span>
         </div>
+      } @else if (activity.state() === 'ready') {
+        <p class="mt-4 max-w-md text-base leading-6 text-vibe-muted dark:text-vibe-sage">
+          Khi Codex bắt đầu công việc, trạng thái sẽ xuất hiện tại đây.
+        </p>
+      } @else if (activity.state() === 'unavailable') {
+        <p class="mt-4 text-base text-vibe-coral">Chưa đọc được hoạt động. VibePing sẽ thử lại khi có tín hiệu mới.</p>
+      }
+    </section>
+
+    <section class="mt-12" aria-labelledby="recent-heading">
+      <div class="flex items-end justify-between gap-4 border-b border-vibe-rule pb-3 dark:border-vibe-rule-dark">
+        <h2 id="recent-heading" class="text-lg font-bold tracking-[-0.02em]">Hoạt động gần đây</h2>
+        <span class="text-xs font-semibold text-vibe-muted dark:text-vibe-sage">Tối đa 50 mục</span>
       </div>
 
-      @if (connectivity.lastSync()) {
-        <p class="mt-5 text-sm text-vibe-muted dark:text-vibe-sage">Cập nhật vừa xong</p>
+      @if (activity.events().length) {
+        <ol class="divide-y divide-vibe-rule dark:divide-vibe-rule-dark">
+          @for (event of activity.events(); track event.id) {
+            <li class="grid grid-cols-[auto_1fr] gap-4 py-5">
+              <span
+                class="mt-1.5 size-2.5 rounded-full"
+                [class.bg-vibe-coral]="event.eventType === 'codex.test.failed'"
+                [class.bg-vibe-amber]="event.eventType === 'codex.attention.permission_required'"
+                [class.bg-vibe-mint]="event.eventType !== 'codex.test.failed' && event.eventType !== 'codex.attention.permission_required'"
+                aria-hidden="true"
+              ></span>
+              <div class="min-w-0">
+                <div class="flex items-baseline justify-between gap-4">
+                  <p class="font-bold">{{ activity.label(event) }}</p>
+                  <time class="shrink-0 text-xs text-vibe-muted dark:text-vibe-sage">
+                    {{ activity.time(event) }}
+                  </time>
+                </div>
+                <p class="mt-1 truncate text-sm font-semibold">{{ event.projectName }}</p>
+                <p class="mt-1 text-sm leading-5 text-vibe-muted dark:text-vibe-sage">
+                  {{ event.summary }}
+                </p>
+              </div>
+            </li>
+          }
+        </ol>
+      } @else if (activity.state() === 'ready') {
+        <p class="py-7 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
+          Chưa có hoạt động nào. VibePing chỉ lưu tín hiệu cần thiết, không lưu prompt hay đầu ra Codex.
+        </p>
       }
     </section>
   </main>

@@ -38,8 +38,8 @@ codex app-server → signed-in Codex services
 
 - **Mobile shell:** present Vietnamese operational state, request notification permission after a tap, cache recent reads, and reconnect.
 - **Application use cases:** derive events, attention severity, allowance state, retry policy, and API results.
-- **SQLite stores:** own bootstrap/runtime metadata, pairing sessions, owner/device state, push subscriptions, notification jobs, delivery attempts, and rate-limit windows through feature-owned stores. Later phases add activities and settings.
-- **Codex adapters:** Gate 1 proves dynamic allowance windows through App Server; production ingestion is added in its roadmap phase.
+- **SQLite stores:** own bootstrap/runtime metadata, pairing sessions, owner/device state, push subscriptions, activity events, Codex turn state, notification jobs, delivery attempts, and rate-limit windows through feature-owned stores. Later phases add settings.
+- **Codex adapters:** supported user-level notify and reviewed hooks normalize attention signals; Gate 1 separately proves dynamic allowance windows through App Server.
 - **Delivery adapters:** serve REST/SSE and encrypt Web Push without leaking provider details into domain code.
 - **Runtime host:** explicit start/run/stop/restart/status/doctor/open commands, single-instance file lock, durable user intent, token-authenticated control listener on a separate loopback-only ephemeral port, localhost API binding, Tailscale verification, rotating logs, crash-spool staging, and graceful shutdown.
 
@@ -56,6 +56,14 @@ A domain event creates a durable outbox record in the same transaction as its so
 ### Codex allowance
 
 The Rust adapter spawns `codex app-server`, completes `initialize`/`initialized`, reads `account/read`, calls `account/rateLimits/read`, and normalizes every returned primary/secondary window. Notifications such as `account/rateLimits/updated` will feed the same normalization path later. No Codex thread or turn is needed.
+
+### Codex attention
+
+The installer merges a user-level `notify` command and VibePing-owned `UserPromptSubmit`, `PermissionRequest`, selected `PostToolUse`, and `Stop` handlers while preserving other hook sources and the previous notifier. Codex requires the user to review their exact hashes through `/hooks`; VibePing does not bypass trust.
+
+The hook process classifies its bounded JSON input in memory and immediately discards raw prompts, tool inputs, tool outputs, transcript paths, and full working paths. Only hashed session/turn keys, the project directory name, a closed signal type, and a timestamp cross the token-authenticated loopback control channel. A transaction updates turn state, inserts one deduplicated activity, and creates one eligible push job per active owner subscription. SSE publishes the committed projection.
+
+When enabled VibePing is unexpectedly unavailable, the already-sanitized record enters a bounded atomic spool and drains exactly once on restart. Explicit Stop disables intent first, so later hook invocations exit successfully without creating a spool backlog.
 
 ## Storage model
 

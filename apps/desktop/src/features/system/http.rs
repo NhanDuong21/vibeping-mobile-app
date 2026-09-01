@@ -48,12 +48,21 @@ pub async fn bootstrap(State(state): State<Arc<ApplicationState>>) -> Json<Boots
     path = "/api/v1/stream",
     responses((status = 200, description = "Foreground live event stream", content_type = "text/event-stream"))
 )]
-pub async fn stream() -> Sse<impl futures_core::Stream<Item = Result<Event, Infallible>>> {
+pub async fn stream(
+    State(state): State<Arc<ApplicationState>>,
+) -> Sse<impl futures_core::Stream<Item = Result<Event, Infallible>>> {
+    let mut activity = state.activity_events.subscribe();
     let events = async_stream::stream! {
         yield Ok(Event::default().event("connected").data("{\"type\":\"system.connected\"}"));
         loop {
-            tokio::time::sleep(Duration::from_secs(15)).await;
-            yield Ok(Event::default().event("heartbeat").data("{\"type\":\"system.heartbeat\"}"));
+            tokio::select! {
+                result = activity.recv() => if let Ok(data) = result {
+                    yield Ok(Event::default().event("activity").data(data));
+                },
+                _ = tokio::time::sleep(Duration::from_secs(15)) => {
+                    yield Ok(Event::default().event("heartbeat").data("{\"type\":\"system.heartbeat\"}"));
+                }
+            }
         }
     };
     Sse::new(events)

@@ -3,6 +3,7 @@ use std::{path::PathBuf, sync::Mutex, time::Duration};
 use anyhow::{Context, Result, bail};
 use chrono::Utc;
 use clap::{Args, Subcommand};
+use tokio::sync::mpsc;
 use tokio::time::{Instant, sleep};
 use uuid::Uuid;
 
@@ -13,7 +14,7 @@ use crate::{
 };
 
 use super::{
-    DoctorReport, LifecycleStatus, RuntimePaths,
+    DoctorReport, LifecycleStatus, RuntimePaths, ingress,
     instance_lock::InstanceLock,
     ipc,
     model::RuntimeMetadata,
@@ -126,6 +127,8 @@ async fn run(options: HostOptions) -> Result<String> {
     init_logging(&paths)?;
     let _lock = InstanceLock::acquire(&paths.lock_file())?;
     let drained = paths.drain_spool()?;
+    let (ingress_sender, ingress_receiver) = mpsc::channel(256);
+    let restored = ingress::restore_pending(&paths, &ingress_sender).await?;
     let control = ipc::bind_control().await?;
     let metadata = RuntimeMetadata {
         process_id: std::process::id(),
@@ -135,12 +138,13 @@ async fn run(options: HostOptions) -> Result<String> {
         started_at: Utc::now(),
     };
     paths.write_metadata(&metadata)?;
-    tracing::info!(drained, "Đã kiểm tra hàng đợi khôi phục");
+    tracing::info!(drained, restored, "Đã kiểm tra hàng đợi khôi phục");
     let token = metadata.control_token.clone();
-    let result = app::run_with_shutdown(config, async move {
+    let control_ingress = ingress_sender.clone();
+    let result = app::run_with_shutdown(config, ingress_receiver, async move {
         tokio::select! {
             _ = tokio::signal::ctrl_c() => {},
-            _ = ipc::wait_for_shutdown(control, token) => {},
+            _ = ipc::wait_for_control(control, token, control_ingress) => {},
         }
     })
     .await;

@@ -11,6 +11,9 @@ use uuid::Uuid;
 
 use super::model::{RuntimeMetadata, UserIntent};
 
+const MAX_SPOOL_FILES: usize = 256;
+const MAX_SPOOL_BYTES: u64 = 16 * 1024 * 1024;
+
 #[derive(Clone, Debug)]
 pub struct RuntimePaths {
     data_dir: PathBuf,
@@ -82,6 +85,51 @@ impl RuntimePaths {
         )
     }
 
+    pub fn is_enabled(&self) -> bool {
+        read_json::<UserIntent>(&self.intent_file())
+            .ok()
+            .flatten()
+            .is_some_and(|intent| intent.enabled)
+    }
+
+    pub fn spool(&self, bytes: &[u8]) -> Result<()> {
+        self.ensure()?;
+        let incoming = self.spool_dir().join("incoming");
+        fs::create_dir_all(&incoming).context("Không mở được hàng đợi sự cố")?;
+        let (count, total) = spool_usage(&incoming)?;
+        if count >= MAX_SPOOL_FILES || total + bytes.len() as u64 > MAX_SPOOL_BYTES {
+            anyhow::bail!("Hàng đợi sự cố đã đầy")
+        }
+        let id = Uuid::new_v4().to_string();
+        let temporary = incoming.join(format!(".{id}.tmp"));
+        let target = incoming.join(format!("{id}.json"));
+        let mut file = File::create(&temporary).context("Không tạo được mục chờ")?;
+        file.write_all(bytes).context("Không lưu được mục chờ")?;
+        file.sync_all().context("Không hoàn tất được mục chờ")?;
+        fs::rename(temporary, target).context("Không chốt được mục chờ")
+    }
+
+    pub fn pending_files(&self) -> Result<Vec<PathBuf>> {
+        let pending = self.spool_dir().join("pending");
+        fs::create_dir_all(&pending).context("Không mở được hàng đợi khôi phục")?;
+        let mut files = fs::read_dir(pending)
+            .context("Không đọc được hàng đợi khôi phục")?
+            .filter_map(|entry| entry.ok().map(|value| value.path()))
+            .filter(|path| path.is_file())
+            .collect::<Vec<_>>();
+        files.sort();
+        Ok(files)
+    }
+
+    pub fn quarantine(&self, path: &Path) -> Result<()> {
+        let directory = self.spool_dir().join("quarantine");
+        fs::create_dir_all(&directory).context("Không mở được vùng cách ly")?;
+        let name = path
+            .file_name()
+            .unwrap_or_else(|| std::ffi::OsStr::new("event.json"));
+        fs::rename(path, directory.join(name)).context("Không cách ly được mục lỗi")
+    }
+
     pub fn open_log(&self) -> Result<File> {
         self.ensure()?;
         let current = self.logs_dir().join("vibeping.log");
@@ -115,6 +163,20 @@ impl RuntimePaths {
         }
         Ok(drained)
     }
+}
+
+fn spool_usage(directory: &Path) -> Result<(usize, u64)> {
+    let mut count = 0;
+    let mut total = 0;
+    for entry in fs::read_dir(directory).context("Không kiểm tra được hàng đợi sự cố")?
+    {
+        let entry = entry.context("Không đọc được mục chờ")?;
+        if entry.path().is_file() {
+            count += 1;
+            total += entry.metadata().map(|value| value.len()).unwrap_or(0);
+        }
+    }
+    Ok((count, total))
 }
 
 fn write_json(path: &Path, value: &impl Serialize) -> Result<()> {

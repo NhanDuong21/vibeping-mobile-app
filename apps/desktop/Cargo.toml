@@ -25,10 +25,11 @@ serde = { version = "=1.0.229", features = ["derive"] }
 serde_json = "=1.0.151"
 sha2 = "=0.11.0"
 sqlx = { version = "=0.9.0", default-features = false, features = ["chrono", "macros", "migrate", "runtime-tokio", "sqlite"] }
-tokio = { version = "=1.53.1", features = ["io-util", "macros", "net", "process", "rt-multi-thread", "signal", "time"] }
+tokio = { version = "=1.53.1", features = ["io-util", "macros", "net", "process", "rt-multi-thread", "signal", "sync", "time"] }
 tower-http = { version = "=0.7.1", features = ["catch-panic", "trace"] }
 tracing = "=0.1.44"
 tracing-subscriber = { version = "=0.3.23", features = ["env-filter"] }
+toml_edit = { version = "=0.24.1", features = ["parse", "serde"] }
 utoipa = { version = "=5.5.0", features = ["axum_extras", "chrono"] }
 uuid = { version = "=1.26.0", features = ["v4"] }
 web-push-native = "=0.5.0"

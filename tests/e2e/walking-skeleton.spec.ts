@@ -26,7 +26,7 @@ test.describe('production walking skeleton', () => {
       await page.setViewportSize(viewport);
       await page.goto(`/activity?viewport=${viewport.width}`);
       await expect(
-        page.getByRole('heading', { name: 'Đã kết nối với laptop' }),
+        page.getByRole('heading', { name: 'Bạn có thể rời laptop' }),
       ).toBeVisible();
       const widths = await page.evaluate(() => ({
         client: document.documentElement.clientWidth,
@@ -88,5 +88,38 @@ test.describe('production walking skeleton', () => {
     await expect(
       page.getByRole('heading', { name: 'Chưa kết nối được với laptop' }),
     ).toBeVisible();
+  });
+
+  test('shows current Codex work and privacy-safe recent activity', async ({
+    page,
+  }) => {
+    await page.route('**/api/v1/activity', (route) =>
+      route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({
+          currentWork: {
+            projectName: 'vibeping-mobile-app',
+            state: 'running',
+            startedAt: '2026-09-02T00:00:00Z',
+            updatedAt: '2026-09-02T00:01:00Z',
+          },
+          events: [
+            {
+              id: 'event-1',
+              eventType: 'codex.attention.permission_required',
+              title: 'Codex cần bạn xác nhận',
+              summary: 'Mở laptop để xem và quyết định.',
+              projectName: 'vibeping-mobile-app',
+              occurredAt: '2026-09-02T00:01:00Z',
+            },
+          ],
+          cursor: '1',
+        }),
+      }),
+    );
+    await page.goto('/activity');
+    await expect(page.getByRole('heading', { name: 'Codex đang làm việc' })).toBeVisible();
+    await expect(page.getByText('Cần xác nhận')).toBeVisible();
+    await expect(page.getByText('Mở laptop để xem và quyết định.')).toBeVisible();
   });
 });

@@ -14,6 +14,7 @@ Gate 0 preserves the proven standards-based iPhone Web Push path from a stable p
 | Phase 1 | COMPLETE | The generated-contract Angular/Ionic PWA is embedded in a loopback-only Rust/SQLite process with REST, SSE, PWA caching, browser E2E coverage, and release builds. |
 | Phase 2 | COMPLETE | Manual Windows lifecycle commands, single-instance control, graceful recovery, diagnostics, logs, and durable user intent are production-ready. |
 | Phase 3 | COMPLETE | Private owner pairing, PWA installation and permission onboarding, Gate 0 state import, persistent VAPID, subscriptions, and durable Web Push delivery are production-ready. |
+| Phase 4 | COMPLETE | Supported Codex notify/hooks feed a private durable activity stream, deduplicated attention events, SSE updates, and eligible push jobs without storing prompts or tool output. |
 
 ## Constraints
 
@@ -52,6 +53,17 @@ Control the production process explicitly (there is no auto-start):
 ```
 
 The same public commands are available directly on `vibeping.exe`. The first unpaired Start prints a short-lived one-time pairing code. Runtime data, the single-instance lock, user intent, private shutdown metadata, SQLite, rotating logs, and sender identity live under `%LOCALAPPDATA%\VibePing` unless `-DataDir`/`--data-dir` is supplied.
+
+Install, inspect, repair, or remove the Codex integration without replacing unrelated user hooks:
+
+```powershell
+vibeping integrations codex install
+vibeping integrations codex status
+vibeping integrations codex repair
+vibeping integrations codex remove
+```
+
+After install or repair, open Codex and run `/hooks` to review and trust the exact VibePing definitions. This human trust step is intentionally not bypassed.
 
 Production imports the known Gate 0 VAPID and phone-registration files once, after first copying them to a timestamped local backup. The original Gate 0 directory is never modified or deleted. The stable private origin stays on Gate 0 until the reversible Phase 10 cutover.
 

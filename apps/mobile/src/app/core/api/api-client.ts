@@ -13,6 +13,7 @@ export type SubscriptionRegistrationDto =
 export type SubscriptionResponseDto =
   components['schemas']['SubscriptionResponse'];
 export type TestPushResponseDto = components['schemas']['TestPushResponse'];
+export type ActivitySnapshotDto = components['schemas']['ActivitySnapshot'];
 
 @Injectable({ providedIn: 'root' })
 export class ApiClient {
@@ -20,6 +21,10 @@ export class ApiClient {
 
   bootstrap(): Observable<BootstrapDto> {
     return this.#http.get<BootstrapDto>('/api/v1/bootstrap');
+  }
+
+  activity(): Observable<ActivitySnapshotDto> {
+    return this.#http.get<ActivitySnapshotDto>('/api/v1/activity');
   }
 
   pairingStatus(): Observable<PairingStatusDto> {

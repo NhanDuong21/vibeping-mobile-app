@@ -10,6 +10,26 @@
     "version": "1.0.0-rc.1"
   },
   "paths": {
+    "/api/v1/activity": {
+      "get": {
+        "tags": [
+          "activity_http"
+        ],
+        "operationId": "activity",
+        "responses": {
+          "200": {
+            "description": "Current Codex work and recent activity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivitySnapshot"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/bootstrap": {
       "get": {
         "tags": [
@@ -265,6 +285,66 @@
           }
         }
       },
+      "ActivityEvent": {
+        "type": "object",
+        "required": [
+          "id",
+          "eventType",
+          "title",
+          "summary",
+          "projectName",
+          "occurredAt"
+        ],
+        "properties": {
+          "eventType": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "ActivitySnapshot": {
+        "type": "object",
+        "required": [
+          "events",
+          "cursor"
+        ],
+        "properties": {
+          "currentWork": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CurrentWork"
+              }
+            ]
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActivityEvent"
+            }
+          }
+        }
+      },
       "BootstrapResponse": {
         "type": "object",
         "required": [
@@ -316,6 +396,31 @@
           },
           "privateConnection": {
             "type": "string"
+          }
+        }
+      },
+      "CurrentWork": {
+        "type": "object",
+        "required": [
+          "projectName",
+          "state",
+          "startedAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "projectName": {
+            "type": "string"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "state": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },

@@ -4,6 +4,22 @@
  */
 
 export interface paths {
+    "/api/v1/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["activity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/bootstrap": {
         parameters: {
             query?: never;
@@ -155,6 +171,20 @@ export interface components {
         ActionResponse: {
             state: string;
         };
+        ActivityEvent: {
+            eventType: string;
+            id: string;
+            /** Format: date-time */
+            occurredAt: string;
+            projectName: string;
+            summary: string;
+            title: string;
+        };
+        ActivitySnapshot: {
+            currentWork?: null | components["schemas"]["CurrentWork"];
+            cursor: string;
+            events: components["schemas"]["ActivityEvent"][];
+        };
         BootstrapResponse: {
             connection: components["schemas"]["ConnectionSnapshot"];
             cursor: string;
@@ -169,6 +199,14 @@ export interface components {
             codex: string;
             desktop: string;
             privateConnection: string;
+        };
+        CurrentWork: {
+            projectName: string;
+            /** Format: date-time */
+            startedAt: string;
+            state: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         ErrorEnvelope: {
             code: string;
@@ -230,6 +268,26 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    activity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current Codex work and recent activity */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActivitySnapshot"];
+                };
+            };
+        };
+    };
     bootstrap: {
         parameters: {
             query?: never;

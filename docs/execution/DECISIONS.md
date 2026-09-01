@@ -37,3 +37,9 @@ Windows background creation uses `CreateProcessW` with handle inheritance disabl
 The first owner claim uses an eight-character, ten-minute, single-use code whose database representation is SHA-256 only. Tailscale identity headers are trusted only when Serve presents a `.ts.net` Host; direct localhost spoofing is rejected. Mutations require JSON, the matching private HTTPS Origin, and a per-run CSRF token. Before a claim, only subscription readiness and a rate-limited test are allowed.
 
 Gate 0 migration is deliberately copy-only. Production creates a timestamped backup, reuses the proven VAPID identity and subscription, leaves the original directory untouched, and attaches the imported unclaimed subscription only after pairing. Angular's service worker is the sole push/click handler; the wrapper worker only imports `ngsw-worker.js`, and push payloads use Angular's `navigateLastFocusedOrOpen` contract.
+
+## 2026-09-02 — Reviewed Codex hooks plus documented notify
+
+Completion comes from the documented user-level `notify` array. Current work, permission attention, final test state, and reliable preview evidence come from documented lifecycle hooks. VibePing merges only its owned user-level handlers, forwards a pre-existing notifier, leaves project/plugin hooks such as Impeccable untouched, and requires the normal `/hooks` review. It never passes the trust-bypass flag.
+
+Hook payloads are normalized before they reach IPC. The durable schema contains hashed session/turn keys, the sanitized project leaf, a closed signal, and time only. Transcript files are never opened and raw prompt/tool content is never stored. Post-tool test classification is advisory turn state: an intermediate failure never notifies; only an unresolved failure at Stop/completion becomes an attention event.
