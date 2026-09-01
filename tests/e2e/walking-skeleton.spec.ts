@@ -24,7 +24,7 @@ test.describe('production walking skeleton', () => {
       { width: 430, height: 932 },
     ]) {
       await page.setViewportSize(viewport);
-      await page.goto(`/?viewport=${viewport.width}`);
+      await page.goto(`/activity?viewport=${viewport.width}`);
       await expect(
         page.getByRole('heading', { name: 'Đã kết nối với laptop' }),
       ).toBeVisible();
@@ -42,11 +42,13 @@ test.describe('production walking skeleton', () => {
   });
 
   test('refreshes a deep link and serves root-relative assets', async ({ page }) => {
-    await page.goto('/status/refresh-check');
+    await page.goto('/settings/notifications');
     await expect(
-      page.getByRole('heading', { name: 'Đã kết nối với laptop' }),
+      page.getByRole('heading', {
+        name: 'Tín hiệu từ Codex, gửi thẳng đến điện thoại.',
+      }),
     ).toBeVisible();
-    await expect(page).toHaveURL(/\/$/);
+    await expect(page).toHaveURL(/\/settings\/notifications$/);
     const assetPaths = await page
       .locator('link[rel="stylesheet"], script[src]')
       .evaluateAll((elements) =>

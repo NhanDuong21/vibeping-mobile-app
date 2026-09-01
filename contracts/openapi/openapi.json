@@ -50,6 +50,191 @@
         }
       }
     },
+    "/api/v1/pairing/claim": {
+      "post": {
+        "tags": [
+          "pairing_http"
+        ],
+        "operationId": "claim",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PairingClaimRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Owner paired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PairingClaimResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pairing request"
+          },
+          "401": {
+            "description": "Private identity required"
+          },
+          "409": {
+            "description": "Pairing code unavailable"
+          },
+          "429": {
+            "description": "Pairing attempt limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/pairing/status": {
+      "get": {
+        "tags": [
+          "pairing_http"
+        ],
+        "operationId": "status",
+        "responses": {
+          "200": {
+            "description": "Private owner pairing status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PairingStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/push/public-key": {
+      "get": {
+        "tags": [
+          "notifications_http"
+        ],
+        "operationId": "public_key",
+        "responses": {
+          "200": {
+            "description": "Persistent browser push sender key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicKeyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/push/subscriptions": {
+      "post": {
+        "tags": [
+          "notifications_http"
+        ],
+        "operationId": "subscribe",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionRegistrationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Push subscription saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid subscription"
+          },
+          "401": {
+            "description": "Private identity required"
+          }
+        }
+      }
+    },
+    "/api/v1/push/subscriptions/{id}": {
+      "delete": {
+        "tags": [
+          "notifications_http"
+        ],
+        "operationId": "unsubscribe",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Subscription identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/push/test": {
+      "post": {
+        "tags": [
+          "notifications_http"
+        ],
+        "operationId": "test_push",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestPushRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Delayed test push queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestPushResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Phone is not ready"
+          },
+          "429": {
+            "description": "Test rate limited"
+          }
+        }
+      }
+    },
     "/api/v1/stream": {
       "get": {
         "tags": [
@@ -69,6 +254,17 @@
   },
   "components": {
     "schemas": {
+      "ActionResponse": {
+        "type": "object",
+        "required": [
+          "state"
+        ],
+        "properties": {
+          "state": {
+            "type": "string"
+          }
+        }
+      },
       "BootstrapResponse": {
         "type": "object",
         "required": [
@@ -85,6 +281,22 @@
           },
           "serverTime": {
             "type": "string"
+          }
+        }
+      },
+      "BrowserSubscription": {
+        "type": "object",
+        "required": [
+          "endpoint",
+          "keys"
+        ],
+        "properties": {
+          "endpoint": {
+            "type": "string"
+          },
+          "expirationTime": {},
+          "keys": {
+            "$ref": "#/components/schemas/SubscriptionKeys"
           }
         }
       },
@@ -137,6 +349,168 @@
             "type": "string"
           },
           "version": {
+            "type": "string"
+          }
+        }
+      },
+      "PairingClaimRequest": {
+        "type": "object",
+        "required": [
+          "code",
+          "installationId",
+          "displayMode",
+          "notificationPermission"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "displayMode": {
+            "type": "string"
+          },
+          "installationId": {
+            "type": "string"
+          },
+          "notificationPermission": {
+            "type": "string"
+          }
+        }
+      },
+      "PairingClaimResponse": {
+        "type": "object",
+        "required": [
+          "state",
+          "deviceId"
+        ],
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        }
+      },
+      "PairingStatusResponse": {
+        "type": "object",
+        "required": [
+          "state",
+          "ownerMatch",
+          "privateIdentityReady",
+          "csrfToken"
+        ],
+        "properties": {
+          "codeExpiresAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "csrfToken": {
+            "type": "string"
+          },
+          "ownerMatch": {
+            "type": "boolean"
+          },
+          "privateIdentityReady": {
+            "type": "boolean"
+          },
+          "state": {
+            "type": "string"
+          }
+        }
+      },
+      "PublicKeyResponse": {
+        "type": "object",
+        "required": [
+          "publicKey"
+        ],
+        "properties": {
+          "publicKey": {
+            "type": "string"
+          }
+        }
+      },
+      "SubscriptionKeys": {
+        "type": "object",
+        "required": [
+          "p256dh",
+          "auth"
+        ],
+        "properties": {
+          "auth": {
+            "type": "string"
+          },
+          "p256dh": {
+            "type": "string"
+          }
+        }
+      },
+      "SubscriptionRegistrationRequest": {
+        "type": "object",
+        "required": [
+          "installationId",
+          "displayMode",
+          "notificationPermission",
+          "subscription"
+        ],
+        "properties": {
+          "displayMode": {
+            "type": "string"
+          },
+          "installationId": {
+            "type": "string"
+          },
+          "notificationPermission": {
+            "type": "string"
+          },
+          "subscription": {
+            "$ref": "#/components/schemas/BrowserSubscription"
+          }
+        }
+      },
+      "SubscriptionResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "state"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        }
+      },
+      "TestPushRequest": {
+        "type": "object",
+        "required": [
+          "installationId"
+        ],
+        "properties": {
+          "installationId": {
+            "type": "string"
+          }
+        }
+      },
+      "TestPushResponse": {
+        "type": "object",
+        "required": [
+          "state",
+          "queued",
+          "sendAfter"
+        ],
+        "properties": {
+          "queued": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sendAfter": {
+            "type": "string"
+          },
+          "state": {
             "type": "string"
           }
         }

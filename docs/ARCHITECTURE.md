@@ -38,7 +38,7 @@ codex app-server → signed-in Codex services
 
 - **Mobile shell:** present Vietnamese operational state, request notification permission after a tap, cache recent reads, and reconnect.
 - **Application use cases:** derive events, attention severity, allowance state, retry policy, and API results.
-- **SQLite stores:** currently own bootstrap/runtime metadata; later phases add durable activities, device state, notification outbox, delivery attempts, and settings through feature-owned stores.
+- **SQLite stores:** own bootstrap/runtime metadata, pairing sessions, owner/device state, push subscriptions, notification jobs, delivery attempts, and rate-limit windows through feature-owned stores. Later phases add activities and settings.
 - **Codex adapters:** Gate 1 proves dynamic allowance windows through App Server; production ingestion is added in its roadmap phase.
 - **Delivery adapters:** serve REST/SSE and encrypt Web Push without leaking provider details into domain code.
 - **Runtime host:** explicit start/run/stop/restart/status/doctor/open commands, single-instance file lock, durable user intent, token-authenticated control listener on a separate loopback-only ephemeral port, localhost API binding, Tailscale verification, rotating logs, crash-spool staging, and graceful shutdown.
@@ -51,7 +51,7 @@ The PWA loads a REST snapshot from Windows, replaces stale IndexedDB cache entri
 
 ### Background notification
 
-A domain event creates a durable outbox record in the same transaction as its source state. A worker encrypts a minimal Vietnamese payload and sends Web Push. Success marks the attempt; retryable failures schedule backoff; 404/410 invalidates the device subscription and asks the user to enable notifications again. The outbox is introduced in the notification phase; Gate 0 validates encryption, identity persistence, and restart behavior only.
+A domain event creates a durable outbox record in the same transaction as its source state. A worker encrypts a minimal Vietnamese payload and sends Web Push. Phase 3 leases due rows, records every attempt, retries network/429/5xx outcomes at 5 seconds, 20 seconds, 1 minute, 5 minutes, and 15 minutes within a TTL, and disables subscriptions on 404/410. Provider acceptance is explicitly not proof that iPhone displayed the notification.
 
 ### Codex allowance
 
@@ -59,7 +59,9 @@ The Rust adapter spawns `codex app-server`, completes `initialize`/`initialized`
 
 ## Storage model
 
-SQLite on Windows is authoritative. IndexedDB stores only replaceable mobile projections plus sync metadata. VAPID private material and the push subscription are local encrypted-delivery state outside source control. Production secrets should use Windows file ACLs and, where justified, DPAPI; Gate 0 limits itself to a single-user local app-data directory.
+SQLite on Windows is authoritative. IndexedDB stores only replaceable mobile projections plus sync metadata. VAPID private material stays in the ignored production data directory and subscriptions remain in SQLite. A one-time importer backs up and copies only Gate 0's known VAPID/subscription files, leaves the source intact, and keeps the imported subscription unclaimed until owner pairing succeeds.
+
+Owner pairing requires a short-lived, single-use code stored only as a hash. The application accepts Tailscale identity headers only on the stable `.ts.net` host, requires same-origin JSON plus a per-run CSRF token for mutations, rejects direct spoofed localhost headers, and allows only subscription readiness and test-push behavior before the first claim.
 
 ## Production folder shape
 

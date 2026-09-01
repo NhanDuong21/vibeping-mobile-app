@@ -8,7 +8,7 @@ Assets include activity history, Codex allowance state, SQLite data, VAPID priva
 
 - **Public exposure:** Funnel, public tunnels, or non-loopback binding would expose the control surface. Mitigation: forbid Funnel, bind `127.0.0.1`, verify Serve, and preserve the private tailnet boundary.
 - **Malicious local process:** another Windows process under the user can call localhost, read weakly protected files, or tamper with runtime state. Mitigation: single-user app-data directory, strict file validation/size limits, no command-execution endpoints, future DPAPI/ACL review, and narrow API capabilities.
-- **Compromised tailnet peer:** a permitted peer can reach Serve. Mitigation: one personal tailnet/ACL scope, minimal data, request validation, no remote commands, and future application-level anti-CSRF/session design for mutations.
+- **Compromised tailnet peer:** a permitted peer can reach Serve. Mitigation: one personal tailnet/ACL scope, one owner claim bound to the trusted Tailscale Serve login header, same-origin JSON mutations, per-run CSRF tokens, rate limits, minimal data, and no remote commands.
 - **Stolen subscription material:** it reveals a provider endpoint and encryption keys. Mitigation: never log/commit/export it, store locally, and invalidate on 404/410.
 - **VAPID key disclosure:** it would let an attacker impersonate this application server to its subscriptions. Mitigation: persist outside the repository, never print it, redact logs, and require explicit deletion.
 - **Codex credential disclosure:** reading auth files or copying tokens would expand trust. Mitigation: use App Server stdio only; never read credentials, cookies, email, or auth headers.

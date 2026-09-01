@@ -6,7 +6,11 @@ use clap::{Args, Subcommand};
 use tokio::time::{Instant, sleep};
 use uuid::Uuid;
 
-use crate::{RuntimeConfig, app};
+use crate::{
+    RuntimeConfig, app,
+    features::pairing::{PairingStore, PairingUseCase},
+    infrastructure,
+};
 
 use super::{
     DoctorReport, LifecycleStatus, RuntimePaths,
@@ -81,10 +85,26 @@ async fn start_enabled(options: &HostOptions, paths: &RuntimePaths) -> Result<St
         LifecycleStatus::Stopped => {}
     }
     tailscale::require_private_serve()?;
+    let ready_message = prepare_pairing_message(paths).await?;
     process_support::spawn_background(options.port, paths)?;
     let metadata = wait_for_metadata(paths, Duration::from_secs(8)).await?;
     ipc::wait_until_ready(&metadata.api_address, Duration::from_secs(15)).await?;
-    Ok("VibePing đã sẵn sàng".into())
+    Ok(ready_message)
+}
+
+async fn prepare_pairing_message(paths: &RuntimePaths) -> Result<String> {
+    let database = infrastructure::database::connect(&paths.database_file()).await?;
+    let code = PairingUseCase::new(PairingStore::new(database.clone()))
+        .prepare_code()
+        .await?;
+    database.close().await;
+    Ok(match code {
+        Some(value) => format!(
+            "VibePing đã sẵn sàng\nMã ghép nối: {}\nMã hết hạn sau 10 phút.",
+            value.code
+        ),
+        None => "VibePing đã sẵn sàng".into(),
+    })
 }
 
 async fn clean_failed_start(paths: &RuntimePaths) {

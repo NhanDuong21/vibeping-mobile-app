@@ -12,6 +12,8 @@ Gate 0 preserves the proven standards-based iPhone Web Push path from a stable p
 | Gate 0 | PASS | A physical iPhone received the Lock Screen push from the stable private origin before and after a Rust restart without reinstalling or resubscribing. |
 | Gate 1 | PASS | The real signed-in ChatGPT account returned sanitized allowance windows through Codex App Server. |
 | Phase 1 | COMPLETE | The generated-contract Angular/Ionic PWA is embedded in a loopback-only Rust/SQLite process with REST, SSE, PWA caching, browser E2E coverage, and release builds. |
+| Phase 2 | COMPLETE | Manual Windows lifecycle commands, single-instance control, graceful recovery, diagnostics, logs, and durable user intent are production-ready. |
+| Phase 3 | COMPLETE | Private owner pairing, PWA installation and permission onboarding, Gate 0 state import, persistent VAPID, subscriptions, and durable Web Push delivery are production-ready. |
 
 ## Constraints
 
@@ -49,7 +51,9 @@ Control the production process explicitly (there is no auto-start):
 .\scripts\vibeping.ps1 stop
 ```
 
-The same public commands are available directly on `vibeping.exe`. Runtime data, the single-instance lock, user intent, private shutdown metadata, SQLite, and rotating logs live under `%LOCALAPPDATA%\VibePing` unless `-DataDir`/`--data-dir` is supplied.
+The same public commands are available directly on `vibeping.exe`. The first unpaired Start prints a short-lived one-time pairing code. Runtime data, the single-instance lock, user intent, private shutdown metadata, SQLite, rotating logs, and sender identity live under `%LOCALAPPDATA%\VibePing` unless `-DataDir`/`--data-dir` is supplied.
+
+Production imports the known Gate 0 VAPID and phone-registration files once, after first copying them to a timestamped local backup. The original Gate 0 directory is never modified or deleted. The stable private origin stays on Gate 0 until the reversible Phase 10 cutover.
 
 Start the Gate 0 server and private Tailscale Serve origin:
 
