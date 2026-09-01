@@ -1,0 +1,24 @@
+# Threat model
+
+## Assets
+
+Assets include activity history, Codex allowance state, SQLite data, VAPID private material, the phone subscription (endpoint and encryption keys), private tailnet hostname/configuration, sanitized logs, and the user's attention.
+
+## Boundaries and threats
+
+- **Public exposure:** Funnel, public tunnels, or non-loopback binding would expose the control surface. Mitigation: forbid Funnel, bind `127.0.0.1`, verify Serve, and preserve the private tailnet boundary.
+- **Malicious local process:** another Windows process under the user can call localhost, read weakly protected files, or tamper with runtime state. Mitigation: single-user app-data directory, strict file validation/size limits, no command-execution endpoints, future DPAPI/ACL review, and narrow API capabilities.
+- **Compromised tailnet peer:** a permitted peer can reach Serve. Mitigation: one personal tailnet/ACL scope, minimal data, request validation, no remote commands, and future application-level anti-CSRF/session design for mutations.
+- **Stolen subscription material:** it reveals a provider endpoint and encryption keys. Mitigation: never log/commit/export it, store locally, and invalidate on 404/410.
+- **VAPID key disclosure:** it would let an attacker impersonate this application server to its subscriptions. Mitigation: persist outside the repository, never print it, redact logs, and require explicit deletion.
+- **Codex credential disclosure:** reading auth files or copying tokens would expand trust. Mitigation: use App Server stdio only; never read credentials, cookies, email, or auth headers.
+- **Notification abuse:** repeated or deceptive pushes erode trust. Mitigation: stable tags, minimal payloads, deduplication/quiet policy later, explicit test action, and no claim of device display from provider acceptance.
+- **Log leakage:** errors may contain endpoints, keys, email, or paths. Mitigation: stable error codes, structured redaction, bounded stderr capture, and sanitized export only.
+
+## Availability
+
+Laptop sleep, Tailscale disconnection, iPhone offline state, provider throttling, stale subscriptions, and Codex timeouts are expected failures. Retry is bounded and visible. No failure opens a public route or deletes durable identity automatically.
+
+## Residual risk
+
+Gate 0 stores sensitive push state for one Windows user but is not the final secret-storage design. Physical access or same-user malware remains out of scope for complete prevention and must be revisited before V1 hardening.

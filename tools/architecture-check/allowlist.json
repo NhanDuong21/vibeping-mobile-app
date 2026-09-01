@@ -1,0 +1,7 @@
+[
+  {
+    "path": "spikes/codex-rate-limits/fixtures/*.json",
+    "reason": "Protocol fixtures preserve representative complete messages and are not production source files.",
+    "owner": "ADR 008"
+  }
+]

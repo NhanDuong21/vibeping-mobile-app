@@ -1,0 +1,34 @@
+# Rust and Node build output
+target/
+node_modules/
+dist/
+generated/
+spikes/tailscale-web-push/web/generated/
+
+# Local runtime state and private integration material
+.runtime/
+**/.runtime/
+**/vapid*.json
+**/vapid*.key
+**/subscription*.json
+**/*.pid
+**/*.log
+**/tailscale-before*.json
+**/tailscale-after*.json
+**/gate1/last-*.json
+
+# Impeccable local review/build output
+.impeccable/review/
+.impeccable/build/
+.impeccable/live/
+
+# Browser/test artifacts
+playwright-report/
+test-results/
+coverage/
+
+# Local editors and operating system
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
