@@ -1,6 +1,6 @@
 importScripts("/push-helpers.js");
 
-const CACHE_NAME = "vibeping-gate0-shell-v1";
+const CACHE_NAME = "vibeping-gate0-shell-v2";
 const SHELL_ASSETS = [
   "/",
   "/index.html",
@@ -9,9 +9,9 @@ const SHELL_ASSETS = [
   "/readiness.js",
   "/push-helpers.js",
   "/manifest.webmanifest",
-  "/assets/icon-180.png",
-  "/assets/icon-192.png",
-  "/assets/icon-512.png",
+  "/assets/logo-icon-180.png",
+  "/assets/logo-icon-192.png",
+  "/assets/logo-icon-512.png",
 ];
 
 self.addEventListener("install", (event) => {
@@ -61,8 +61,8 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification(payload.title, {
       body: payload.body,
-      icon: "/assets/icon-192.png",
-      badge: "/assets/icon-192.png",
+      icon: "/assets/logo-icon-192.png",
+      badge: "/assets/logo-icon-192.png",
       tag: payload.tag,
       timestamp: payload.timestamp,
       data: { url: payload.url },
