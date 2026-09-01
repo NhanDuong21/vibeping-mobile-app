@@ -28,14 +28,12 @@ test.describe('production walking skeleton', () => {
       { width: 430, height: 932 },
     ]) {
       await page.setViewportSize(viewport);
-      const activity = page.waitForResponse('**/api/v1/activity');
-      const allowance = page.waitForResponse('**/api/v1/usage-limits');
+      const activity = page.waitForResponse(/\/api\/v1\/events(\?.*)?$/);
       await page.goto(`/activity?viewport=${viewport.width}`);
       await expect(
         page.getByRole('heading', { name: 'Bạn có thể rời laptop' }),
       ).toBeVisible();
       expect((await activity).ok()).toBe(true);
-      expect((await allowance).ok()).toBe(true);
       const widths = await page.evaluate(() => ({
         client: document.documentElement.clientWidth,
         scroll: document.documentElement.scrollWidth,
@@ -101,7 +99,7 @@ test.describe('production walking skeleton', () => {
   test('shows current Codex work and privacy-safe recent activity', async ({
     page,
   }) => {
-    await page.route('**/api/v1/activity', (route) =>
+    await page.route('**/api/v1/bootstrap', (route) =>
       route.fulfill({
         contentType: 'application/json',
         body: JSON.stringify({
@@ -111,6 +109,18 @@ test.describe('production walking skeleton', () => {
             startedAt: '2026-09-02T00:00:00Z',
             updatedAt: '2026-09-02T00:01:00Z',
           },
+          usageLimits: { state: 'available', readAt: null, windows: [], cursor: '1' },
+          unreadCount: 1,
+          serverTime: '2026-09-02T00:01:00Z',
+          cursor: '1',
+          connection: { desktop: 'running', codex: 'ready', privateConnection: 'local' },
+        }),
+      }),
+    );
+    await page.route(/\/api\/v1\/events(\?.*)?$/, (route) =>
+      route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({
           events: [
             {
               id: 'event-1',
@@ -119,9 +129,11 @@ test.describe('production walking skeleton', () => {
               summary: 'Mở laptop để xem và quyết định.',
               projectName: 'vibeping-mobile-app',
               occurredAt: '2026-09-02T00:01:00Z',
+              isRead: false,
             },
           ],
-          cursor: '1',
+          nextCursor: null,
+          unreadCount: 1,
         }),
       }),
     );

@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { BottomNavigation } from '../../../core/navigation/ui/bottom-navigation';
 import { UsageLimitsStore } from '../application/usage-limits.store';
 
 @Component({
   selector: 'app-usage-limits-page',
-  imports: [RouterLink],
+  imports: [RouterLink, BottomNavigation],
   templateUrl: './usage-limits-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

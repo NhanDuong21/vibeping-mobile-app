@@ -1,4 +1,5 @@
 pub mod application;
+pub(crate) mod authorization;
 pub mod dto;
 pub mod http;
 pub mod identity;

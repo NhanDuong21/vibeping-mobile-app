@@ -140,3 +140,50 @@ async fn final_failure_and_duplicates_create_one_attention_event_each() {
             .any(|event| event.event_type == "codex.turn.completed")
     );
 }
+
+#[tokio::test]
+async fn activity_feed_handles_empty_history_pagination_and_read_state() {
+    let temp = tempdir().unwrap();
+    let pool = database::connect(&temp.path().join("feed.sqlite3"))
+        .await
+        .unwrap();
+    let store = ActivityStore::new(pool);
+    let empty = store.list_events(None, 20).await.unwrap();
+    assert!(empty.events.is_empty());
+    assert_eq!(empty.unread_count, 0);
+
+    for turn in ["one", "two", "three"] {
+        store
+            .ingest(&ingress(turn, CodexSignal::Started))
+            .await
+            .unwrap();
+    }
+    let first = store.list_events(None, 2).await.unwrap();
+    assert_eq!(first.events.len(), 2);
+    assert_eq!(first.unread_count, 3);
+    let second = store
+        .list_events(first.next_cursor.as_deref(), 2)
+        .await
+        .unwrap();
+    assert_eq!(second.events.len(), 1);
+    assert!(second.next_cursor.is_none());
+
+    let id = first.events[0].id.clone();
+    let state = store.mark_read(&id).await.unwrap().unwrap();
+    assert_eq!(state.unread_count, 2);
+    assert!(store.event(&id).await.unwrap().unwrap().is_read);
+    assert!(store.mark_read("missing").await.unwrap().is_none());
+    assert_eq!(store.mark_all_read().await.unwrap().unread_count, 0);
+}
+
+#[tokio::test]
+async fn activity_feed_rejects_unknown_cursor_and_oversized_page() {
+    let temp = tempdir().unwrap();
+    let pool = database::connect(&temp.path().join("cursor.sqlite3"))
+        .await
+        .unwrap();
+    let store = ActivityStore::new(pool);
+
+    assert!(store.list_events(Some("missing"), 20).await.is_err());
+    assert!(store.list_events(None, 51).await.is_err());
+}

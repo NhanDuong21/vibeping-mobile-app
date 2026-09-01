@@ -242,6 +242,7 @@ async fn insert_alert_event(
         summary,
         project_name: "Codex".into(),
         occurred_at,
+        is_read: false,
     }))
 }
 

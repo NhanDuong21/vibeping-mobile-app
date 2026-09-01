@@ -1,0 +1,43 @@
+<nav
+  class="fixed inset-x-0 bottom-0 z-40 border-t border-vibe-rule bg-vibe-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl dark:border-vibe-rule-dark dark:bg-vibe-night/95"
+  aria-label="Điều hướng chính"
+>
+  <div class="mx-auto grid h-16 w-full max-w-lg grid-cols-3 px-3">
+    <a
+      routerLink="/activity"
+      routerLinkActive="bg-vibe-mint-soft text-vibe-green! dark:bg-vibe-mint/10 dark:text-vibe-mint!"
+      [routerLinkActiveOptions]="{ exact: false }"
+      class="relative grid min-h-11 place-items-center content-center gap-0.5 rounded-xl text-xs font-bold text-vibe-muted! dark:text-vibe-sage!"
+    >
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M4 18V9m5 9V5m5 13v-7m5 7V3" />
+      </svg>
+      Hoạt động
+      @if (activity.unreadCount() > 0) {
+        <span class="absolute right-[27%] top-2 min-w-5 rounded-full bg-vibe-coral px-1.5 py-0.5 text-center text-[10px] leading-4 text-white" aria-label="Hoạt động chưa đọc">
+          {{ activity.unreadCount() > 99 ? '99+' : activity.unreadCount() }}
+        </span>
+      }
+    </a>
+    <a
+      routerLink="/usage-limits"
+      routerLinkActive="bg-vibe-mint-soft text-vibe-green! dark:bg-vibe-mint/10 dark:text-vibe-mint!"
+      class="grid min-h-11 place-items-center content-center gap-0.5 rounded-xl text-xs font-bold text-vibe-muted! dark:text-vibe-sage!"
+    >
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M12 3v18M5.5 6.5 12 3l6.5 3.5M5.5 17.5 12 21l6.5-3.5" />
+      </svg>
+      Hạn mức
+    </a>
+    <a
+      routerLink="/settings/notifications"
+      routerLinkActive="bg-vibe-mint-soft text-vibe-green! dark:bg-vibe-mint/10 dark:text-vibe-mint!"
+      class="grid min-h-11 place-items-center content-center gap-0.5 rounded-xl text-xs font-bold text-vibe-muted! dark:text-vibe-sage!"
+    >
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M12 3a6 6 0 0 0-6 6v4l-2 3h16l-2-3V9a6 6 0 0 0-6-6Zm-2 17h4" />
+      </svg>
+      Thông báo
+    </a>
+  </div>
+</nav>

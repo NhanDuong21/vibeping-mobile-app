@@ -3,13 +3,20 @@ use std::{convert::Infallible, sync::Arc, time::Duration};
 use axum::{
     Json,
     extract::State,
+    http::HeaderMap,
     response::{Sse, sse::Event},
 };
 use chrono::Utc;
 
 use crate::{
     app::ApplicationState,
-    features::system::dto::{BootstrapResponse, ConnectionSnapshot, HealthResponse},
+    features::{
+        codex_attention::ActivityStore,
+        pairing::authorization::authorize_if_claimed,
+        system::dto::{BootstrapResponse, ConnectionSnapshot, HealthResponse},
+        usage_limits::UsageLimitStore,
+    },
+    infrastructure::web::error::ApiError,
 };
 
 #[utoipa::path(
@@ -30,9 +37,25 @@ pub async fn health() -> Json<HealthResponse> {
     path = "/api/v1/bootstrap",
     responses((status = 200, description = "Initial client snapshot", body = BootstrapResponse))
 )]
-pub async fn bootstrap(State(state): State<Arc<ApplicationState>>) -> Json<BootstrapResponse> {
-    let _database_is_ready = &state.database;
-    Json(BootstrapResponse {
+pub async fn bootstrap(
+    State(state): State<Arc<ApplicationState>>,
+    headers: HeaderMap,
+) -> Result<Json<BootstrapResponse>, ApiError> {
+    authorize_if_claimed(&state, &headers).await?;
+    let activity = ActivityStore::new(state.database.clone());
+    let current_work = activity
+        .current_work()
+        .await
+        .map_err(|_| ApiError::unavailable("BOOTSTRAP_UNAVAILABLE"))?;
+    let unread_count = activity
+        .unread_count()
+        .await
+        .map_err(|_| ApiError::unavailable("BOOTSTRAP_UNAVAILABLE"))?;
+    let usage_limits = UsageLimitStore::new(state.database.clone())
+        .snapshot()
+        .await
+        .map_err(|_| ApiError::unavailable("BOOTSTRAP_UNAVAILABLE"))?;
+    Ok(Json(BootstrapResponse {
         server_time: Utc::now().to_rfc3339(),
         connection: ConnectionSnapshot {
             desktop: "running",
@@ -40,7 +63,10 @@ pub async fn bootstrap(State(state): State<Arc<ApplicationState>>) -> Json<Boots
             private_connection: "local",
         },
         cursor: state.started_at.timestamp_millis().to_string(),
-    })
+        current_work,
+        usage_limits,
+        unread_count,
+    }))
 }
 
 #[utoipa::path(
@@ -50,7 +76,9 @@ pub async fn bootstrap(State(state): State<Arc<ApplicationState>>) -> Json<Boots
 )]
 pub async fn stream(
     State(state): State<Arc<ApplicationState>>,
-) -> Sse<impl futures_core::Stream<Item = Result<Event, Infallible>>> {
+    headers: HeaderMap,
+) -> Result<Sse<impl futures_core::Stream<Item = Result<Event, Infallible>>>, ApiError> {
+    authorize_if_claimed(&state, &headers).await?;
     let mut activity = state.activity_events.subscribe();
     let mut usage = state.usage_events.subscribe();
     let events = async_stream::stream! {
@@ -69,5 +97,5 @@ pub async fn stream(
             }
         }
     };
-    Sse::new(events)
+    Ok(Sse::new(events))
 }

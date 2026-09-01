@@ -1,7 +1,10 @@
 use utoipa::OpenApi;
 
 use crate::features::{
-    codex_attention::{ActivityEvent, ActivitySnapshot, CurrentWork, http as activity_http},
+    codex_attention::{
+        ActivityEvent, ActivitySnapshot, CurrentWork, EventFeed, ReadStateResponse,
+        http as activity_http,
+    },
     notifications::{
         dto::{
             ActionResponse, BrowserSubscription, PublicKeyResponse, SubscriptionKeys,
@@ -29,6 +32,10 @@ use crate::features::{
         http::bootstrap,
         http::stream,
         activity_http::activity,
+        activity_http::events,
+        activity_http::event,
+        activity_http::read_event,
+        activity_http::read_all,
         usage_limits_http::get_limits,
         usage_limits_http::refresh_limits,
         pairing_http::status,
@@ -56,6 +63,8 @@ use crate::features::{
         ActionResponse,
         ActivityEvent,
         ActivitySnapshot,
+        EventFeed,
+        ReadStateResponse,
         CurrentWork,
         UsageLimitWindow,
         UsageLimitsSnapshot

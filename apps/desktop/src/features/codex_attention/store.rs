@@ -7,7 +7,7 @@ use super::model::{ActivityEvent, ActivitySnapshot, CodexIngress, CodexSignal, C
 
 #[derive(Clone)]
 pub struct ActivityStore {
-    pool: SqlitePool,
+    pub(super) pool: SqlitePool,
 }
 
 impl ActivityStore {
@@ -62,7 +62,7 @@ impl ActivityStore {
         .await
         .context("Không đọc được công việc hiện tại")?;
         let events = sqlx::query_as::<_, ActivityEvent>(
-            "SELECT id, event_type, title, summary, project_name, occurred_at \
+            "SELECT id, event_type, title, summary, project_name, occurred_at, is_read \
              FROM activity_events ORDER BY occurred_at DESC, id DESC LIMIT 50",
         )
         .fetch_all(&self.pool)
@@ -251,6 +251,7 @@ async fn insert_event(
         summary: value.summary.into(),
         project_name: ingress.project_name.clone(),
         occurred_at: ingress.occurred_at,
+        is_read: false,
     }))
 }
 
@@ -273,13 +274,14 @@ async fn enqueue_pushes(
             "INSERT OR IGNORE INTO notification_jobs \
              (id, subscription_id, dedupe_key, kind, title, body, target_url, tag, state, \
               attempt_count, next_attempt_at, expires_at, created_at, event_id) \
-             VALUES (?, ?, ?, 'activity', ?, ?, '/activity', ?, 'pending', 0, ?, ?, ?, ?)",
+             VALUES (?, ?, ?, 'activity', ?, ?, ?, ?, 'pending', 0, ?, ?, ?, ?)",
         )
         .bind(Uuid::new_v4().to_string())
         .bind(subscription)
         .bind(dedupe)
         .bind(value.title)
         .bind(format!("{} · {}", ingress.project_name, value.summary))
+        .bind(format!("/activity/events/{event_id}"))
         .bind(format!("vibeping-{}", value.event_type.replace('.', "-")))
         .bind(Utc::now())
         .bind(Utc::now() + Duration::hours(value.ttl_hours))

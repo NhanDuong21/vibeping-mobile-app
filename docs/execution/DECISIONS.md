@@ -49,3 +49,11 @@ Hook payloads are normalized before they reach IPC. The durable schema contains 
 Production ports Gate 1's documented `initialize`, `initialized`, `account/read`, and `account/rateLimits/read` flow into one long-lived supervised child. Update notifications, completion refresh, serialized manual refresh, and a ten-minute fallback poll share one reader. Unexpected exits use 1/5/20/60-second bounded backoff; stale last-good data remains visible and activity/push ingestion continues independently.
 
 Internal limit IDs are SHA-256 keys only. A returned human label is accepted only when bounded and free of identifier/credential patterns; otherwise the duration supplies the Vietnamese label. Alert state is keyed by hashed window plus reset timestamp, so low, critical, and exhausted advance once per cycle without altering the real account for tests.
+
+## 2026-09-02 — Offline activity is a replaceable projection
+
+SQLite remains the only activity source of truth. The PWA caches a bounded 100-event projection with current-work, allowance-summary, pagination, last-sync, and pending read metadata. It labels any cache-only view, retries read intents after reconnect, reconciles SSE through REST, and collapses duplicate IDs. Notification links target exact event detail routes; a missing or expired event produces a calm return path rather than a raw API error.
+
+The common owner guard now covers private bootstrap, activity, allowance, and foreground stream reads after pairing. Before the first claim these reads remain available only to support local setup; every read-state mutation requires the claimed owner plus the existing same-origin JSON/CSRF boundary.
+
+Angular's service worker remains the sole offline shell. A ready version produces an explicit Vietnamese update banner and reloads only after the user taps Update. There is no background forced refresh that could discard in-progress reading state.

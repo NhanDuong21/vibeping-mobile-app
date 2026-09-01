@@ -16,8 +16,15 @@ export const routes: Routes = [
   {
     path: 'activity',
     loadComponent: () =>
-      import('./features/system/ui/system-page').then(
-        (module) => module.SystemPage,
+      import('./features/activity/ui/activity-page').then(
+        (module) => module.ActivityPage,
+      ),
+  },
+  {
+    path: 'activity/events/:id',
+    loadComponent: () =>
+      import('./features/activity/ui/event-detail-page').then(
+        (module) => module.EventDetailPage,
       ),
   },
   {

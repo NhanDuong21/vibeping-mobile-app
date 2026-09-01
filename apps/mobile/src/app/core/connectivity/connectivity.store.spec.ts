@@ -12,6 +12,13 @@ const snapshot: BootstrapDto = {
   },
   cursor: '1',
   serverTime: '2026-09-02T00:00:00Z',
+  unreadCount: 0,
+  usageLimits: {
+    cursor: '1',
+    readAt: null,
+    state: 'unavailable',
+    windows: [],
+  },
 };
 
 class FakeEventSource {

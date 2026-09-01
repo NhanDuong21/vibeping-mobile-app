@@ -67,6 +67,12 @@ The hook process classifies its bounded JSON input in memory and immediately dis
 
 When enabled VibePing is unexpectedly unavailable, the already-sanitized record enters a bounded atomic spool and drains exactly once on restart. Explicit Stop disables intent first, so later hook invocations exit successfully without creating a spool backlog.
 
+### Mobile activity reconciliation
+
+`GET /api/v1/bootstrap` returns current work, normalized allowance, and the unread total. The paginated event feed uses an event identifier as a stable cursor, while exact event reads and idempotent read/read-all mutations remain owner-bound. SSE is an invalidation and low-latency delivery channel; every reconnect can reconcile against REST, and duplicate event identifiers collapse in the client projection.
+
+IndexedDB keeps at most 100 privacy-safe activity projections, bootstrap summary state, pagination metadata, and pending read intents. It is never authoritative. A cached launch renders immediately with a stale label, then replaces or merges data after REST succeeds. Offline read intents retry after reconnection. Service-worker versions are activated only after a visible user action, avoiding an unexpected in-session reload.
+
 ## Storage model
 
 SQLite on Windows is authoritative. IndexedDB stores only replaceable mobile projections plus sync metadata. VAPID private material stays in the ignored production data directory and subscriptions remain in SQLite. A one-time importer backs up and copies only Gate 0's known VAPID/subscription files, leaves the source intact, and keeps the imported subscription unclaimed until owner pairing succeeds.
@@ -91,6 +97,6 @@ Feature internals remain private. `main.rs` composes adapters and lifecycle only
 
 ## Availability and recovery
 
-The PWA renders cached state immediately but labels it "Chưa đồng bộ với laptop" until a fresh snapshot arrives. The Windows process survives phone/network interruption through persisted state and queued work. Tailscale or HTTPS failure produces a private-connection recovery message, never a public fallback.
+The PWA renders cached state immediately but labels it as saved data until a fresh snapshot arrives. The Windows process survives phone/network interruption through persisted state and queued work. Tailscale or HTTPS failure produces a private-connection recovery message, never a public fallback.
 
 The background process is created without inheriting console or pipe handles, so `start` returns while the host remains alive and no permanent console window appears. Status trusts a live authenticated application health response rather than a PID file alone. Explicit stop records disabled user intent before requesting bounded graceful shutdown; crash recovery preserves enabled intent and stale metadata is never treated as proof that the process is running.

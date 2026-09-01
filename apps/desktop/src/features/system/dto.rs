@@ -1,6 +1,8 @@
 use serde::Serialize;
 use utoipa::ToSchema;
 
+use crate::features::{codex_attention::CurrentWork, usage_limits::UsageLimitsSnapshot};
+
 #[derive(Debug, Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct HealthResponse {
@@ -15,6 +17,9 @@ pub struct BootstrapResponse {
     pub server_time: String,
     pub connection: ConnectionSnapshot,
     pub cursor: String,
+    pub current_work: Option<CurrentWork>,
+    pub usage_limits: UsageLimitsSnapshot,
+    pub unread_count: i64,
 }
 
 #[derive(Debug, Serialize, ToSchema)]

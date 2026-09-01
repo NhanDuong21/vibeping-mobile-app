@@ -33,6 +33,7 @@ pub struct ActivityEvent {
     pub summary: String,
     pub project_name: String,
     pub occurred_at: DateTime<Utc>,
+    pub is_read: bool,
 }
 
 #[derive(Clone, Debug, Serialize, sqlx::FromRow, ToSchema)]
@@ -50,4 +51,19 @@ pub struct ActivitySnapshot {
     pub current_work: Option<CurrentWork>,
     pub events: Vec<ActivityEvent>,
     pub cursor: String,
+}
+
+#[derive(Clone, Debug, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct EventFeed {
+    pub events: Vec<ActivityEvent>,
+    pub next_cursor: Option<String>,
+    pub unread_count: i64,
+}
+
+#[derive(Clone, Debug, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct ReadStateResponse {
+    pub state: &'static str,
+    pub unread_count: i64,
 }

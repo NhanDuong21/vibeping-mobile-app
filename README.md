@@ -16,6 +16,7 @@ Gate 0 preserves the proven standards-based iPhone Web Push path from a stable p
 | Phase 3 | COMPLETE | Private owner pairing, PWA installation and permission onboarding, Gate 0 state import, persistent VAPID, subscriptions, and durable Web Push delivery are production-ready. |
 | Phase 4 | COMPLETE | Supported Codex notify/hooks feed a private durable activity stream, deduplicated attention events, SSE updates, and eligible push jobs without storing prompts or tool output. |
 | Phase 5 | COMPLETE | A supervised official Codex App Server session persists dynamic allowance windows, publishes live updates, deduplicates threshold alerts, and powers Vietnamese summary/detail views. |
+| Phase 6 | COMPLETE | The mobile Activity product now has a paginated unread feed, exact event detail links, bottom navigation, live reconciliation, IndexedDB recovery, stale states, and a deliberate app-update banner. |
 
 ## Constraints
 

@@ -22,6 +22,16 @@ pub fn router(state: Arc<ApplicationState>) -> Router {
         .route("/api/v1/bootstrap", get(system::http::bootstrap))
         .route("/api/v1/stream", get(system::http::stream))
         .route("/api/v1/activity", get(codex_attention::http::activity))
+        .route("/api/v1/events", get(codex_attention::http::events))
+        .route(
+            "/api/v1/events/read-all",
+            post(codex_attention::http::read_all),
+        )
+        .route("/api/v1/events/{id}", get(codex_attention::http::event))
+        .route(
+            "/api/v1/events/{id}/read",
+            post(codex_attention::http::read_event),
+        )
         .route("/api/v1/usage-limits", get(usage_limits::http::get_limits))
         .route(
             "/api/v1/usage-limits/refresh",

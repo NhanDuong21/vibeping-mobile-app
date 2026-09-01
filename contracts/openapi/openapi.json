@@ -50,6 +50,137 @@
         }
       }
     },
+    "/api/v1/events": {
+      "get": {
+        "tags": [
+          "activity_http"
+        ],
+        "operationId": "events",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cursor-paginated activity feed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventFeed"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid cursor or limit"
+          }
+        }
+      }
+    },
+    "/api/v1/events/read-all": {
+      "post": {
+        "tags": [
+          "activity_http"
+        ],
+        "operationId": "read_all",
+        "responses": {
+          "200": {
+            "description": "All activity events marked read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadStateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/events/{id}": {
+      "get": {
+        "tags": [
+          "activity_http"
+        ],
+        "operationId": "event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Activity event identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Activity event detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityEvent"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Activity event not found"
+          }
+        }
+      }
+    },
+    "/api/v1/events/{id}/read": {
+      "post": {
+        "tags": [
+          "activity_http"
+        ],
+        "operationId": "read_event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Activity event identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Activity event marked read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadStateResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Activity event not found"
+          }
+        }
+      }
+    },
     "/api/v1/health": {
       "get": {
         "tags": [
@@ -336,7 +467,8 @@
           "title",
           "summary",
           "projectName",
-          "occurredAt"
+          "occurredAt",
+          "isRead"
         ],
         "properties": {
           "eventType": {
@@ -344,6 +476,9 @@
           },
           "id": {
             "type": "string"
+          },
+          "isRead": {
+            "type": "boolean"
           },
           "occurredAt": {
             "type": "string",
@@ -393,17 +528,36 @@
         "required": [
           "serverTime",
           "connection",
-          "cursor"
+          "cursor",
+          "usageLimits",
+          "unreadCount"
         ],
         "properties": {
           "connection": {
             "$ref": "#/components/schemas/ConnectionSnapshot"
+          },
+          "currentWork": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CurrentWork"
+              }
+            ]
           },
           "cursor": {
             "type": "string"
           },
           "serverTime": {
             "type": "string"
+          },
+          "unreadCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "usageLimits": {
+            "$ref": "#/components/schemas/UsageLimitsSnapshot"
           }
         }
       },
@@ -479,6 +633,31 @@
           },
           "requestId": {
             "type": "string"
+          }
+        }
+      },
+      "EventFeed": {
+        "type": "object",
+        "required": [
+          "events",
+          "unreadCount"
+        ],
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActivityEvent"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unreadCount": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -576,6 +755,22 @@
         "properties": {
           "publicKey": {
             "type": "string"
+          }
+        }
+      },
+      "ReadStateResponse": {
+        "type": "object",
+        "required": [
+          "state",
+          "unreadCount"
+        ],
+        "properties": {
+          "state": {
+            "type": "string"
+          },
+          "unreadCount": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },

@@ -36,6 +36,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/events/read-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["read_all"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/events/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["event"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/events/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["read_event"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -206,6 +270,7 @@ export interface components {
         ActivityEvent: {
             eventType: string;
             id: string;
+            isRead: boolean;
             /** Format: date-time */
             occurredAt: string;
             projectName: string;
@@ -219,8 +284,12 @@ export interface components {
         };
         BootstrapResponse: {
             connection: components["schemas"]["ConnectionSnapshot"];
+            currentWork?: null | components["schemas"]["CurrentWork"];
             cursor: string;
             serverTime: string;
+            /** Format: int64 */
+            unreadCount: number;
+            usageLimits: components["schemas"]["UsageLimitsSnapshot"];
         };
         BrowserSubscription: {
             endpoint: string;
@@ -243,6 +312,12 @@ export interface components {
         ErrorEnvelope: {
             code: string;
             requestId: string;
+        };
+        EventFeed: {
+            events: components["schemas"]["ActivityEvent"][];
+            nextCursor?: string | null;
+            /** Format: int64 */
+            unreadCount: number;
         };
         HealthResponse: {
             service: string;
@@ -268,6 +343,11 @@ export interface components {
         };
         PublicKeyResponse: {
             publicKey: string;
+        };
+        ReadStateResponse: {
+            state: string;
+            /** Format: int64 */
+            unreadCount: number;
         };
         SubscriptionKeys: {
             auth: string;
@@ -356,6 +436,116 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["BootstrapResponse"];
                 };
+            };
+        };
+    };
+    events: {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cursor-paginated activity feed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventFeed"];
+                };
+            };
+            /** @description Invalid cursor or limit */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    read_all: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description All activity events marked read */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadStateResponse"];
+                };
+            };
+        };
+    };
+    event: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Activity event identifier */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Activity event detail */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActivityEvent"];
+                };
+            };
+            /** @description Activity event not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    read_event: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Activity event identifier */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Activity event marked read */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadStateResponse"];
+                };
+            };
+            /** @description Activity event not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

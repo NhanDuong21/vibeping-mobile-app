@@ -14,6 +14,9 @@ export type SubscriptionResponseDto =
   components['schemas']['SubscriptionResponse'];
 export type TestPushResponseDto = components['schemas']['TestPushResponse'];
 export type ActivitySnapshotDto = components['schemas']['ActivitySnapshot'];
+export type ActivityEventDto = components['schemas']['ActivityEvent'];
+export type EventFeedDto = components['schemas']['EventFeed'];
+export type ReadStateDto = components['schemas']['ReadStateResponse'];
 export type UsageLimitsSnapshotDto = components['schemas']['UsageLimitsSnapshot'];
 
 @Injectable({ providedIn: 'root' })
@@ -26,6 +29,32 @@ export class ApiClient {
 
   activity(): Observable<ActivitySnapshotDto> {
     return this.#http.get<ActivitySnapshotDto>('/api/v1/activity');
+  }
+
+  events(cursor?: string): Observable<EventFeedDto> {
+    return this.#http.get<EventFeedDto>('/api/v1/events', {
+      params: cursor ? { cursor, limit: 20 } : { limit: 20 },
+    });
+  }
+
+  event(id: string): Observable<ActivityEventDto> {
+    return this.#http.get<ActivityEventDto>(`/api/v1/events/${encodeURIComponent(id)}`);
+  }
+
+  markEventRead(id: string, csrfToken: string): Observable<ReadStateDto> {
+    return this.#http.post<ReadStateDto>(
+      `/api/v1/events/${encodeURIComponent(id)}/read`,
+      null,
+      mutationOptions(csrfToken),
+    );
+  }
+
+  markAllEventsRead(csrfToken: string): Observable<ReadStateDto> {
+    return this.#http.post<ReadStateDto>(
+      '/api/v1/events/read-all',
+      null,
+      mutationOptions(csrfToken),
+    );
   }
 
   usageLimits(): Observable<UsageLimitsSnapshotDto> {
