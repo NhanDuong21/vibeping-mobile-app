@@ -17,7 +17,7 @@ Push-Location $repoRoot
 try {
     & pnpm run generate:contracts
     & pnpm run build:mobile
-    & $cargo run -p vibeping -- --port $Port --data-dir $runtime
+    & $cargo run -p vibeping -- run --port $Port --data-dir $runtime
 }
 finally {
     Pop-Location

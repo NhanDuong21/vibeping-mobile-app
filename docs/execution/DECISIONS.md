@@ -25,3 +25,9 @@ Because a commit cannot embed its own hash, the next phase finalizes the previou
 The Angular production build emits root-relative asset URLs so SPA refreshes remain valid even under a strict `base-uri` policy. Critical CSS inlining is disabled because its generated inline load handler conflicts with `script-src 'self'`. The CSP keeps scripts self-only and permits inline styles because Ionic web components apply runtime styles; browser tests fail on any resulting console error and Phase 8 will re-audit the policy.
 
 The Rust build fingerprints every generated web asset before embedding it. This prevents Cargo from reusing a stale embedded PWA when only Angular output changes.
+
+## 2026-09-02 — Private lifecycle control without a public shutdown route
+
+The production host uses a second ephemeral loopback listener for shutdown control. Its address and per-run random token live only in the ignored local runtime directory; Tailscale Serve proxies only the application port, so the control channel is not reachable through the private web origin. A file lock remains held for the host lifetime. `status` verifies the application health contract and treats unreadable or unreachable PID metadata as stale.
+
+Windows background creation uses `CreateProcessW` with handle inheritance disabled and no console window. This is required so `start` returns even when invoked through a pipe or test harness; the child writes directly to rotating local logs. Normal stop never force-kills the process.

@@ -1,26 +1,31 @@
-use std::path::PathBuf;
+use std::process::ExitCode;
 
-use anyhow::Result;
 use clap::Parser;
-use vibeping::{RuntimeConfig, run};
+use vibeping::features::lifecycle::{LifecycleCommand, execute};
 
 #[derive(Debug, Parser)]
-#[command(name = "vibeping", version, about = "Cầu nối chú ý riêng tư cho Codex")]
+#[command(
+    name = "vibeping",
+    version,
+    about = "Cầu nối chú ý riêng tư cho Codex",
+    subcommand_required = true,
+    arg_required_else_help = true
+)]
 struct Cli {
-    #[arg(long, default_value_t = 8790)]
-    port: u16,
-    #[arg(long)]
-    data_dir: Option<PathBuf>,
+    #[command(subcommand)]
+    command: LifecycleCommand,
 }
 
 #[tokio::main]
-async fn main() -> Result<()> {
-    tracing_subscriber::fmt()
-        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
-        .with_target(false)
-        .compact()
-        .init();
-
-    let cli = Cli::parse();
-    run(RuntimeConfig::discover(cli.port, cli.data_dir)?).await
+async fn main() -> ExitCode {
+    match execute(Cli::parse().command).await {
+        Ok(message) => {
+            println!("{message}");
+            ExitCode::SUCCESS
+        }
+        Err(error) => {
+            eprintln!("VibePing chưa hoàn tất thao tác: {error}");
+            ExitCode::FAILURE
+        }
+    }
 }

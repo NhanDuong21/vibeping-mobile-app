@@ -38,6 +38,19 @@ Run the production browser suite after building the release executable:
 pnpm run e2e
 ```
 
+Control the production process explicitly (there is no auto-start):
+
+```powershell
+.\scripts\vibeping.ps1 start
+.\scripts\vibeping.ps1 status
+.\scripts\vibeping.ps1 doctor
+.\scripts\vibeping.ps1 restart
+.\scripts\vibeping.ps1 open
+.\scripts\vibeping.ps1 stop
+```
+
+The same public commands are available directly on `vibeping.exe`. Runtime data, the single-instance lock, user intent, private shutdown metadata, SQLite, and rotating logs live under `%LOCALAPPDATA%\VibePing` unless `-DataDir`/`--data-dir` is supplied.
+
 Start the Gate 0 server and private Tailscale Serve origin:
 
 ```powershell

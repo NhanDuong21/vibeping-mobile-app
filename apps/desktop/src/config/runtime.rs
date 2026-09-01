@@ -27,6 +27,10 @@ impl RuntimeConfig {
     pub fn database_path(&self) -> PathBuf {
         self.data_dir.join("vibeping.sqlite3")
     }
+
+    pub fn data_dir(&self) -> &std::path::Path {
+        &self.data_dir
+    }
 }
 
 fn default_data_dir() -> Result<PathBuf> {

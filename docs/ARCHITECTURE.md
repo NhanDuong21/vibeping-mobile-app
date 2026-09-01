@@ -41,7 +41,7 @@ codex app-server → signed-in Codex services
 - **SQLite stores:** currently own bootstrap/runtime metadata; later phases add durable activities, device state, notification outbox, delivery attempts, and settings through feature-owned stores.
 - **Codex adapters:** Gate 1 proves dynamic allowance windows through App Server; production ingestion is added in its roadmap phase.
 - **Delivery adapters:** serve REST/SSE and encrypt Web Push without leaking provider details into domain code.
-- **Runtime host:** manual lifecycle, localhost binding, Tailscale verification, logs, and graceful shutdown.
+- **Runtime host:** explicit start/run/stop/restart/status/doctor/open commands, single-instance file lock, durable user intent, token-authenticated control listener on a separate loopback-only ephemeral port, localhost API binding, Tailscale verification, rotating logs, crash-spool staging, and graceful shutdown.
 
 ## Data flow
 
@@ -80,3 +80,5 @@ Feature internals remain private. `main.rs` composes adapters and lifecycle only
 ## Availability and recovery
 
 The PWA renders cached state immediately but labels it "Chưa đồng bộ với laptop" until a fresh snapshot arrives. The Windows process survives phone/network interruption through persisted state and queued work. Tailscale or HTTPS failure produces a private-connection recovery message, never a public fallback.
+
+The background process is created without inheriting console or pipe handles, so `start` returns while the host remains alive and no permanent console window appears. Status trusts a live authenticated application health response rather than a PID file alone. Explicit stop records disabled user intent before requesting bounded graceful shutdown; crash recovery preserves enabled intent and stale metadata is never treated as proof that the process is running.

@@ -13,7 +13,7 @@ export default defineConfig({
   },
   webServer: {
     command:
-      'target\\release\\vibeping.exe --port 8791 --data-dir .runtime\\e2e',
+      'target\\release\\vibeping.exe run --port 8791 --data-dir .runtime\\e2e',
     url: 'http://127.0.0.1:8791/api/v1/health',
     reuseExistingServer: false,
     timeout: 30_000,
