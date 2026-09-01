@@ -1,0 +1,3 @@
+{
+  "fixture": "child process accepts a request but emits no response before the configured deadline"
+}

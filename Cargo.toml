@@ -1,6 +1,7 @@
 [workspace]
 members = [
   "spikes/tailscale-web-push",
+  "spikes/codex-rate-limits",
 ]
 resolver = "3"
 

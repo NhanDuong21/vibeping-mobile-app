@@ -1,0 +1,13 @@
+{
+  "rateLimits": {
+    "limitId": "dynamic_limit",
+    "limitName": null,
+    "primary": {
+      "usedPercent": 33,
+      "windowDurationMins": 120,
+      "resetsAt": 1935950400
+    },
+    "secondary": null,
+    "rateLimitReachedType": null
+  }
+}
