@@ -2,11 +2,11 @@
 
 ## Gate 0 — stable private iPhone Web Push
 
-Prove one `.ts.net` HTTPS origin, localhost-only Rust server, persistent VAPID identity/subscription, desktop PWA behavior, physical Lock Screen/background delivery, and restart survival. The only tracked pre-phone state is `READY_FOR_IPHONE_TEST`.
+**Status: PASS.** One `.ts.net` HTTPS origin, localhost-only Rust server, persistent VAPID identity/subscription, desktop PWA behavior, physical Lock Screen/background delivery, and restart survival were proven on 2026-09-02. The only tracked pre-phone state was `READY_FOR_IPHONE_TEST`.
 
 ## Gate 1 — Codex allowance data
 
-Prove the signed-in local Codex installation returns real dynamic windows through stable App Server methods, normalize primary/secondary multi-bucket data, and print a sanitized Vietnamese summary.
+**Status: PASS.** The signed-in local Codex installation returned real dynamic windows through stable App Server methods; primary/secondary multi-bucket data was normalized and printed as a sanitized Vietnamese summary.
 
 ## Phase 1 — walking skeleton
 

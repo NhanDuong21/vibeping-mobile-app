@@ -1,7 +1,7 @@
 # Gate 0: Tailscale Web Push
 
 - **Objective:** Prove a Home Screen PWA from one stable private `.ts.net` HTTPS origin receives encrypted Web Push on a physical iPhone and survives a local Rust restart without reinstalling or resubscribing.
-- **Current status:** READY_FOR_IPHONE_TEST
+- **Current status:** PASS
 - **Date:** 2026-09-02
 
 ## Environment
@@ -25,15 +25,17 @@ The source completed Impeccable shape, two independent critique assessments, har
 
 | Case | Result |
 | --- | --- |
-| Foreground | Pending |
-| Background | Pending |
-| Locked | Pending |
-| Removed from app switcher | Pending |
-| Phone cellular / laptop Wi-Fi | Pending |
-| Offline then online | Pending |
-| Notification tap opens/focuses | Pending |
-| Rust restart, same origin/subscription | Pending |
+| Foreground | Not rerun; covered by the prior Quick Tunnel PoC and not part of the permanent-origin revalidation |
+| Background | PASS — the Home Screen app was not foregrounded during Lock Screen delivery |
+| Locked | PASS — the human observed the first notification on the physical iPhone Lock Screen |
+| Removed from app switcher | Not rerun; covered by the prior Quick Tunnel PoC |
+| Phone cellular / laptop Wi-Fi | Not rerun; covered by the prior Quick Tunnel PoC |
+| Offline then online | Not rerun; covered by the prior Quick Tunnel PoC |
+| Notification tap opens/focuses | Not rerun; covered by the prior Quick Tunnel PoC |
+| Rust restart, same origin/subscription | PASS — the phone registration remained ready and the human observed a second Lock Screen notification after restart |
 
 ## Evidence and uncertainty
 
-The sibling Quick Tunnel PoC is prior evidence for basic iPhone Web Push only. Its tracked server and Quick Tunnel were stopped to release port 8787; its source and durable push data were not changed. Gate 0 is ready, but it cannot pass until the human observes the physical Lock Screen/background push and then verifies delivery again after a Rust restart without reinstalling or recreating the subscription.
+The sibling Quick Tunnel PoC is prior evidence for the basic Web Push matrix only. Its tracked server and Quick Tunnel were stopped to release port 8787; its source and durable push data were not changed.
+
+On 2026-09-02, the physical iPhone registered from the private Home Screen PWA and received the first Lock Screen notification. The Rust Gate 0 process was then restarted. The private origin, sender identity, and stored phone registration remained ready without reinstalling or resubscribing, and the human observed the second Lock Screen notification. Provider acceptance was treated only as intermediate evidence; both deliveries were declared by the human. This satisfies the permanent-origin and restart-survival acceptance condition, so Gate 0 is PASS.
