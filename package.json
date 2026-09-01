@@ -1,0 +1,22 @@
+{
+  "name": "vibeping-validation-gates",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.15.1",
+  "scripts": {
+    "build": "pnpm run build:gate0",
+    "build:gate0": "tailwindcss -i ./spikes/tailscale-web-push/web/tailwind.input.css -o ./spikes/tailscale-web-push/web/generated/app.css --minify",
+    "check:js": "node --check ./spikes/tailscale-web-push/web/app.js && node --check ./spikes/tailscale-web-push/web/sw.js && node --check ./spikes/tailscale-web-push/web/readiness.js && node --check ./spikes/tailscale-web-push/web/push-helpers.js",
+    "check:pwa": "node ./spikes/tailscale-web-push/tests/verify-pwa.mjs",
+    "test": "node --test ./spikes/tailscale-web-push/tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "css-select": "7.0.0",
+    "css-tree": "3.2.1",
+    "domutils": "4.0.2",
+    "htmlparser2": "12.0.0",
+    "tailwindcss": "4.3.3"
+  }
+}
