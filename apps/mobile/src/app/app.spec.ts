@@ -5,6 +5,10 @@ import { App } from './app';
 
 describe('App', () => {
   it('creates the Ionic application host', async () => {
+    vi.stubGlobal('matchMedia', () => ({
+      matches: false,
+      addEventListener: vi.fn(),
+    }));
     await TestBed.configureTestingModule({
       imports: [App],
       providers: [provideIonicAngular(), provideRouter([])],

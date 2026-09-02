@@ -4,6 +4,7 @@ use serde_json::{Value, json};
 use tempfile::tempdir;
 use tokio::io::{AsyncWriteExt, duplex};
 
+use crate::features::preferences::PreferenceStore;
 use crate::infrastructure::database;
 
 use super::{UsageLimitStore, normalize::normalize_response, protocol::JsonLineClient};
@@ -123,6 +124,30 @@ async fn alerts_cross_each_stage_once_and_reset_with_a_new_cycle() {
     .await
     .unwrap();
     assert_eq!(low, 2);
+}
+
+#[tokio::test]
+async fn configured_low_threshold_controls_allowance_activity() {
+    let temp = tempdir().unwrap();
+    let pool = database::connect(&temp.path().join("threshold.sqlite3"))
+        .await
+        .unwrap();
+    let preference_store = PreferenceStore::new(pool.clone());
+    let mut preferences = preference_store.get().await.unwrap();
+    preferences.allowance_threshold_percent = 25;
+    preference_store.save(&preferences).await.unwrap();
+
+    UsageLimitStore::new(pool.clone())
+        .save(&normalize_response(response(window(78.0, 300, 2_000_000_000))).unwrap())
+        .await
+        .unwrap();
+    let low: i64 = sqlx::query_scalar(
+        "SELECT COUNT(*) FROM activity_events WHERE event_type = 'codex.allowance.low'",
+    )
+    .fetch_one(&pool)
+    .await
+    .unwrap();
+    assert_eq!(low, 1);
 }
 
 #[tokio::test]

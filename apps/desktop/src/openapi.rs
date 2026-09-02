@@ -5,6 +5,7 @@ use crate::features::{
         ActivityEvent, ActivitySnapshot, CurrentWork, EventFeed, ReadStateResponse,
         http as activity_http,
     },
+    computer::{ComputerStatus, DiagnosticCheck, DiagnosticsReport, http as computer_http},
     notifications::{
         dto::{
             ActionResponse, BrowserSubscription, PublicKeyResponse, SubscriptionKeys,
@@ -17,6 +18,7 @@ use crate::features::{
         dto::{PairingClaimRequest, PairingClaimResponse, PairingStatusResponse},
         http as pairing_http,
     },
+    preferences::{NotificationPreferences, Preferences, QuietHours, http as preferences_http},
     system::{
         dto::{BootstrapResponse, ConnectionSnapshot, ErrorEnvelope, HealthResponse},
         http,
@@ -31,6 +33,11 @@ use crate::features::{
         http::health,
         http::bootstrap,
         http::stream,
+        computer_http::computer_status,
+        computer_http::diagnostics,
+        computer_http::run_diagnostics,
+        preferences_http::get,
+        preferences_http::put,
         activity_http::activity,
         activity_http::events,
         activity_http::event,
@@ -66,6 +73,12 @@ use crate::features::{
         EventFeed,
         ReadStateResponse,
         CurrentWork,
+        ComputerStatus,
+        DiagnosticCheck,
+        DiagnosticsReport,
+        Preferences,
+        NotificationPreferences,
+        QuietHours,
         UsageLimitWindow,
         UsageLimitsSnapshot
     ))

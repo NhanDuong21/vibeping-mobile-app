@@ -50,11 +50,9 @@ test.describe('production walking skeleton', () => {
   test('refreshes a deep link and serves root-relative assets', async ({ page }) => {
     await page.goto('/settings/notifications');
     await expect(
-      page.getByRole('heading', {
-        name: 'Tín hiệu từ Codex, gửi thẳng đến điện thoại.',
-      }),
+      page.getByRole('heading', { name: 'Cài đặt' }),
     ).toBeVisible();
-    await expect(page).toHaveURL(/\/settings\/notifications$/);
+    await expect(page).toHaveURL(/\/settings$/);
     const assetPaths = await page
       .locator('link[rel="stylesheet"], script[src]')
       .evaluateAll((elements) =>

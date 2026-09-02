@@ -35,10 +35,29 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'settings/notifications',
+    path: 'computer',
     loadComponent: () =>
-      import('./features/onboarding/ui/onboarding-page').then(
-        (module) => module.OnboardingPage,
+      import('./features/computer/ui/computer-page').then(
+        (module) => module.ComputerPage,
+      ),
+  },
+  {
+    path: 'settings',
+    loadComponent: () =>
+      import('./features/settings/ui/settings-page').then(
+        (module) => module.SettingsPage,
+      ),
+  },
+  {
+    path: 'settings/notifications',
+    redirectTo: 'settings',
+    pathMatch: 'full',
+  },
+  {
+    path: 'diagnostics',
+    loadComponent: () =>
+      import('./features/diagnostics/ui/diagnostics-page').then(
+        (module) => module.DiagnosticsPage,
       ),
   },
   { path: '**', redirectTo: 'onboarding' },

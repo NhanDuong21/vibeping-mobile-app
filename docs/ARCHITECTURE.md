@@ -38,7 +38,7 @@ codex app-server → signed-in Codex services
 
 - **Mobile shell:** present Vietnamese operational state, request notification permission after a tap, cache recent reads, and reconnect.
 - **Application use cases:** derive events, attention severity, allowance state, retry policy, and API results.
-- **SQLite stores:** own bootstrap/runtime metadata, pairing sessions, owner/device state, push subscriptions, activity events, Codex turn state, notification jobs, delivery attempts, and rate-limit windows through feature-owned stores. Later phases add settings.
+- **SQLite stores:** own bootstrap/runtime metadata, pairing sessions, owner/device state, push subscriptions, activity events, Codex turn state, notification jobs, delivery attempts, rate-limit windows, and production preferences through feature-owned stores.
 - **Codex adapters:** supported user-level notify and reviewed hooks normalize attention signals; Gate 1 separately proves dynamic allowance windows through App Server.
 - **Delivery adapters:** serve REST/SSE and encrypt Web Push without leaking provider details into domain code.
 - **Runtime host:** explicit start/run/stop/restart/status/doctor/open commands, single-instance file lock, durable user intent, token-authenticated control listener on a separate loopback-only ephemeral port, localhost API binding, Tailscale verification, rotating logs, crash-spool staging, and graceful shutdown.
@@ -72,6 +72,14 @@ When enabled VibePing is unexpectedly unavailable, the already-sanitized record 
 `GET /api/v1/bootstrap` returns current work, normalized allowance, and the unread total. The paginated event feed uses an event identifier as a stable cursor, while exact event reads and idempotent read/read-all mutations remain owner-bound. SSE is an invalidation and low-latency delivery channel; every reconnect can reconcile against REST, and duplicate event identifiers collapse in the client projection.
 
 IndexedDB keeps at most 100 privacy-safe activity projections, bootstrap summary state, pagination metadata, and pending read intents. It is never authoritative. A cached launch renders immediately with a stale label, then replaces or merges data after REST succeeds. Offline read intents retry after reconnection. Service-worker versions are activated only after a visible user action, avoiding an unexpected in-session reload.
+
+### Preferences and diagnostics
+
+One validated preferences row in SQLite controls completion, permission, preview, final-failure, and allowance delivery; the low-allowance threshold; critical alerts; local quiet hours; urgent exceptions; privacy mode; theme; and activity retention. Event activity is still recorded when a notification type is disabled. The transactional outbox applies the preference at enqueue time: a disabled type creates no push job, quiet-hour delivery moves to the local interval end, urgent return-needed signals may bypass that delay, and private mode replaces project/summary content with a generic lock-screen message. Intervals where the start is later than the end cross midnight by definition.
+
+Saving retention deletes expired authoritative activity in the same transaction as the new setting. Theme changes apply immediately in the PWA and are persisted for the next device load. Notification re-registration removes the remembered server subscription where possible, unsubscribes the browser endpoint, and creates one replacement only after an explicit user action.
+
+Computer status is an aggregate projection over the live host, Codex integration marker and allowance reader, owner subscription readiness, private request identity, and last stored signal. Diagnostics re-run those bounded local checks and return plain recovery actions plus a technical report containing only application version, stable enum states, counts, and timestamps. Paths, identity, endpoints, credentials, prompt content, and raw errors never enter that report.
 
 ## Storage model
 

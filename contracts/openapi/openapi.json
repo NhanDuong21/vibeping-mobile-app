@@ -50,6 +50,66 @@
         }
       }
     },
+    "/api/v1/computer/status": {
+      "get": {
+        "tags": [
+          "computer_http"
+        ],
+        "operationId": "computer_status",
+        "responses": {
+          "200": {
+            "description": "Operational laptop status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/diagnostics": {
+      "get": {
+        "tags": [
+          "computer_http"
+        ],
+        "operationId": "diagnostics",
+        "responses": {
+          "200": {
+            "description": "Sanitized diagnostic report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiagnosticsReport"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/diagnostics/run": {
+      "post": {
+        "tags": [
+          "computer_http"
+        ],
+        "operationId": "run_diagnostics",
+        "responses": {
+          "200": {
+            "description": "Fresh sanitized diagnostic report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiagnosticsReport"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/events": {
       "get": {
         "tags": [
@@ -259,6 +319,57 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v1/preferences": {
+      "get": {
+        "tags": [
+          "preferences_http"
+        ],
+        "operationId": "get",
+        "responses": {
+          "200": {
+            "description": "Production notification and display preferences",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preferences"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "preferences_http"
+        ],
+        "operationId": "put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Preferences"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Saved production preferences",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preferences"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid preferences"
           }
         }
       }
@@ -577,6 +688,45 @@
           }
         }
       },
+      "ComputerStatus": {
+        "type": "object",
+        "required": [
+          "desktop",
+          "codex",
+          "allowanceReader",
+          "notifications",
+          "privateConnection",
+          "startedAt"
+        ],
+        "properties": {
+          "allowanceReader": {
+            "type": "string"
+          },
+          "codex": {
+            "type": "string"
+          },
+          "desktop": {
+            "type": "string"
+          },
+          "lastSignalAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "notifications": {
+            "type": "string"
+          },
+          "privateConnection": {
+            "type": "string"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "ConnectionSnapshot": {
         "type": "object",
         "required": [
@@ -618,6 +768,58 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "DiagnosticCheck": {
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "state",
+          "detail"
+        ],
+        "properties": {
+          "action": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "detail": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        }
+      },
+      "DiagnosticsReport": {
+        "type": "object",
+        "required": [
+          "generatedAt",
+          "checks",
+          "technicalReport"
+        ],
+        "properties": {
+          "checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiagnosticCheck"
+            }
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "technicalReport": {
+            "type": "string"
           }
         }
       },
@@ -677,6 +879,33 @@
           },
           "version": {
             "type": "string"
+          }
+        }
+      },
+      "NotificationPreferences": {
+        "type": "object",
+        "required": [
+          "completion",
+          "permission",
+          "preview",
+          "finalFailure",
+          "allowance"
+        ],
+        "properties": {
+          "allowance": {
+            "type": "boolean"
+          },
+          "completion": {
+            "type": "boolean"
+          },
+          "finalFailure": {
+            "type": "boolean"
+          },
+          "permission": {
+            "type": "boolean"
+          },
+          "preview": {
+            "type": "boolean"
           }
         }
       },
@@ -747,6 +976,43 @@
           }
         }
       },
+      "Preferences": {
+        "type": "object",
+        "required": [
+          "notifications",
+          "allowanceThresholdPercent",
+          "criticalAllowanceNotifications",
+          "quietHours",
+          "privacyMode",
+          "theme",
+          "retentionDays"
+        ],
+        "properties": {
+          "allowanceThresholdPercent": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "criticalAllowanceNotifications": {
+            "type": "boolean"
+          },
+          "notifications": {
+            "$ref": "#/components/schemas/NotificationPreferences"
+          },
+          "privacyMode": {
+            "type": "string"
+          },
+          "quietHours": {
+            "$ref": "#/components/schemas/QuietHours"
+          },
+          "retentionDays": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "theme": {
+            "type": "string"
+          }
+        }
+      },
       "PublicKeyResponse": {
         "type": "object",
         "required": [
@@ -755,6 +1021,34 @@
         "properties": {
           "publicKey": {
             "type": "string"
+          }
+        }
+      },
+      "QuietHours": {
+        "type": "object",
+        "required": [
+          "enabled",
+          "start",
+          "end",
+          "timezoneOffsetMinutes",
+          "allowUrgent"
+        ],
+        "properties": {
+          "allowUrgent": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "end": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string"
+          },
+          "timezoneOffsetMinutes": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

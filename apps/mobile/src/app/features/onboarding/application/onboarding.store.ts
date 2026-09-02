@@ -5,8 +5,14 @@ import { firstValueFrom, take } from 'rxjs';
 import {
   ApiClient,
   type PairingStatusDto,
-  type SubscriptionRegistrationDto,
 } from '../../../core/api/api-client';
+import {
+  installationId,
+  isStandalone,
+  notificationPermission,
+  registrationFor,
+  rememberSubscription,
+} from '../../../core/notifications/registration';
 import {
   clientErrorCopy,
   type ClientErrorCopy,
@@ -35,7 +41,7 @@ export class OnboardingStore {
   readonly #stage = signal<OnboardingStage>('loading');
   readonly #busy = signal(false);
   readonly #error = signal<ClientErrorCopy | null>(null);
-  readonly #installationId = loadInstallationId();
+  readonly #installationId = installationId();
   #status?: PairingStatusDto;
   #publicKey = '';
 
@@ -85,8 +91,8 @@ export class OnboardingStore {
           {
             code,
             installationId: this.#installationId,
-            displayMode: displayMode(),
-            notificationPermission: permission(),
+            displayMode: isStandalone() ? 'standalone' : 'browser',
+            notificationPermission: notificationPermission(),
           },
           csrf,
         ),
@@ -115,7 +121,7 @@ export class OnboardingStore {
       await this.#saveSubscription(subscription);
       this.#stage.set('test');
     } catch (error) {
-      if (permission() === 'denied') {
+      if (notificationPermission() === 'denied') {
         this.#stage.set('denied');
       } else {
         this.#error.set(clientErrorCopy(errorCode(error)));
@@ -165,7 +171,7 @@ export class OnboardingStore {
       this.#stage.set('unsupported');
       return;
     }
-    if (permission() === 'denied') {
+    if (notificationPermission() === 'denied') {
       this.#stage.set('denied');
       return;
     }
@@ -179,52 +185,17 @@ export class OnboardingStore {
   }
 
   async #saveSubscription(subscription: PushSubscription): Promise<void> {
-    const json = subscription.toJSON();
-    const keys = json.keys;
-    if (!json.endpoint || !keys?.['p256dh'] || !keys['auth'] || !this.#status) {
+    if (!this.#status) {
       throw new Error('SUBSCRIPTION_INVALID');
     }
-    const request: SubscriptionRegistrationDto = {
-      installationId: this.#installationId,
-      displayMode: displayMode(),
-      notificationPermission: permission(),
-      subscription: {
-        endpoint: json.endpoint,
-        expirationTime: json.expirationTime,
-        keys: { p256dh: keys['p256dh'], auth: keys['auth'] },
-      },
-    };
-    await firstValueFrom(
-      this.#api.saveSubscription(request, this.#status.csrfToken),
+    const response = await firstValueFrom(
+      this.#api.saveSubscription(
+        registrationFor(subscription),
+        this.#status.csrfToken,
+      ),
     );
+    rememberSubscription(response.id);
   }
-}
-
-function isStandalone(): boolean {
-  const navigatorWithStandalone = navigator as Navigator & {
-    standalone?: boolean;
-  };
-  return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    navigatorWithStandalone.standalone === true
-  );
-}
-
-function displayMode(): 'browser' | 'standalone' {
-  return isStandalone() ? 'standalone' : 'browser';
-}
-
-function permission(): NotificationPermission {
-  return typeof Notification === 'undefined' ? 'default' : Notification.permission;
-}
-
-function loadInstallationId(): string {
-  const key = 'vibeping.installation-id';
-  const existing = localStorage.getItem(key);
-  if (existing) return existing;
-  const created = crypto.randomUUID();
-  localStorage.setItem(key, created);
-  return created;
 }
 
 function errorCode(error: unknown): string | undefined {

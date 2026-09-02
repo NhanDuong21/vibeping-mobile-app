@@ -74,15 +74,13 @@ test('installed app waits for an explicit tap before requesting default permissi
   await expect(page.getByRole('button', { name: 'Bật thông báo' })).toBeVisible();
 });
 
-test('notification deep link is refreshable and the custom worker owns no duplicate handler', async ({
+test('notification settings deep link is refreshable and the custom worker owns no duplicate handler', async ({
   page,
 }) => {
   await mockStart(page, paired);
   await page.goto('/settings/notifications');
   await expect(
-    page.getByRole('heading', {
-      name: 'Tín hiệu từ Codex, gửi thẳng đến điện thoại.',
-    }),
+    page.getByRole('heading', { name: 'Cài đặt' }),
   ).toBeVisible();
   const worker = await (await page.request.get('/sw.js')).text();
   expect(worker.trim()).toBe("importScripts('./ngsw-worker.js');");

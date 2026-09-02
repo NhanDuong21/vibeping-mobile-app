@@ -4,6 +4,7 @@ use sqlx::{Sqlite, SqlitePool, Transaction};
 use uuid::Uuid;
 
 use crate::features::codex_attention::ActivityEvent;
+use crate::features::preferences::policy::{self, DeliveryPolicy};
 
 use super::model::{NormalizedLimits, NormalizedWindow, UsageLimitWindow, UsageLimitsSnapshot};
 
@@ -24,6 +25,7 @@ impl UsageLimitStore {
 
     pub async fn save(&self, limits: &NormalizedLimits) -> Result<SaveOutcome> {
         let mut transaction = self.pool.begin().await.context("Không mở được hạn mức")?;
+        let policy = policy::load(&mut transaction).await?;
         sqlx::query("DELETE FROM usage_limit_windows")
             .execute(&mut *transaction)
             .await
@@ -31,7 +33,9 @@ impl UsageLimitStore {
         let mut activities = Vec::new();
         for window in &limits.windows {
             insert_window(&mut transaction, limits, window).await?;
-            if let Some(event) = create_alert(&mut transaction, window, limits.read_at).await? {
+            if let Some(event) =
+                create_alert(&mut transaction, window, limits.read_at, &policy).await?
+            {
                 activities.push(event);
             }
         }
@@ -148,8 +152,9 @@ async fn create_alert(
     transaction: &mut Transaction<'_, Sqlite>,
     window: &NormalizedWindow,
     occurred_at: chrono::DateTime<Utc>,
+    policy: &DeliveryPolicy,
 ) -> Result<Option<ActivityEvent>> {
-    let Some(stage) = alert_stage(window) else {
+    let Some(stage) = alert_stage(window, f64::from(policy.allowance_threshold_percent)) else {
         return Ok(None);
     };
     let previous: Option<String> = sqlx::query_scalar(
@@ -178,15 +183,15 @@ async fn create_alert(
     .execute(&mut **transaction)
     .await
     .context("Không lưu được cảnh báo hạn mức")?;
-    insert_alert_event(transaction, window, stage, occurred_at).await
+    insert_alert_event(transaction, window, stage, occurred_at, policy).await
 }
 
-fn alert_stage(window: &NormalizedWindow) -> Option<&'static str> {
+fn alert_stage(window: &NormalizedWindow, low_threshold: f64) -> Option<&'static str> {
     if window.reached || window.remaining_percent <= 0.0 {
         Some("exhausted")
     } else if window.remaining_percent <= 5.0 {
         Some("critical")
-    } else if window.remaining_percent <= 20.0 {
+    } else if window.remaining_percent <= low_threshold {
         Some("low")
     } else {
         None
@@ -207,6 +212,7 @@ async fn insert_alert_event(
     window: &NormalizedWindow,
     stage: &str,
     occurred_at: chrono::DateTime<Utc>,
+    policy: &DeliveryPolicy,
 ) -> Result<Option<ActivityEvent>> {
     let (event_type, title) = match stage {
         "low" => ("codex.allowance.low", "Hạn mức Codex sắp thấp"),
@@ -234,7 +240,7 @@ async fn insert_alert_event(
     if inserted.rows_affected() == 0 {
         return Ok(None);
     }
-    enqueue_pushes(transaction, &id, &dedupe, event_type, title, stage).await?;
+    enqueue_pushes(transaction, &id, &dedupe, event_type, title, stage, policy).await?;
     Ok(Some(ActivityEvent {
         id,
         event_type: event_type.into(),
@@ -253,7 +259,11 @@ async fn enqueue_pushes(
     event_type: &str,
     title: &str,
     stage: &str,
+    policy: &DeliveryPolicy,
 ) -> Result<()> {
+    let Some(send_at) = policy.scheduled_at(event_type, Utc::now()) else {
+        return Ok(());
+    };
     let subscriptions: Vec<String> = sqlx::query_scalar(
         "SELECT p.id FROM push_subscriptions p JOIN mobile_devices d ON d.id = p.device_id \
          WHERE p.disabled_at IS NULL AND d.owner_id = 1",
@@ -274,7 +284,7 @@ async fn enqueue_pushes(
         .bind(dedupe)
         .bind(title)
         .bind(format!("vibeping-{event_type}"))
-        .bind(Utc::now())
+        .bind(send_at)
         .bind(Utc::now() + Duration::hours(if stage == "exhausted" { 12 } else { 8 }))
         .bind(Utc::now())
         .bind(event_id)

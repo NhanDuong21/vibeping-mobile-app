@@ -57,3 +57,13 @@ SQLite remains the only activity source of truth. The PWA caches a bounded 100-e
 The common owner guard now covers private bootstrap, activity, allowance, and foreground stream reads after pairing. Before the first claim these reads remain available only to support local setup; every read-state mutation requires the claimed owner plus the existing same-origin JSON/CSRF boundary.
 
 Angular's service worker remains the sole offline shell. A ready version produces an explicit Vietnamese update banner and reloads only after the user taps Update. There is no background forced refresh that could discard in-progress reading state.
+
+## 2026-09-02 — Preferences govern delivery without erasing activity
+
+Notification-type toggles suppress only the corresponding push job; the authoritative activity event is still committed and remains visible in the owner-bound feed. Quiet hours store local `HH:MM` boundaries with the phone offset at edit time, and a start later than the end crosses midnight. Permission-required, unresolved final-failure, critical, and exhausted signals may bypass quiet hours only when the explicit urgent exception is enabled.
+
+The low allowance threshold is user-configurable from 1–50 percent, while critical and exhausted alerts have a separate enable switch. Private mode changes lock-screen body copy to a generic instruction. The explicit delayed test notification bypasses ordinary preference filters because it is a direct diagnostic action rather than a product event.
+
+## 2026-09-02 — Diagnostics are a closed sanitized projection
+
+The Computer page aggregates only operational readiness already owned by the Rust process. Diagnostics derive plain-language checks and recovery actions from those stable values and local database health. The copyable technical report is deliberately constructed from version, enum states, counts, and timestamps; it never serializes an error object, filesystem path, Tailscale identity, Codex account field, endpoint, or key. Notification recovery remains an explicit iPhone action and never edits iOS permissions remotely.

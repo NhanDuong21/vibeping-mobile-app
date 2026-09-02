@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular';
+import { ThemeStore } from './core/theme/theme.store';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,8 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular';
   templateUrl: './app.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class App {}
+export class App {
+  constructor() {
+    inject(ThemeStore).start();
+  }
+}

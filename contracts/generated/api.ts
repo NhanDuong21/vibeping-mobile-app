@@ -36,6 +36,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/computer/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["computer_status"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/diagnostics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["diagnostics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/diagnostics/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["run_diagnostics"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/events": {
         parameters: {
             query?: never;
@@ -141,6 +189,22 @@ export interface paths {
         };
         get: operations["status"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get"];
+        put: operations["put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -296,6 +360,17 @@ export interface components {
             expirationTime?: unknown;
             keys: components["schemas"]["SubscriptionKeys"];
         };
+        ComputerStatus: {
+            allowanceReader: string;
+            codex: string;
+            desktop: string;
+            /** Format: date-time */
+            lastSignalAt?: string | null;
+            notifications: string;
+            privateConnection: string;
+            /** Format: date-time */
+            startedAt: string;
+        };
         ConnectionSnapshot: {
             codex: string;
             desktop: string;
@@ -308,6 +383,19 @@ export interface components {
             state: string;
             /** Format: date-time */
             updatedAt: string;
+        };
+        DiagnosticCheck: {
+            action?: string | null;
+            detail: string;
+            key: string;
+            label: string;
+            state: string;
+        };
+        DiagnosticsReport: {
+            checks: components["schemas"]["DiagnosticCheck"][];
+            /** Format: date-time */
+            generatedAt: string;
+            technicalReport: string;
         };
         ErrorEnvelope: {
             code: string;
@@ -323,6 +411,13 @@ export interface components {
             service: string;
             status: string;
             version: string;
+        };
+        NotificationPreferences: {
+            allowance: boolean;
+            completion: boolean;
+            finalFailure: boolean;
+            permission: boolean;
+            preview: boolean;
         };
         PairingClaimRequest: {
             code: string;
@@ -341,8 +436,27 @@ export interface components {
             privateIdentityReady: boolean;
             state: string;
         };
+        Preferences: {
+            /** Format: int32 */
+            allowanceThresholdPercent: number;
+            criticalAllowanceNotifications: boolean;
+            notifications: components["schemas"]["NotificationPreferences"];
+            privacyMode: string;
+            quietHours: components["schemas"]["QuietHours"];
+            /** Format: int32 */
+            retentionDays: number;
+            theme: string;
+        };
         PublicKeyResponse: {
             publicKey: string;
+        };
+        QuietHours: {
+            allowUrgent: boolean;
+            enabled: boolean;
+            end: string;
+            start: string;
+            /** Format: int32 */
+            timezoneOffsetMinutes: number;
         };
         ReadStateResponse: {
             state: string;
@@ -435,6 +549,66 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BootstrapResponse"];
+                };
+            };
+        };
+    };
+    computer_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Operational laptop status */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ComputerStatus"];
+                };
+            };
+        };
+    };
+    diagnostics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sanitized diagnostic report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiagnosticsReport"];
+                };
+            };
+        };
+    };
+    run_diagnostics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Fresh sanitized diagnostic report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiagnosticsReport"];
                 };
             };
         };
@@ -638,6 +812,57 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["PairingStatusResponse"];
                 };
+            };
+        };
+    };
+    get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Production notification and display preferences */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preferences"];
+                };
+            };
+        };
+    };
+    put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Preferences"];
+            };
+        };
+        responses: {
+            /** @description Saved production preferences */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preferences"];
+                };
+            };
+            /** @description Invalid preferences */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

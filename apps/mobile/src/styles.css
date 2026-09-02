@@ -4,6 +4,8 @@
 @import '@ionic/angular/css/typography.css';
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --color-vibe-canvas: #f3f7f4;
@@ -46,12 +48,9 @@ body {
   outline-offset: 3px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root,
-  html,
-  body {
-    background: var(--color-vibe-night);
-  }
+html.dark,
+html.dark body {
+  background: var(--color-vibe-night);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,0 +1,96 @@
+<div class="h-dvh overflow-y-auto overscroll-y-contain bg-vibe-canvas px-5 pb-[calc(env(safe-area-inset-bottom)+6.5rem)] pt-[calc(env(safe-area-inset-top)+1.25rem)] text-vibe-ink dark:bg-vibe-night dark:text-vibe-paper">
+  <header class="mx-auto w-full max-w-lg py-2">
+    <p class="text-sm font-bold uppercase tracking-[0.16em] text-vibe-green dark:text-vibe-mint">Điều chỉnh VibePing</p>
+    <h1 class="mt-3 text-3xl font-bold tracking-[-0.04em]">Cài đặt</h1>
+  </header>
+
+  <main class="mx-auto w-full max-w-lg pt-7">
+    @if (preferences.state() === 'loading') {
+      <div class="space-y-4" aria-label="Đang tải cài đặt">
+        @for (item of [1, 2, 3, 4]; track item) {
+          <span class="block h-20 animate-pulse rounded-xl bg-vibe-rule/70 dark:bg-vibe-rule-dark"></span>
+        }
+      </div>
+    } @else if (preferences.state() === 'unavailable') {
+      <section class="border-y border-vibe-rule py-6 dark:border-vibe-rule-dark" aria-live="polite">
+        <h2 class="text-lg font-bold">Chưa đọc được cài đặt</h2>
+        <p class="mt-2 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">Mở Tailscale trên iPhone và laptop, rồi thử lại.</p>
+        <button type="button" class="mt-5 min-h-11 rounded-full bg-vibe-ink px-5 text-sm font-black text-vibe-paper dark:bg-vibe-mint dark:text-vibe-ink" (click)="preferences.load()">Thử lại</button>
+      </section>
+    } @else if (preferences.draft(); as draft) {
+      <section aria-labelledby="notification-heading">
+        <h2 id="notification-heading" class="text-xl font-bold tracking-[-0.02em]">Loại thông báo</h2>
+        <p class="mt-2 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">Chỉ bật những tín hiệu đáng để làm gián đoạn bạn.</p>
+        <div class="mt-5 divide-y divide-vibe-rule border-y border-vibe-rule dark:divide-vibe-rule-dark dark:border-vibe-rule-dark">
+          <div class="flex min-h-16 items-center justify-between gap-4 py-3"><span class="font-semibold">Công việc hoàn tất</span><app-toggle-switch [checked]="draft.notifications.completion" label="Thông báo công việc hoàn tất" (changed)="preferences.toggleNotification('completion')" /></div>
+          <div class="flex min-h-16 items-center justify-between gap-4 py-3"><span class="font-semibold">Cần xác nhận</span><app-toggle-switch [checked]="draft.notifications.permission" label="Thông báo khi cần xác nhận" (changed)="preferences.toggleNotification('permission')" /></div>
+          <div class="flex min-h-16 items-center justify-between gap-4 py-3"><span class="font-semibold">Bản xem trước sẵn sàng</span><app-toggle-switch [checked]="draft.notifications.preview" label="Thông báo bản xem trước" (changed)="preferences.toggleNotification('preview')" /></div>
+          <div class="flex min-h-16 items-center justify-between gap-4 py-3"><span class="font-semibold">Kiểm tra cuối chưa đạt</span><app-toggle-switch [checked]="draft.notifications.finalFailure" label="Thông báo kiểm tra cuối" (changed)="preferences.toggleNotification('finalFailure')" /></div>
+          <div class="flex min-h-16 items-center justify-between gap-4 py-3"><span class="font-semibold">Hạn mức Codex</span><app-toggle-switch [checked]="draft.notifications.allowance" label="Thông báo hạn mức Codex" (changed)="preferences.toggleNotification('allowance')" /></div>
+        </div>
+      </section>
+
+      <section class="mt-10 border-t border-vibe-rule pt-7 dark:border-vibe-rule-dark" aria-labelledby="allowance-setting-heading">
+        <h2 id="allowance-setting-heading" class="text-xl font-bold tracking-[-0.02em]">Ngưỡng hạn mức</h2>
+        <div class="mt-5 flex items-baseline justify-between"><label for="allowance-threshold" class="font-semibold">Báo khi còn</label><output for="allowance-threshold" class="text-2xl font-black tabular-nums">{{ draft.allowanceThresholdPercent }}%</output></div>
+        <input id="allowance-threshold" type="range" min="1" max="50" step="1" class="mt-4 min-h-11 w-full accent-vibe-green dark:accent-vibe-mint" [value]="draft.allowanceThresholdPercent" (input)="setThreshold($event)" />
+        <div class="mt-3 flex min-h-16 items-center justify-between gap-4 border-y border-vibe-rule py-3 dark:border-vibe-rule-dark"><div><p class="font-semibold">Báo mức nguy cấp</p><p class="mt-1 text-sm text-vibe-muted dark:text-vibe-sage">Gồm gần hết và đã chạm hạn mức.</p></div><app-toggle-switch [checked]="draft.criticalAllowanceNotifications" label="Thông báo hạn mức nguy cấp" (changed)="preferences.toggleCriticalAllowance()" /></div>
+      </section>
+
+      <section class="mt-10 border-t border-vibe-rule pt-7 dark:border-vibe-rule-dark" aria-labelledby="quiet-heading">
+        <div class="flex items-center justify-between gap-4"><div><h2 id="quiet-heading" class="text-xl font-bold tracking-[-0.02em]">Giờ yên tĩnh</h2><p class="mt-2 text-sm leading-5 text-vibe-muted dark:text-vibe-sage">Hoãn tín hiệu thường đến khi khoảng yên tĩnh kết thúc.</p></div><app-toggle-switch [checked]="draft.quietHours.enabled" label="Bật giờ yên tĩnh" (changed)="preferences.toggleQuietHours()" /></div>
+        @if (draft.quietHours.enabled) {
+          <div class="mt-5 grid grid-cols-2 gap-4">
+            <label class="text-sm font-bold">Bắt đầu<input type="time" class="mt-2 min-h-12 w-full rounded-xl border border-vibe-rule bg-transparent px-3 font-semibold dark:border-vibe-rule-dark" [value]="draft.quietHours.start" (change)="setQuietTime('start', $event)" /></label>
+            <label class="text-sm font-bold">Kết thúc<input type="time" class="mt-2 min-h-12 w-full rounded-xl border border-vibe-rule bg-transparent px-3 font-semibold dark:border-vibe-rule-dark" [value]="draft.quietHours.end" (change)="setQuietTime('end', $event)" /></label>
+          </div>
+          <p class="mt-3 text-sm text-vibe-muted dark:text-vibe-sage">Khoảng qua nửa đêm được hiểu tự động, ví dụ 22:00–07:00.</p>
+          <div class="mt-4 flex min-h-16 items-center justify-between gap-4 border-y border-vibe-rule py-3 dark:border-vibe-rule-dark"><div><p class="font-semibold">Cho phép việc gấp</p><p class="mt-1 text-sm text-vibe-muted dark:text-vibe-sage">Vẫn báo khi cần bạn quay lại hoặc hạn mức nguy cấp.</p></div><app-toggle-switch [checked]="draft.quietHours.allowUrgent" label="Cho phép thông báo gấp" (changed)="preferences.toggleUrgentException()" /></div>
+        }
+      </section>
+
+      <section class="mt-10 border-t border-vibe-rule pt-7 dark:border-vibe-rule-dark" aria-labelledby="privacy-heading">
+        <h2 id="privacy-heading" class="text-xl font-bold tracking-[-0.02em]">Nội dung trên màn hình khóa</h2>
+        <div class="mt-5 grid grid-cols-2 gap-3" role="group" aria-label="Mức riêng tư">
+          <button type="button" class="min-h-14 rounded-xl border border-vibe-rule px-3 text-sm font-bold dark:border-vibe-rule-dark" [class.bg-vibe-mint-soft]="draft.privacyMode === 'standard'" [class.text-vibe-green]="draft.privacyMode === 'standard'" [attr.aria-pressed]="draft.privacyMode === 'standard'" (click)="preferences.setPrivacyMode('standard')">Hiện tóm tắt</button>
+          <button type="button" class="min-h-14 rounded-xl border border-vibe-rule px-3 text-sm font-bold dark:border-vibe-rule-dark" [class.bg-vibe-mint-soft]="draft.privacyMode === 'private'" [class.text-vibe-green]="draft.privacyMode === 'private'" [attr.aria-pressed]="draft.privacyMode === 'private'" (click)="preferences.setPrivacyMode('private')">Chỉ báo có tín hiệu</button>
+        </div>
+      </section>
+
+      <section class="mt-10 border-t border-vibe-rule pt-7 dark:border-vibe-rule-dark" aria-labelledby="theme-heading">
+        <h2 id="theme-heading" class="text-xl font-bold tracking-[-0.02em]">Giao diện</h2>
+        <div class="mt-5 grid grid-cols-3 gap-3" role="group" aria-label="Giao diện sáng tối">
+          <button type="button" class="min-h-12 rounded-xl border border-vibe-rule text-sm font-bold dark:border-vibe-rule-dark" [class.bg-vibe-mint-soft]="draft.theme === 'system'" [attr.aria-pressed]="draft.theme === 'system'" (click)="preferences.setTheme('system')">Theo máy</button>
+          <button type="button" class="min-h-12 rounded-xl border border-vibe-rule text-sm font-bold dark:border-vibe-rule-dark" [class.bg-vibe-mint-soft]="draft.theme === 'light'" [attr.aria-pressed]="draft.theme === 'light'" (click)="preferences.setTheme('light')">Sáng</button>
+          <button type="button" class="min-h-12 rounded-xl border border-vibe-rule text-sm font-bold dark:border-vibe-rule-dark" [class.bg-vibe-mint-soft]="draft.theme === 'dark'" [attr.aria-pressed]="draft.theme === 'dark'" (click)="preferences.setTheme('dark')">Tối</button>
+        </div>
+      </section>
+
+      <section class="mt-10 border-t border-vibe-rule pt-7 dark:border-vibe-rule-dark" aria-labelledby="retention-heading">
+        <h2 id="retention-heading" class="text-xl font-bold tracking-[-0.02em]">Lưu hoạt động</h2>
+        <label for="retention" class="mt-4 block text-sm font-semibold">Thời gian giữ lịch sử</label>
+        <select id="retention" class="mt-2 min-h-12 w-full rounded-xl border border-vibe-rule bg-transparent px-3 font-semibold dark:border-vibe-rule-dark" [value]="draft.retentionDays" (change)="setRetention($event)">
+          <option [value]="7">7 ngày</option><option [value]="30">30 ngày</option><option [value]="90">90 ngày</option><option [value]="365">365 ngày</option>
+        </select>
+      </section>
+
+      <section class="mt-10 border-t border-vibe-rule pt-7 dark:border-vibe-rule-dark" aria-labelledby="recovery-heading">
+        <h2 id="recovery-heading" class="text-xl font-bold tracking-[-0.02em]">Thông báo trên iPhone</h2>
+        <p class="mt-2 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">Dùng khi bạn đã bật lại quyền thông báo hoặc đăng ký cũ không còn hoạt động.</p>
+        <button type="button" class="mt-4 min-h-12 w-full rounded-full border border-vibe-rule px-5 text-sm font-black disabled:opacity-60 dark:border-vibe-rule-dark" [disabled]="preferences.recovery() === 'working'" (click)="preferences.resetNotifications()">{{ preferences.recovery() === 'working' ? 'Đang đăng ký lại' : 'Đăng ký lại thông báo' }}</button>
+        @if (preferences.recovery() === 'ready') { <p class="mt-3 text-sm font-semibold text-vibe-green dark:text-vibe-mint" aria-live="polite">Đã đăng ký lại thông báo.</p> }
+        @if (preferences.recovery() === 'denied') { <p class="mt-3 text-sm font-semibold" aria-live="polite">Quyền đang bị tắt. Mở Cài đặt iPhone → Thông báo → VibePing, bật thông báo rồi quay lại đây.</p> }
+        @if (preferences.recovery() === 'unsupported') { <p class="mt-3 text-sm font-semibold" aria-live="polite">Hãy mở VibePing từ biểu tượng đã thêm vào Màn hình chính để đăng ký thông báo.</p> }
+        @if (preferences.recovery() === 'failed') { <p class="mt-3 text-sm font-semibold" aria-live="polite">Chưa đăng ký lại được. Kiểm tra Tailscale rồi thử lại.</p> }
+      </section>
+
+      <div class="mt-10 border-t border-vibe-rule pt-7 dark:border-vibe-rule-dark">
+        <button type="button" class="min-h-12 w-full rounded-full bg-vibe-ink px-5 text-sm font-black text-vibe-paper disabled:opacity-60 dark:bg-vibe-mint dark:text-vibe-ink" [disabled]="preferences.saving()" (click)="preferences.save()">{{ preferences.saving() ? 'Đang lưu' : 'Lưu cài đặt' }}</button>
+        @if (preferences.saved()) { <p class="mt-2 text-center text-sm font-semibold text-vibe-green dark:text-vibe-mint" aria-live="polite">Đã áp dụng cài đặt.</p> }
+        @if (preferences.saveFailed()) { <p class="mt-2 text-center text-sm font-semibold" aria-live="polite">Chưa lưu được. Kiểm tra kết nối rồi thử lại.</p> }
+      </div>
+    }
+  </main>
+</div>
+
+<app-bottom-navigation />

@@ -13,7 +13,9 @@ use tower_http::{catch_panic::CatchPanicLayer, trace::TraceLayer};
 
 use crate::{
     app::ApplicationState,
-    features::{codex_attention, notifications, pairing, system, usage_limits},
+    features::{
+        codex_attention, computer, notifications, pairing, preferences, system, usage_limits,
+    },
 };
 
 pub fn router(state: Arc<ApplicationState>) -> Router {
@@ -21,6 +23,19 @@ pub fn router(state: Arc<ApplicationState>) -> Router {
         .route("/api/v1/health", get(system::http::health))
         .route("/api/v1/bootstrap", get(system::http::bootstrap))
         .route("/api/v1/stream", get(system::http::stream))
+        .route(
+            "/api/v1/computer/status",
+            get(computer::http::computer_status),
+        )
+        .route(
+            "/api/v1/preferences",
+            get(preferences::http::get).put(preferences::http::put),
+        )
+        .route("/api/v1/diagnostics", get(computer::http::diagnostics))
+        .route(
+            "/api/v1/diagnostics/run",
+            post(computer::http::run_diagnostics),
+        )
         .route("/api/v1/activity", get(codex_attention::http::activity))
         .route("/api/v1/events", get(codex_attention::http::events))
         .route(

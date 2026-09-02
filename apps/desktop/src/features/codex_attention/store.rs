@@ -3,6 +3,8 @@ use chrono::{Duration, Utc};
 use sqlx::{Sqlite, SqlitePool, Transaction};
 use uuid::Uuid;
 
+use crate::features::preferences::policy::{self, DeliveryPolicy};
+
 use super::model::{ActivityEvent, ActivitySnapshot, CodexIngress, CodexSignal, CurrentWork};
 
 #[derive(Clone)]
@@ -22,6 +24,7 @@ impl ActivityStore {
             .await
             .context("Không mở được sự kiện Codex")?;
         ensure_turn(&mut transaction, ingress).await?;
+        let policy = policy::load(&mut transaction).await?;
         let event = match ingress.signal {
             CodexSignal::Started => event_for(ingress, "codex.turn.started"),
             CodexSignal::PermissionRequired => {
@@ -42,7 +45,7 @@ impl ActivityStore {
             }
         };
         let inserted = if let Some(event) = event {
-            insert_event(&mut transaction, ingress, event).await?
+            insert_event(&mut transaction, ingress, event, &policy).await?
         } else {
             None
         };
@@ -218,6 +221,7 @@ async fn insert_event(
     transaction: &mut Transaction<'_, Sqlite>,
     ingress: &CodexIngress,
     value: EventCopy,
+    policy: &DeliveryPolicy,
 ) -> Result<Option<ActivityEvent>> {
     let id = Uuid::new_v4().to_string();
     let dedupe = format!("{}:{}", ingress.turn_key, value.event_type);
@@ -242,7 +246,7 @@ async fn insert_event(
         return Ok(None);
     }
     if value.push {
-        enqueue_pushes(transaction, &id, &dedupe, ingress, value).await?;
+        enqueue_pushes(transaction, &id, &dedupe, ingress, value, policy).await?;
     }
     Ok(Some(ActivityEvent {
         id,
@@ -261,7 +265,11 @@ async fn enqueue_pushes(
     dedupe: &str,
     ingress: &CodexIngress,
     value: EventCopy,
+    policy: &DeliveryPolicy,
 ) -> Result<()> {
+    let Some(send_at) = policy.scheduled_at(value.event_type, Utc::now()) else {
+        return Ok(());
+    };
     let subscriptions: Vec<String> = sqlx::query_scalar(
         "SELECT p.id FROM push_subscriptions p JOIN mobile_devices d ON d.id = p.device_id \
          WHERE p.disabled_at IS NULL AND d.owner_id = 1",
@@ -280,10 +288,10 @@ async fn enqueue_pushes(
         .bind(subscription)
         .bind(dedupe)
         .bind(value.title)
-        .bind(format!("{} · {}", ingress.project_name, value.summary))
+        .bind(policy.push_body(&ingress.project_name, value.summary))
         .bind(format!("/activity/events/{event_id}"))
         .bind(format!("vibeping-{}", value.event_type.replace('.', "-")))
-        .bind(Utc::now())
+        .bind(send_at)
         .bind(Utc::now() + Duration::hours(value.ttl_hours))
         .bind(Utc::now())
         .bind(event_id)

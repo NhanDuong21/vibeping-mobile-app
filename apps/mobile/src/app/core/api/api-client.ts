@@ -18,6 +18,9 @@ export type ActivityEventDto = components['schemas']['ActivityEvent'];
 export type EventFeedDto = components['schemas']['EventFeed'];
 export type ReadStateDto = components['schemas']['ReadStateResponse'];
 export type UsageLimitsSnapshotDto = components['schemas']['UsageLimitsSnapshot'];
+export type ComputerStatusDto = components['schemas']['ComputerStatus'];
+export type PreferencesDto = components['schemas']['Preferences'];
+export type DiagnosticsDto = components['schemas']['DiagnosticsReport'];
 
 @Injectable({ providedIn: 'root' })
 export class ApiClient {
@@ -69,6 +72,37 @@ export class ApiClient {
     );
   }
 
+  computerStatus(): Observable<ComputerStatusDto> {
+    return this.#http.get<ComputerStatusDto>('/api/v1/computer/status');
+  }
+
+  preferences(): Observable<PreferencesDto> {
+    return this.#http.get<PreferencesDto>('/api/v1/preferences');
+  }
+
+  savePreferences(
+    request: PreferencesDto,
+    csrfToken: string,
+  ): Observable<PreferencesDto> {
+    return this.#http.put<PreferencesDto>(
+      '/api/v1/preferences',
+      request,
+      mutationOptions(csrfToken),
+    );
+  }
+
+  diagnostics(): Observable<DiagnosticsDto> {
+    return this.#http.get<DiagnosticsDto>('/api/v1/diagnostics');
+  }
+
+  runDiagnostics(csrfToken: string): Observable<DiagnosticsDto> {
+    return this.#http.post<DiagnosticsDto>(
+      '/api/v1/diagnostics/run',
+      null,
+      mutationOptions(csrfToken),
+    );
+  }
+
   pairingStatus(): Observable<PairingStatusDto> {
     return this.#http.get<PairingStatusDto>('/api/v1/pairing/status');
   }
@@ -95,6 +129,13 @@ export class ApiClient {
     return this.#http.post<SubscriptionResponseDto>(
       '/api/v1/push/subscriptions',
       request,
+      mutationOptions(csrfToken),
+    );
+  }
+
+  removeSubscription(id: string, csrfToken: string): Observable<{ state: string }> {
+    return this.#http.delete<{ state: string }>(
+      `/api/v1/push/subscriptions/${encodeURIComponent(id)}`,
       mutationOptions(csrfToken),
     );
   }
