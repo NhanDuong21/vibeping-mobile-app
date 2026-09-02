@@ -71,10 +71,39 @@ pub fn notify_command(executable: &Path) -> Vec<String> {
 }
 
 fn hook_command(executable: &Path) -> String {
-    format!(
-        "\"{}\" integrations codex ingest-hook --source {OWNER_MARKER}",
-        executable.to_string_lossy().replace('"', "")
-    )
+    let executable = executable.to_string_lossy().replace('"', "");
+    let executable = if executable.chars().any(needs_shell_quotes) {
+        format!("\"{executable}\"")
+    } else {
+        executable
+    };
+    format!("{executable} integrations codex ingest-hook --source {OWNER_MARKER}")
+}
+
+fn needs_shell_quotes(character: char) -> bool {
+    character.is_whitespace()
+        || matches!(
+            character,
+            '&' | '<'
+                | '>'
+                | '['
+                | ']'
+                | '|'
+                | '{'
+                | '}'
+                | '^'
+                | '='
+                | ';'
+                | '!'
+                | '\''
+                | '+'
+                | ','
+                | '`'
+                | '~'
+                | '%'
+                | '('
+                | ')'
+        )
 }
 
 pub fn read_string_array(item: Option<&Item>) -> Option<Vec<String>> {
@@ -176,5 +205,23 @@ mod tests {
         assert_eq!(repaired.to_string().matches("keep-me").count(), 1);
         assert_eq!(repaired.to_string().matches(OWNER_MARKER).count(), 4);
         assert!(repaired["hooks"]["PostToolUse"][0].get("matcher").is_none());
+    }
+
+    #[test]
+    fn hook_command_avoids_unneeded_leading_quote_for_older_codex_on_windows() {
+        let command = hook_command(Path::new("C:\\VibePing\\vibeping.exe"));
+        assert_eq!(
+            command,
+            "C:\\VibePing\\vibeping.exe integrations codex ingest-hook --source vibeping-hook-v1"
+        );
+    }
+
+    #[test]
+    fn hook_command_quotes_paths_with_shell_sensitive_characters() {
+        let command = hook_command(Path::new("C:\\Vibe Ping\\vibeping.exe"));
+        assert_eq!(
+            command,
+            "\"C:\\Vibe Ping\\vibeping.exe\" integrations codex ingest-hook --source vibeping-hook-v1"
+        );
     }
 }

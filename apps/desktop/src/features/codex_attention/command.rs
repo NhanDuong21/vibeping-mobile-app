@@ -55,7 +55,7 @@ pub async fn execute(args: CodexIntegrationArgs) -> Result<String> {
         CodexIntegrationCommand::Remove => installer::remove(),
         CodexIntegrationCommand::IngestHook { source, data_dir } => {
             if source != "vibeping-hook-v1" {
-                return Ok("{}".into());
+                return Ok(String::new());
             }
             let mut bytes = Vec::new();
             io::stdin()
@@ -63,7 +63,7 @@ pub async fn execute(args: CodexIntegrationArgs) -> Result<String> {
                 .read_to_end(&mut bytes)
                 .context("Không đọc được tín hiệu Codex")?;
             ingest("hook", &bytes, data_dir).await?;
-            Ok("{}".into())
+            Ok(String::new())
         }
         CodexIntegrationCommand::IngestNotify { payload, data_dir } => {
             ingest("notify", payload.as_bytes(), data_dir).await?;
