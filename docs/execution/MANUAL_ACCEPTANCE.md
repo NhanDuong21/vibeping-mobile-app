@@ -17,23 +17,25 @@ Do Angular service worker thay thế worker Gate 0 tại cùng scope, lần mở
 
 ## Installation and update
 
-- [ ] Tailscale is connected on the iPhone.
-- [ ] The existing VibePing Home Screen icon opens the final product.
-- [ ] The final product replaces the Gate 0 interface.
-- [ ] The private origin has not changed.
-- [ ] No reinstall is required, or the documented one-time reload succeeds.
+- [x] Tailscale is connected on the iPhone.
+- [x] The existing VibePing Home Screen icon opens the final product.
+- [x] The final product replaces the Gate 0 interface.
+- [x] The private origin has not changed.
+- [x] No reinstall is required, or the documented one-time reload succeeds.
 
 ## Push notifications
 
-- [ ] A notification scheduled for 10 seconds appears on the locked iPhone.
-- [ ] Tapping the notification opens or focuses VibePing.
-- [ ] Foreground delivery behaves correctly.
-- [ ] Background delivery behaves correctly.
-- [ ] Delivery works after removing VibePing from the app switcher.
-- [ ] Delivery works with iPhone cellular data and laptop Wi-Fi.
-- [ ] A queued signal arrives after the iPhone goes offline and returns online.
-- [ ] Delivery works after the final Rust process restarts.
-- [ ] Restart does not require enabling notifications or reinstalling the PWA.
+- [x] A notification scheduled for 10 seconds appears on the locked iPhone.
+- [x] Tapping the notification opens or focuses VibePing.
+- [x] Foreground delivery behaves correctly.
+- [x] Background delivery behaves correctly.
+- [x] Delivery works after removing VibePing from the app switcher.
+- [x] Delivery works with iPhone cellular data and laptop Wi-Fi.
+- [x] A queued signal arrives after the iPhone goes offline and returns online.
+- [x] Delivery works after the final Rust process restarts.
+- [x] Restart does not require enabling notifications or reinstalling the PWA.
+
+Physical evidence on 2026-09-02: the locked iPhone displayed the delayed test notification with sound or vibration, and tapping it opened or focused VibePing.
 
 ## Codex attention
 
@@ -45,9 +47,9 @@ Do Angular service worker thay thế worker Gate 0 tại cùng scope, lần mở
 
 ## Codex allowance
 
-- [ ] Real allowance windows are visible and understandable.
-- [ ] Percent remaining and local reset time are correct.
-- [ ] Manual refresh works.
+- [x] Real allowance windows are visible and understandable.
+- [x] Percent remaining and local reset time are correct.
+- [x] Manual refresh works.
 - [ ] No internal bucket identifier appears as the main label.
 - [ ] Low/critical behavior is simulated without changing the real account.
 
@@ -62,12 +64,12 @@ Do Angular service worker thay thế worker Gate 0 tại cùng scope, lần mở
 
 ## Interface and settings
 
-- [ ] Light theme is usable.
-- [ ] Dark theme is usable.
-- [ ] System theme follows the iPhone.
-- [ ] No screen overflows horizontally on the iPhone.
+- [x] Light theme is usable.
+- [x] Dark theme is usable.
+- [x] System theme follows the iPhone.
+- [x] No screen overflows horizontally on the iPhone.
 - [ ] All visible client text is Vietnamese.
-- [ ] Settings persist and affect behavior.
+- [x] Settings persist and affect behavior.
 - [ ] Quiet hours, including an overnight interval, behave correctly.
 - [ ] Minimal, balanced, and full lock-screen privacy modes behave correctly.
 

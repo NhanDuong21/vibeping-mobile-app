@@ -6,6 +6,17 @@ import { EVENT_SOURCE_FACTORY } from '../../../core/connectivity/event-source';
 type UsageWindow = UsageLimitsSnapshotDto['windows'][number];
 type ReaderState = 'loading' | 'ready' | 'refreshing' | 'unavailable';
 
+const DAY_IN_MILLISECONDS = 86_400_000;
+const WEEKDAY_LABELS = [
+  'Chủ Nhật',
+  'Thứ Hai',
+  'Thứ Ba',
+  'Thứ Tư',
+  'Thứ Năm',
+  'Thứ Sáu',
+  'Thứ Bảy',
+] as const;
+
 @Injectable({ providedIn: 'root' })
 export class UsageLimitsStore {
   readonly #api = inject(ApiClient);
@@ -70,12 +81,15 @@ export class UsageLimitsStore {
     const minutes = Math.max(0, Math.round((reset.getTime() - now.getTime()) / 60_000));
     if (minutes < 60) return `Đặt lại sau ${minutes} phút`;
     if (minutes < 24 * 60) return `Đặt lại sau ${Math.round(minutes / 60)} giờ`;
-    return `Đặt lại ${new Intl.DateTimeFormat('vi-VN', {
-      day: 'numeric',
-      month: 'numeric',
+    const weekday = WEEKDAY_LABELS[reset.getDay()];
+    const weekContext = isNextCalendarWeek(reset, now) ? ' tuần sau' : '';
+    const time = new Intl.DateTimeFormat('vi-VN', {
       hour: '2-digit',
       minute: '2-digit',
-    }).format(reset)}`;
+      hourCycle: 'h23',
+    }).format(reset);
+    const date = formatCalendarDate(reset, now);
+    return `Đặt lại ${weekday}${weekContext}, ${time} · ${date}`;
   }
 
   #load(): void {
@@ -92,4 +106,20 @@ export class UsageLimitsStore {
         error: () => this.#readerState.set('unavailable'),
       });
   }
+}
+
+function isNextCalendarWeek(value: Date, now: Date): boolean {
+  return localWeekStart(value) - localWeekStart(now) === 7 * DAY_IN_MILLISECONDS;
+}
+
+function localWeekStart(value: Date): number {
+  const daysSinceMonday = (value.getDay() + 6) % 7;
+  return Date.UTC(value.getFullYear(), value.getMonth(), value.getDate() - daysSinceMonday);
+}
+
+function formatCalendarDate(value: Date, now: Date): string {
+  const day = String(value.getDate()).padStart(2, '0');
+  const month = String(value.getMonth() + 1).padStart(2, '0');
+  const year = value.getFullYear() === now.getFullYear() ? '' : `/${value.getFullYear()}`;
+  return `${day}/${month}${year}`;
 }
