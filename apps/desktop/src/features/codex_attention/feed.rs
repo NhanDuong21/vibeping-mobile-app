@@ -3,13 +3,14 @@ use anyhow::{Context, Result, bail};
 use super::{ActivityEvent, ActivityStore, CurrentWork, EventFeed, ReadStateResponse};
 
 impl ActivityStore {
-    pub async fn has_started_signal(&self) -> Result<bool> {
+    pub async fn has_hook_signal(&self) -> Result<bool> {
         sqlx::query_scalar(
-            "SELECT EXISTS(SELECT 1 FROM activity_events WHERE event_type = 'codex.turn.started')",
+            "SELECT EXISTS(SELECT 1 FROM app_metadata WHERE key = 'codex_hook_observed' \
+             UNION ALL SELECT 1 FROM activity_events WHERE event_type = 'codex.turn.started')",
         )
         .fetch_one(&self.pool)
         .await
-        .context("Không kiểm tra được tín hiệu bắt đầu Codex")
+        .context("Không kiểm tra được tín hiệu Codex")
     }
 
     pub async fn current_work(&self) -> Result<Option<CurrentWork>> {

@@ -39,7 +39,7 @@ impl ComputerStore {
                 .context("Không đọc được tín hiệu gần nhất")?;
         let installed = self.data_dir.join("codex-integration.json").is_file();
         let hook_ready = ActivityStore::new(self.pool.clone())
-            .has_started_signal()
+            .has_hook_signal()
             .await?;
         let codex = match (installed, hook_ready, allowance.state.as_str()) {
             (false, _, _) => "notInstalled",

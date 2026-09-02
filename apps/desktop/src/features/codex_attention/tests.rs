@@ -74,6 +74,27 @@ fn classifier_recognizes_documented_attention_and_test_signals() {
 }
 
 #[tokio::test]
+async fn hook_readiness_ignores_notify_only_and_accepts_any_hook_signal() {
+    let temp = tempdir().unwrap();
+    let pool = database::connect(&temp.path().join("hook-readiness.sqlite3"))
+        .await
+        .unwrap();
+    let store = ActivityStore::new(pool);
+
+    store
+        .ingest(&ingress("notify", CodexSignal::Completed))
+        .await
+        .unwrap();
+    assert!(!store.has_hook_signal().await.unwrap());
+
+    store
+        .ingest(&ingress("hook", CodexSignal::Stopped))
+        .await
+        .unwrap();
+    assert!(store.has_hook_signal().await.unwrap());
+}
+
+#[tokio::test]
 async fn progress_resumes_waiting_work_without_creating_feed_noise() {
     let temp = tempdir().unwrap();
     let pool = database::connect(&temp.path().join("progress.sqlite3"))

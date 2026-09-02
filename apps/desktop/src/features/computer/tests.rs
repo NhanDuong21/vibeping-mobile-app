@@ -41,7 +41,7 @@ async fn status_and_diagnostics_expose_only_stable_sanitized_facts() {
 }
 
 #[tokio::test]
-async fn configured_codex_stays_in_review_until_a_real_start_signal_arrives() {
+async fn configured_codex_stays_in_review_until_a_real_hook_signal_arrives() {
     let temp = tempdir().unwrap();
     let data_dir = temp.path().join("data");
     std::fs::create_dir(&data_dir).unwrap();
@@ -60,7 +60,7 @@ async fn configured_codex_stays_in_review_until_a_real_start_signal_arrives() {
             session_key: "session".into(),
             turn_key: "turn".into(),
             project_name: "project".into(),
-            signal: CodexSignal::Started,
+            signal: CodexSignal::Progressed,
             occurred_at: Utc::now(),
         })
         .await

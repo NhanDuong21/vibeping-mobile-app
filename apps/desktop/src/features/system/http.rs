@@ -54,7 +54,7 @@ pub async fn bootstrap(
     let codex = if !state.data_dir.join("codex-integration.json").is_file() {
         "notInstalled"
     } else if activity
-        .has_started_signal()
+        .has_hook_signal()
         .await
         .map_err(|_| ApiError::unavailable("BOOTSTRAP_UNAVAILABLE"))?
     {

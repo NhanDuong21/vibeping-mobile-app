@@ -94,7 +94,7 @@ fn check(
 
 fn codex_recovery(state: &str) -> &'static str {
     if state == "needsReview" {
-        "Trên laptop, mở /hooks trong Codex và duyệt VibePing một lần."
+        "Gửi một yêu cầu mới trong Codex. Nếu VibePing vẫn chưa cập nhật, mở /hooks và kiểm tra các mục VibePing đang bật."
     } else {
         "Trên laptop, chạy sửa tích hợp rồi kiểm tra /hooks trong Codex."
     }

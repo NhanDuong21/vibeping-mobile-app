@@ -23,6 +23,9 @@ impl ActivityStore {
             .begin()
             .await
             .context("Không mở được sự kiện Codex")?;
+        if ingress.signal != CodexSignal::Completed {
+            record_hook_signal(&mut transaction, ingress).await?;
+        }
         ensure_turn(&mut transaction, ingress).await?;
         let policy = policy::load(&mut transaction).await?;
         let event = match ingress.signal {
@@ -84,6 +87,22 @@ impl ActivityStore {
             cursor: Utc::now().timestamp_millis().to_string(),
         })
     }
+}
+
+async fn record_hook_signal(
+    transaction: &mut Transaction<'_, Sqlite>,
+    value: &CodexIngress,
+) -> Result<()> {
+    sqlx::query(
+        "INSERT INTO app_metadata (key, value, updated_at) VALUES \
+         ('codex_hook_observed', 'true', ?) ON CONFLICT(key) DO UPDATE SET \
+         value = excluded.value, updated_at = excluded.updated_at",
+    )
+    .bind(value.occurred_at)
+    .execute(&mut **transaction)
+    .await
+    .context("Không lưu được trạng thái kết nối Codex")?;
+    Ok(())
 }
 
 async fn ensure_turn(

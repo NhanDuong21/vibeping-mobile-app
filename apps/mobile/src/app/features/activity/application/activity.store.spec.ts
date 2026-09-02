@@ -145,6 +145,45 @@ describe('ActivityStore', () => {
     store.stop();
   });
 
+  it('refreshes Codex readiness when a work signal arrives after hook review', async () => {
+    const listeners = new Map<string, EventListener>();
+    const needsReview = {
+      ...bootstrap,
+      connection: { ...bootstrap.connection, codex: 'needsReview' },
+    };
+    const api = {
+      bootstrap: vi.fn().mockReturnValueOnce(of(needsReview)).mockReturnValue(of(bootstrap)),
+      events: vi.fn().mockReturnValue(of({ events: [], nextCursor: null, unreadCount: 0 })),
+      pairingStatus: vi.fn().mockReturnValue(throwError(() => new Error('offline'))),
+    };
+    const stream = {
+      addEventListener: vi.fn((name: string, listener: EventListener) =>
+        listeners.set(name, listener),
+      ),
+      close: vi.fn(),
+    } as unknown as EventSource;
+    TestBed.configureTestingModule({
+      providers: [
+        ActivityStore,
+        { provide: ApiClient, useValue: api },
+        {
+          provide: ActivityCache,
+          useValue: { read: vi.fn().mockResolvedValue(null), write: vi.fn() },
+        },
+        { provide: EVENT_SOURCE_FACTORY, useValue: () => stream },
+      ],
+    });
+    const store = TestBed.inject(ActivityStore);
+    store.start();
+    await vi.waitFor(() => expect(store.codexNeedsReview()).toBe(true));
+
+    listeners.get('work')?.(new MessageEvent('work', { data: 'null' }));
+
+    await vi.waitFor(() => expect(store.codexNeedsReview()).toBe(false));
+    expect(api.bootstrap).toHaveBeenCalledTimes(2);
+    store.stop();
+  });
+
   it('preserves optimistic read state while reconciling duplicate records', () => {
     expect(mergeEvents([{ ...event, isRead: true }], [event])).toEqual([
       { ...event, isRead: true },

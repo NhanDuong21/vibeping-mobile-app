@@ -220,9 +220,11 @@ export class ActivityStore {
         void this.#sync();
         return;
       }
+      const shouldRefreshCodexStatus = bootstrap.connection.codex === 'needsReview';
       this.#bootstrap.set({ ...bootstrap, currentWork: current });
       this.#savedAt.set(new Date());
       void this.#persist();
+      if (shouldRefreshCodexStatus) void this.#sync();
     } catch {
       void this.#sync();
     }
