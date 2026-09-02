@@ -20,14 +20,23 @@ pub struct DeliveryOutcome {
 }
 
 pub async fn deliver(data_dir: &Path, job: &DeliveryJob) -> DeliveryOutcome {
-    match build_and_send(data_dir, job).await {
+    classify(build_and_send(data_dir, job).await)
+}
+
+fn classify(result: Result<StatusCode>) -> DeliveryOutcome {
+    match result {
         Ok(status) if status.is_success() => outcome("accepted", Some(status)),
         Ok(status @ (StatusCode::NOT_FOUND | StatusCode::GONE)) => outcome("stale", Some(status)),
         Ok(status) if status == StatusCode::TOO_MANY_REQUESTS || status.is_server_error() => {
             outcome("retry", Some(status))
         }
         Ok(status) => outcome("rejected", Some(status)),
-        Err(error) if error.to_string().contains("PROVIDER_UNREACHABLE") => outcome("retry", None),
+        Err(error)
+            if error.to_string().contains("PROVIDER_UNREACHABLE")
+                || error.to_string().contains("PROVIDER_TIMEOUT") =>
+        {
+            outcome("retry", None)
+        }
         Err(_) => outcome("malformed", None),
     }
 }
@@ -72,9 +81,9 @@ async fn build_and_send(data_dir: &Path, job: &DeliveryJob) -> Result<StatusCode
         "VibePing/1.0".parse().expect("static user agent"),
     );
     let client = Client::builder(TokioExecutor::new()).build(HttpsConnector::new());
-    client
-        .request(request)
+    tokio::time::timeout(Duration::from_secs(10), client.request(request))
         .await
+        .context("PROVIDER_TIMEOUT")?
         .map(|response| response.status())
         .context("PROVIDER_UNREACHABLE")
 }
@@ -88,7 +97,14 @@ fn outcome(kind: &'static str, status: Option<StatusCode>) -> DeliveryOutcome {
 
 #[cfg(test)]
 mod tests {
+    use anyhow::anyhow;
+    use chrono::{Duration as ChronoDuration, Utc};
+    use hyper::StatusCode;
     use serde_json::Value;
+    use tempfile::tempdir;
+
+    use super::{classify, deliver};
+    use crate::features::notifications::store::DeliveryJob;
 
     #[test]
     fn angular_payload_has_one_click_navigation_contract() {
@@ -103,5 +119,43 @@ mod tests {
                 .and_then(Value::as_str),
             Some("navigateLastFocusedOrOpen")
         );
+    }
+
+    #[test]
+    fn provider_statuses_and_network_failures_have_bounded_outcomes() {
+        for status in [StatusCode::OK, StatusCode::CREATED, StatusCode::NO_CONTENT] {
+            assert_eq!(classify(Ok(status)).kind, "accepted");
+        }
+        for status in [StatusCode::NOT_FOUND, StatusCode::GONE] {
+            assert_eq!(classify(Ok(status)).kind, "stale");
+        }
+        for status in [StatusCode::TOO_MANY_REQUESTS, StatusCode::BAD_GATEWAY] {
+            assert_eq!(classify(Ok(status)).kind, "retry");
+        }
+        assert_eq!(classify(Err(anyhow!("PROVIDER_TIMEOUT"))).kind, "retry");
+        assert_eq!(classify(Err(anyhow!("PROVIDER_UNREACHABLE"))).kind, "retry");
+        assert_eq!(classify(Err(anyhow!("bad subscription"))).kind, "malformed");
+    }
+
+    #[tokio::test]
+    async fn malformed_subscription_fails_before_network_delivery() {
+        let temp = tempdir().unwrap();
+        let outcome = deliver(
+            temp.path(),
+            &DeliveryJob {
+                id: "job".into(),
+                endpoint: "https://push.example.test/id".into(),
+                p256dh: "not-a-key".into(),
+                auth: "not-auth".into(),
+                title: "VibePing".into(),
+                body: "Tín hiệu".into(),
+                target_url: "/activity".into(),
+                tag: "vibeping-test".into(),
+                attempt_count: 0,
+                expires_at: Utc::now() + ChronoDuration::minutes(1),
+            },
+        )
+        .await;
+        assert_eq!(outcome.kind, "malformed");
     }
 }

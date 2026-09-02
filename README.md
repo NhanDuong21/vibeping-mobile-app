@@ -18,6 +18,7 @@ Gate 0 preserves the proven standards-based iPhone Web Push path from a stable p
 | Phase 5 | COMPLETE | A supervised official Codex App Server session persists dynamic allowance windows, publishes live updates, deduplicates threshold alerts, and powers Vietnamese summary/detail views. |
 | Phase 6 | COMPLETE | The mobile Activity product now has a paginated unread feed, exact event detail links, bottom navigation, live reconciliation, IndexedDB recovery, stale states, and a deliberate app-update banner. |
 | Phase 7 | COMPLETE | Computer readiness, production notification preferences, overnight quiet hours, privacy/theme/retention controls, subscription recovery, and sanitized diagnostics are available on mobile. |
+| Phase 8 | COMPLETE | Database migration recovery, confirmed backup/restore/reset commands, lifecycle and push fault handling, private-host and browser security, cache/XSS safety, redaction, dependency audits, and Windows owner ACLs are hardened. |
 
 ## Constraints
 
@@ -54,6 +55,16 @@ Control the production process explicitly (there is no auto-start):
 .\scripts\vibeping.ps1 open
 .\scripts\vibeping.ps1 stop
 ```
+
+Back up or recover local state only while VibePing is stopped. Restore and notification reset deliberately require explicit confirmation:
+
+```powershell
+vibeping backup
+vibeping restore --file <duong-dan-ban-sao> --confirm
+vibeping reset notifications --confirm
+```
+
+Manual backup bundles can include the private notification sender identity. Keep them inside the protected VibePing data directory or protect any copy you move elsewhere.
 
 The same public commands are available directly on `vibeping.exe`. The first unpaired Start prints a short-lived one-time pairing code. Runtime data, the single-instance lock, user intent, private shutdown metadata, SQLite, rotating logs, and sender identity live under `%LOCALAPPDATA%\VibePing` unless `-DataDir`/`--data-dir` is supplied.
 

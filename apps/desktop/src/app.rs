@@ -11,6 +11,7 @@ use tokio::{
 use crate::features::{
     codex_attention::{ActivityStore, CodexIngress, CodexSignal},
     notifications::{VapidIdentity, migration, worker},
+    preferences::PreferenceStore,
     usage_limits::{self, RefreshRequest, UsageLimitStore},
 };
 use crate::{config::RuntimeConfig, infrastructure};
@@ -29,6 +30,9 @@ pub struct ApplicationState {
 
 pub async fn build_state(config: &RuntimeConfig) -> Result<Arc<ApplicationState>> {
     let database = infrastructure::database::connect(&config.database_path()).await?;
+    PreferenceStore::new(database.clone())
+        .cleanup_retention()
+        .await?;
     migration::import_gate0_once(config.data_dir(), &database).await?;
     VapidIdentity::load_or_create(config.data_dir())?;
     let (activity_events, _) = broadcast::channel(64);
@@ -84,7 +88,13 @@ pub async fn run_with_shutdown(
                     }
                 }
                 Ok(None) => {}
-                Err(error) => tracing::warn!(%error, "Không lưu được tín hiệu Codex"),
+                Err(error) => {
+                    let reason = infrastructure::observability::SafeErrorCode::from_error(
+                        "ACTIVITY_PERSIST_FAILED",
+                        &error,
+                    );
+                    tracing::warn!(%reason, "Không lưu được tín hiệu Codex");
+                }
             }
             if refresh_usage {
                 let _ = activity_state

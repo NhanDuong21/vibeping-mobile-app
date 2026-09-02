@@ -4,6 +4,7 @@ use clap::{Parser, Subcommand};
 use vibeping::features::{
     codex_attention::command::{self as codex_command, CodexIntegrationArgs},
     lifecycle::{self, DataOptions, HostOptions, LifecycleCommand},
+    recovery::{self, BackupArgs, ResetNotificationsArgs, RestoreArgs},
 };
 
 #[derive(Debug, Parser)]
@@ -35,6 +36,15 @@ enum RootCommand {
     Doctor(DataOptions),
     #[command(about = "Mở VibePing bằng trình duyệt mặc định")]
     Open(DataOptions),
+    #[command(about = "Tạo bản sao dữ liệu cục bộ")]
+    Backup(BackupArgs),
+    #[command(about = "Khôi phục từ bản sao dữ liệu")]
+    Restore(RestoreArgs),
+    #[command(about = "Đặt lại dữ liệu có xác nhận")]
+    Reset {
+        #[command(subcommand)]
+        action: ResetCommand,
+    },
     #[command(about = "Quản lý tích hợp")]
     Integrations {
         #[command(subcommand)]
@@ -48,6 +58,12 @@ enum IntegrationCommand {
     Codex(CodexIntegrationArgs),
 }
 
+#[derive(Debug, Subcommand)]
+enum ResetCommand {
+    #[command(about = "Xóa đăng ký thông báo để đăng ký lại")]
+    Notifications(ResetNotificationsArgs),
+}
+
 #[tokio::main]
 async fn main() -> ExitCode {
     let result = match Cli::parse().command {
@@ -58,6 +74,11 @@ async fn main() -> ExitCode {
         RootCommand::Status(value) => lifecycle::execute(LifecycleCommand::Status(value)).await,
         RootCommand::Doctor(value) => lifecycle::execute(LifecycleCommand::Doctor(value)).await,
         RootCommand::Open(value) => lifecycle::execute(LifecycleCommand::Open(value)).await,
+        RootCommand::Backup(value) => recovery::command::backup(value).await,
+        RootCommand::Restore(value) => recovery::command::restore(value).await,
+        RootCommand::Reset {
+            action: ResetCommand::Notifications(value),
+        } => recovery::command::reset_notifications(value).await,
         RootCommand::Integrations {
             integration: IntegrationCommand::Codex(value),
         } => codex_command::execute(value).await,

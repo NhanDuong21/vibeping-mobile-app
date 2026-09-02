@@ -168,4 +168,20 @@ mod tests {
         assert!(removed.to_string().contains("impeccable"));
         assert!(!removed.to_string().contains(OWNER_MARKER));
     }
+
+    #[test]
+    fn repair_reinstates_missing_owned_hooks_without_duplicating_other_hooks() {
+        let executable = Path::new("C:\\VibePing\\vibeping.exe");
+        let original = json!({
+            "hooks": {
+                "Stop": [{"hooks": [{"type": "command", "command": "keep-me"}]}],
+                "PermissionRequest": []
+            }
+        });
+        let repaired = merge_hooks(original, executable);
+        let repaired_again = merge_hooks(repaired.clone(), executable);
+        assert_eq!(repaired, repaired_again);
+        assert_eq!(repaired.to_string().matches("keep-me").count(), 1);
+        assert_eq!(repaired.to_string().matches(OWNER_MARKER).count(), 4);
+    }
 }

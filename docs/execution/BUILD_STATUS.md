@@ -5,7 +5,7 @@
 - **Stable private origin:** discovered at runtime; intentionally not repeated in tracked documentation
 - **Gate 0:** PASS and still running on `127.0.0.1:8787` during early development
 - **Gate 1:** PASS
-- **Current phase:** Phase 8 ready to begin
+- **Current phase:** Phase 9 ready to begin
 - **Overall state:** IN_PROGRESS
 
 ## Phase ledger
@@ -18,18 +18,18 @@
 | 4 | COMPLETE | `4d57124c65b852f07b352dbe40b7639ecbe2627b` | Safe Codex executable selection; idempotent notify/hook merge with backup, coexistence and removal; privacy-normalized loopback IPC and crash spool; persisted turn/activity state; deduplicated push jobs; SSE and current-work activity UI | 24 Rust unit tests including classifier, state, dedupe, IPC, spool and installer merge; generated contract; Angular lint/typecheck/build and 4 unit tests; isolated install/status/repair/remove exercise | `/hooks` review remains a required morning action; real hook delivery is not claimed before trust | Physical iPhone display remains pending until Phase 10 cutover |
 | 5 | COMPLETE | `6173a96a8a879b29fe9f46517acf88bfeefed891` | Supervised official App Server session; supported account classification; dynamic primary/secondary normalization; update/completion/manual/poll refresh; persistence and stale fallback; per-cycle low/critical/exhausted events and push jobs; REST/SSE; allowance summary/detail UI | 35 Rust tests total including allowance/account/protocol/restart/concurrency/alert and owner-boundary tests; 6 Angular tests; generated-contract freshness; lint/typecheck/build; 20 light/dark Playwright tests | Real signed-in account returned three normalized windows; ignored SQLite scan contained no email/token pattern; Impeccable Shape/Implement/Critique/Harden/Adapt applied | Physical iPhone display and low-alert simulation remain pending until final acceptance |
 | 6 | COMPLETE | `0a5033f95572eb50a3392f83ac2613902fadfe8a` | Owner-bound bootstrap; cursor feed/detail/read APIs; unread badge and bottom navigation; exact push deep links; SSE reconciliation; bounded IndexedDB cache and pending read intents; offline/stale/missing states; deliberate service-worker update banner | 37 Rust tests; 9 Angular tests; generated-contract freshness; lint/typecheck/release build; 30 light/dark Playwright checks including pagination, duplicate SSE, deep links, offline cached launch, and schema upgrade | Impeccable Shape/Implement/Critique/Harden/Adapt plus bounded 390 px light/dark screenshot review; scrolling and Ionic link-color issues corrected | Physical iPhone display remains pending until final acceptance |
-| 7 | COMPLETE | Pending next checkpoint | Owner-safe Computer status; delayed notification test; production notification types, allowance threshold, critical alerts, overnight quiet hours and urgent exception; privacy/theme/retention; notification re-registration; actionable sanitized diagnostics and clipboard report | 42 Rust tests; 14 Angular tests; generated-contract freshness; lint/typecheck/release build; 36 light/dark Playwright checks including full settings persistence, delayed test, diagnostics, clipboard and WCAG | Impeccable Shape/Implement/Critique/Harden/Adapt with 390×844 light/dark screenshots; switch affordance, touch targets, duplicate recovery copy, and recovery-text contrast corrected | Physical iPhone settings, delayed display, and notification permission recovery remain pending until final acceptance |
-| 8 | PENDING | — | — | — | — | — |
+| 7 | COMPLETE | `64644181cee7b231ce3491e01b2756c75af810f6` | Owner-safe Computer status; delayed notification test; production notification types, allowance threshold, critical alerts, overnight quiet hours and urgent exception; privacy/theme/retention; notification re-registration; actionable sanitized diagnostics and clipboard report | 42 Rust tests; 14 Angular tests; generated-contract freshness; lint/typecheck/release build; 36 light/dark Playwright checks including full settings persistence, delayed test, diagnostics, clipboard and WCAG | Impeccable Shape/Implement/Critique/Harden/Adapt with 390×844 light/dark screenshots; switch affordance, touch targets, duplicate recovery copy, and recovery-text contrast corrected | Physical iPhone settings, delayed display, and notification permission recovery remain pending until final acceptance |
+| 8 | COMPLETE | Pending next checkpoint | SQLite migration backup/rollback and retention; confirmed backup/restore/notification reset; lifecycle, outbox, spool, SSE, network, push and Codex fault hardening; private-host/security headers; cache/XSS safety; stable-code logs; owner/SYSTEM ACL | 57 production Rust unit tests plus CLI/HTTP integrations; 15 Angular tests; 40 light/dark Playwright checks; contract, lint, typecheck, release, architecture, hygiene, secret and dependency audits | No physical claim; private Gate 0 remains isolated and live | Same-user malware and backup files copied outside the protected directory remain residual risks |
 | 9 | PENDING | — | — | — | Physical iPhone visual check pending | — |
 | 10 | PENDING | — | — | — | Full physical matrix and seven-day soak pending | — |
 
 ## Next phase
 
-Begin Phase 8 hardening without changing the live Serve mapping.
+Begin the final bounded Phase 9 Impeccable and accessibility passes without changing the live Serve mapping.
 
 ## Exact resume point
 
-After committing Phase 7, finalize its hash in this ledger. Then harden secret storage, ACLs, CSP, rate limits, retention cleanup, backup/restore, fault recovery, logging, and observability while leaving Gate 0 live.
+After committing Phase 8, finalize its hash in this ledger. Then audit every required mobile surface at the requested widths, themes, motion and text-stress settings, apply one bounded fix round, and confirm it once.
 
 ## Commit-record convention
 

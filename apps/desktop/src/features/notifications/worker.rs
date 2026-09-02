@@ -14,12 +14,20 @@ pub async fn run(pool: SqlitePool, data_dir: PathBuf) {
             Ok(Some(job)) => {
                 let outcome = sender::deliver(&data_dir, &job).await;
                 if let Err(error) = store.finish(&job, outcome.kind, outcome.status).await {
-                    tracing::warn!(reason = %error, "Chưa lưu được kết quả thông báo");
+                    let reason = crate::infrastructure::observability::SafeErrorCode::from_error(
+                        "OUTBOX_WRITE_FAILED",
+                        &error,
+                    );
+                    tracing::warn!(%reason, "Chưa lưu được kết quả thông báo");
                 }
             }
             Ok(None) => tokio::time::sleep(Duration::from_millis(500)).await,
             Err(error) => {
-                tracing::warn!(reason = %error, "Hàng đợi thông báo đang chờ khôi phục");
+                let reason = crate::infrastructure::observability::SafeErrorCode::from_error(
+                    "OUTBOX_READ_FAILED",
+                    &error,
+                );
+                tracing::warn!(%reason, "Hàng đợi thông báo đang chờ khôi phục");
                 tokio::time::sleep(Duration::from_secs(2)).await;
             }
         }

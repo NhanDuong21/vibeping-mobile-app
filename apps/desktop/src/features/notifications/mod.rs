@@ -9,6 +9,7 @@ pub mod worker;
 
 pub use store::NotificationStore;
 pub use vapid::VapidIdentity;
+pub(crate) use vapid::vapid_path;
 
 #[cfg(test)]
 mod tests;

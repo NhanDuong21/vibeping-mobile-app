@@ -245,6 +245,13 @@ async fn inspect_status(paths: &RuntimePaths) -> LifecycleStatus {
     }
 }
 
+pub(crate) async fn ensure_stopped(paths: &RuntimePaths) -> Result<()> {
+    if matches!(inspect_status(paths).await, LifecycleStatus::Running { .. }) {
+        bail!("Hãy dừng VibePing trước khi tiếp tục")
+    }
+    Ok(())
+}
+
 async fn build_doctor_report(paths: &RuntimePaths) -> DoctorReport {
     let data_directory_ready = paths.ensure().is_ok();
     let status = inspect_status(paths).await;

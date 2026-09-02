@@ -55,6 +55,15 @@ async fn health_bootstrap_and_spa_fallback_are_served() {
             .unwrap()
             .contains("base-uri 'self'")
     );
+    assert_eq!(
+        route.headers()["Permissions-Policy"],
+        "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+    );
+    assert_eq!(route.headers()["Cross-Origin-Opener-Policy"], "same-origin");
+    assert_eq!(
+        route.headers()["Cross-Origin-Resource-Policy"],
+        "same-origin"
+    );
 
     let script = app
         .oneshot(Request::get("/ngsw-worker.js").body(Body::empty()).unwrap())
@@ -62,6 +71,45 @@ async fn health_bootstrap_and_spa_fallback_are_served() {
         .unwrap();
     assert_eq!(script.status(), StatusCode::OK);
     assert_eq!(script.headers()[header::CACHE_CONTROL], "no-cache");
+}
+
+#[tokio::test]
+async fn untrusted_host_is_rejected_before_api_or_assets() {
+    let temp = tempdir().unwrap();
+    let config = RuntimeConfig::discover(8792, Some(temp.path().to_path_buf())).unwrap();
+    let app = web::router(build_state(&config).await.unwrap());
+    let response = app
+        .oneshot(
+            Request::get("/api/v1/health")
+                .header(header::HOST, "attacker.example")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::MISDIRECTED_REQUEST);
+    assert_eq!(response.headers()["X-Frame-Options"], "DENY");
+}
+
+#[tokio::test]
+async fn private_https_host_receives_transport_security() {
+    let temp = tempdir().unwrap();
+    let config = RuntimeConfig::discover(8792, Some(temp.path().to_path_buf())).unwrap();
+    let app = web::router(build_state(&config).await.unwrap());
+    let response = app
+        .oneshot(
+            Request::get("/api/v1/health")
+                .header(header::HOST, "phone.tailnet.ts.net")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(
+        response.headers()["Strict-Transport-Security"],
+        "max-age=31536000"
+    );
 }
 
 #[tokio::test]

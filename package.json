@@ -10,6 +10,7 @@
     "build:gate0": "tailwindcss -i ./spikes/tailscale-web-push/web/tailwind.input.css -o ./spikes/tailscale-web-push/web/generated/app.css --minify",
     "check:js": "node --check ./spikes/tailscale-web-push/web/app.js && node --check ./spikes/tailscale-web-push/web/sw.js && node --check ./spikes/tailscale-web-push/web/readiness.js && node --check ./spikes/tailscale-web-push/web/push-helpers.js",
     "check:pwa": "node ./spikes/tailscale-web-push/tests/verify-pwa.mjs",
+    "check:dependencies": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/check-dependencies.ps1",
     "e2e": "playwright test",
     "test": "pnpm run test:gate0 && pnpm run test:mobile",
     "test:gate0": "node --test ./spikes/tailscale-web-push/tests/*.test.mjs",

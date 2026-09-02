@@ -28,6 +28,7 @@ impl RuntimePaths {
         fs::create_dir_all(self.data_dir()).context("Không tạo được thư mục vận hành")?;
         fs::create_dir_all(self.logs_dir()).context("Không tạo được thư mục nhật ký")?;
         fs::create_dir_all(self.spool_dir()).context("Không tạo được hàng đợi sự cố")?;
+        super::permissions::secure(self.data_dir())?;
         Ok(())
     }
 

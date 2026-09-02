@@ -125,4 +125,23 @@ mod tests {
             "owner@example.test"
         );
     }
+
+    #[test]
+    fn mutations_require_json_private_origin_and_csrf() {
+        let mut headers = HeaderMap::new();
+        headers.insert(header::HOST, "pc.tailnet.ts.net".parse().unwrap());
+        headers.insert(header::ORIGIN, "https://pc.tailnet.ts.net".parse().unwrap());
+        headers.insert(header::CONTENT_TYPE, "application/json".parse().unwrap());
+        headers.insert(CSRF_HEADER, "expected".parse().unwrap());
+        assert!(require_mutation(&headers, "expected").is_ok());
+
+        headers.insert(header::ORIGIN, "https://attacker.example".parse().unwrap());
+        assert!(require_mutation(&headers, "expected").is_err());
+        headers.insert(header::ORIGIN, "https://pc.tailnet.ts.net".parse().unwrap());
+        headers.insert(CSRF_HEADER, "wrong".parse().unwrap());
+        assert!(require_mutation(&headers, "expected").is_err());
+        headers.insert(CSRF_HEADER, "expected".parse().unwrap());
+        headers.insert(header::CONTENT_TYPE, "text/plain".parse().unwrap());
+        assert!(require_mutation(&headers, "expected").is_err());
+    }
 }

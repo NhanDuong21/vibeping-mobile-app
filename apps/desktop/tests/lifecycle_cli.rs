@@ -2,6 +2,7 @@
 
 use std::{
     fs,
+    io::{Read, Write},
     net::TcpListener,
     path::Path,
     process::{Command, Output},
@@ -29,7 +30,13 @@ fn lifecycle_recovers_stale_state_and_survives_restart_and_crash() {
     );
     assert_success(run(binary, &data_dir, port, "status"), "VibePing đang chạy");
     assert_success(run(binary, &data_dir, port, "doctor"), "Funnel: đang tắt");
-    assert_success(run(binary, &data_dir, port, "stop"), "VibePing đã dừng");
+    let stream = open_sse(port);
+    let stop_binary = binary.to_owned();
+    let stop_data = data_dir.clone();
+    let stopping = thread::spawn(move || run(&stop_binary, &stop_data, port, "stop"));
+    thread::sleep(Duration::from_millis(300));
+    drop(stream);
+    assert_success(stopping.join().unwrap(), "VibePing đã dừng an toàn");
     assert_success(run(binary, &data_dir, port, "stop"), "VibePing đã dừng");
 
     assert_success(
@@ -90,4 +97,21 @@ fn available_port() -> u16 {
         .local_addr()
         .unwrap()
         .port()
+}
+
+fn open_sse(port: u16) -> std::net::TcpStream {
+    let mut stream = std::net::TcpStream::connect(("127.0.0.1", port)).unwrap();
+    stream
+        .set_read_timeout(Some(Duration::from_secs(2)))
+        .unwrap();
+    write!(
+        stream,
+        "GET /api/v1/stream HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nConnection: keep-alive\r\n\r\n"
+    )
+    .unwrap();
+    let mut response = [0_u8; 512];
+    let read = stream.read(&mut response).unwrap();
+    let text = String::from_utf8_lossy(&response[..read]);
+    assert!(text.contains("200 OK") && text.contains("text/event-stream"));
+    stream
 }

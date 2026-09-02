@@ -14,13 +14,13 @@ Service-worker tests exercise JSON/text/fallback payload normalization and stabl
 
 The human records foreground, background, locked, app-switcher removed, cellular phone with Wi-Fi laptop, offline then online, tap-to-open/focus, and post-Rust-restart delivery. Gate 0 passes only after Lock Screen/background delivery and subscription survival across the restart.
 
-## Future Angular scope
+## Angular scope
 
-Future features test use cases and Signals separately from components, RxJS reconnection with marbles/fakes, contract compatibility, IndexedDB cache replacement, Vietnamese error mapping, accessibility, and one end-to-end vertical slice. Pages do not need tests for business logic they must not contain.
+Feature tests isolate stores and Signals from components, exercise asynchronous integration with fakes, verify contract compatibility, reject corrupted IndexedDB cache, cover Vietnamese recovery mapping, and retain end-to-end vertical slices. Pages do not need tests for business logic they do not contain.
 
 ## Architecture and hygiene
 
-The architecture checker warns above 350 source lines, fails above 500, applies the stricter `main.rs` rule, and rejects forbidden catch-all filenames. The hygiene check rejects tracked runtime state/secrets and common credential patterns. Allowlist entries require a path, reason, and owner/decision reference.
+The architecture checker warns above 350 source lines, fails above 500, applies the stricter `main.rs` rule, and rejects forbidden catch-all filenames. The hygiene check rejects tracked runtime state/secrets, common credential patterns, and any Codex credential-file access in production source. Dependency gates run the production pnpm audit and RustSec `cargo audit`. Allowlist entries require a path, reason, and owner/decision reference.
 
 ## Live integrations
 

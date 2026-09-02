@@ -142,4 +142,14 @@ mod tests {
         let state = parse_state(status, serve, "Available on the internet (Funnel on)").unwrap();
         assert!(state.funnel_active);
     }
+
+    #[test]
+    fn temporary_tailscale_loss_is_reported_without_reusing_stale_readiness() {
+        let status =
+            r#"{"BackendState":"Stopped","Self":{"Online":false,"DNSName":"pc.example.ts.net."}}"#;
+        let serve = r#"{"Web":{"https:443":{"Handlers":{"/":{"Proxy":"http://127.0.0.1:8787"}}}}}"#;
+        let state = parse_state(status, serve, "No Funnel configuration").unwrap();
+        assert!(!state.online);
+        assert!(!state.funnel_active);
+    }
 }

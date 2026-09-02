@@ -122,6 +122,35 @@ async fn notification_toggles_and_private_mode_change_real_delivery() {
     assert!(!body.contains("Dự án riêng"));
 }
 
+#[tokio::test]
+async fn startup_retention_cleanup_removes_expired_activity() {
+    let temp = tempdir().unwrap();
+    let pool = database::connect(&temp.path().join("startup-retention.sqlite3"))
+        .await
+        .unwrap();
+    let old = Utc::now() - Duration::days(31);
+    sqlx::query(
+        "INSERT INTO activity_events (id, dedupe_key, event_type, title, summary, project_name, \
+         occurred_at, created_at) VALUES ('old', 'old', 'codex.turn.started', 'Cũ', 'Cũ', \
+         'VibePing', ?, ?)",
+    )
+    .bind(old)
+    .bind(old)
+    .execute(&pool)
+    .await
+    .unwrap();
+    let deleted = PreferenceStore::new(pool.clone())
+        .cleanup_retention()
+        .await
+        .unwrap();
+    assert_eq!(deleted, 1);
+    let count: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM activity_events")
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert_eq!(count, 0);
+}
+
 async fn seed_owned_subscription(pool: &sqlx::SqlitePool) {
     let now = Utc::now();
     sqlx::query("INSERT INTO owner_identity (id, tailscale_login, claimed_at) VALUES (1, 'owner@example.test', ?)")

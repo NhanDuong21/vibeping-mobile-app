@@ -67,3 +67,9 @@ The low allowance threshold is user-configurable from 1–50 percent, while crit
 ## 2026-09-02 — Diagnostics are a closed sanitized projection
 
 The Computer page aggregates only operational readiness already owned by the Rust process. Diagnostics derive plain-language checks and recovery actions from those stable values and local database health. The copyable technical report is deliberately constructed from version, enum states, counts, and timestamps; it never serializes an error object, filesystem path, Tailscale identity, Codex account field, endpoint, or key. Notification recovery remains an explicit iPhone action and never edits iOS permissions remotely.
+
+## 2026-09-02 — Recovery is explicit, validated, and owner-protected
+
+SQLite is checked before and after migrations. An existing database receives a checkpointed, retained pre-migration copy; migration failure closes the pool and restores the exact prior bytes before returning operational Vietnamese copy. Restore accepts only a bounded, checksummed VibePing bundle with SQLite identity, requires `--confirm`, requires the app to be stopped, takes a pre-restore database copy, validates the restored database through the normal connector, and rolls back on failure. Notification reset has the same stop and confirmation boundary and does not replace the owner or VAPID identity.
+
+The Windows data root uses an inheritance-free ACL for the current user SID and Local System. This is the chosen Windows protection for persistent VAPID, SQLite, control metadata, logs, and local backups: it preserves the exact imported sender identity and supports unattended background use without placing decryption material in the process environment. The app refuses to apply recursive ACL changes to a filesystem root, the user profile root, or the working directory. Manual backup bundles remain sensitive if copied outside this protected location.

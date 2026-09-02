@@ -96,4 +96,70 @@ async fn retry_and_stale_outcomes_are_durable() {
             .await
             .unwrap();
     assert_eq!(disabled, 1);
+
+    store
+        .register(&registration(installation), None)
+        .await
+        .unwrap();
+    let recovered: (Option<chrono::DateTime<Utc>>, i64) =
+        sqlx::query_as("SELECT disabled_at, failure_count FROM push_subscriptions LIMIT 1")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(recovered, (None, 0));
+}
+
+#[tokio::test]
+async fn expired_leases_recover_without_concurrent_duplicate_claims() {
+    let (_temp, store, pool) = fixture().await;
+    let installation = Uuid::new_v4().to_string();
+    store
+        .register(&registration(installation.clone()), None)
+        .await
+        .unwrap();
+    store.enqueue_test(&installation, false).await.unwrap();
+    sqlx::query("UPDATE notification_jobs SET next_attempt_at = ?")
+        .bind(Utc::now())
+        .execute(&pool)
+        .await
+        .unwrap();
+    let first = store.claim_due().await.unwrap().unwrap();
+    assert!(store.claim_due().await.unwrap().is_none());
+    sqlx::query("UPDATE notification_jobs SET lease_until = ? WHERE id = ?")
+        .bind(Utc::now() - chrono::Duration::seconds(1))
+        .bind(&first.id)
+        .execute(&pool)
+        .await
+        .unwrap();
+    let recovered = store.claim_due().await.unwrap().unwrap();
+    assert_eq!(recovered.id, first.id);
+}
+
+#[tokio::test]
+async fn ttl_expiry_is_terminal_and_records_one_attempt() {
+    let (_temp, store, pool) = fixture().await;
+    let installation = Uuid::new_v4().to_string();
+    store
+        .register(&registration(installation.clone()), None)
+        .await
+        .unwrap();
+    store.enqueue_test(&installation, false).await.unwrap();
+    sqlx::query("UPDATE notification_jobs SET next_attempt_at = ?, expires_at = ?")
+        .bind(Utc::now())
+        .bind(Utc::now() - chrono::Duration::seconds(1))
+        .execute(&pool)
+        .await
+        .unwrap();
+    let job = store.claim_due().await.unwrap().unwrap();
+    store.finish(&job, "expired", None).await.unwrap();
+    let state: String = sqlx::query_scalar("SELECT state FROM notification_jobs WHERE id = ?")
+        .bind(&job.id)
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    let attempts: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM notification_attempts")
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert_eq!((state.as_str(), attempts), ("expired", 1));
 }

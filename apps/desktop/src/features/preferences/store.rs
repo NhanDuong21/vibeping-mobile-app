@@ -93,6 +93,20 @@ impl PreferenceStore {
             .context("Không chốt được cài đặt")?;
         self.get().await
     }
+
+    pub async fn cleanup_retention(&self) -> Result<u64> {
+        let retention_days: i32 =
+            sqlx::query_scalar("SELECT retention_days FROM preferences WHERE id = 1")
+                .fetch_one(&self.pool)
+                .await
+                .context("Không đọc được thời gian lưu hoạt động")?;
+        let deleted = sqlx::query("DELETE FROM activity_events WHERE occurred_at < ?")
+            .bind(Utc::now() - Duration::days(i64::from(retention_days)))
+            .execute(&self.pool)
+            .await
+            .context("Không dọn được hoạt động đã hết hạn")?;
+        Ok(deleted.rows_affected())
+    }
 }
 
 impl From<PreferenceRow> for Preferences {

@@ -47,7 +47,13 @@ pub async fn wait_for_control(
         match accept_request(stream, &expected_token, &ingress).await {
             Ok(true) => return,
             Ok(false) => {}
-            Err(error) => tracing::warn!(%error, "Kênh điều khiển từ chối yêu cầu"),
+            Err(error) => {
+                let reason = crate::infrastructure::observability::SafeErrorCode::from_error(
+                    "CONTROL_REQUEST_REJECTED",
+                    &error,
+                );
+                tracing::warn!(%reason, "Kênh điều khiển từ chối yêu cầu");
+            }
         }
     }
 }
