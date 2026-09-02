@@ -27,6 +27,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Install Playwright browser
         run: pnpm exec playwright install chromium
+      - name: Install repository tooling
+        run: choco install ripgrep --no-progress -y
       - name: Generate API contract
         run: pnpm run generate:contracts
       - name: Angular and PWA quality gates
