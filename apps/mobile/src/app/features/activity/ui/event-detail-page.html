@@ -1,0 +1,41 @@
+<div class="h-dvh overflow-y-auto overscroll-y-contain bg-vibe-canvas px-5 pb-[calc(env(safe-area-inset-bottom)+6.5rem)] pt-[calc(env(safe-area-inset-top)+1rem)] text-vibe-ink dark:bg-vibe-night dark:text-vibe-paper">
+  <header class="mx-auto flex w-full max-w-lg items-center justify-between py-2">
+    <a routerLink="/activity" class="grid min-h-11 min-w-11 place-items-center rounded-full border border-vibe-rule text-vibe-ink! dark:border-vibe-rule-dark dark:text-vibe-paper!" aria-label="Quay lại hoạt động">
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+    </a>
+    <p class="font-bold">Chi tiết hoạt động</p>
+    <span class="size-11" aria-hidden="true"></span>
+  </header>
+
+  <main class="mx-auto w-full max-w-lg pt-10" aria-live="polite">
+    @if (activity.selected(); as event) {
+      <h1 class="text-balance text-3xl font-bold leading-tight tracking-[-0.04em]">{{ event.title }}</h1>
+      <div class="mt-8 border-y border-vibe-rule py-6 dark:border-vibe-rule-dark">
+        <p class="break-words text-lg font-bold">{{ event.projectName }}</p>
+        <p class="mt-3 text-base leading-7 text-vibe-muted dark:text-vibe-sage">{{ event.summary }}</p>
+      </div>
+      <dl class="mt-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-sm">
+        <dt class="text-vibe-muted dark:text-vibe-sage">Thời gian</dt>
+        <dd class="text-right font-semibold">{{ activity.time(event) }}</dd>
+        <dt class="text-vibe-muted dark:text-vibe-sage">Trạng thái</dt>
+        <dd class="text-right font-semibold">{{ event.isRead ? 'Đã đọc' : 'Chưa đọc' }}</dd>
+      </dl>
+      <p class="mt-10 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">VibePing không lưu prompt, đầu ra Codex hoặc đường dẫn đầy đủ.</p>
+    } @else if (activity.detailState() === 'missing') {
+      <section class="py-10">
+        <p class="text-sm font-bold uppercase tracking-[0.16em] text-vibe-green dark:text-vibe-mint">Không còn dữ liệu</p>
+        <h1 class="mt-3 text-3xl font-bold tracking-[-0.04em]">Hoạt động này không còn trên laptop</h1>
+        <p class="mt-4 leading-7 text-vibe-muted dark:text-vibe-sage">Có thể hoạt động đã được dọn hoặc liên kết không còn hợp lệ.</p>
+        <a routerLink="/activity" class="mt-7 inline-grid min-h-11 place-items-center rounded-full bg-vibe-ink px-5 text-sm font-bold text-vibe-paper! dark:bg-vibe-mint dark:text-vibe-ink!">Về Hoạt động</a>
+      </section>
+    } @else {
+      <div class="space-y-4 py-8" aria-label="Đang tải chi tiết">
+        <span class="block h-5 w-1/3 animate-pulse rounded bg-vibe-rule dark:bg-vibe-rule-dark"></span>
+        <span class="block h-10 w-5/6 animate-pulse rounded bg-vibe-rule dark:bg-vibe-rule-dark"></span>
+        <span class="block h-24 animate-pulse rounded-xl bg-vibe-rule dark:bg-vibe-rule-dark"></span>
+      </div>
+    }
+  </main>
+</div>
+
+<app-bottom-navigation />

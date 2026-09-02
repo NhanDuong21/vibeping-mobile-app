@@ -2,8 +2,8 @@
 target/
 node_modules/
 dist/
-generated/
 spikes/tailscale-web-push/web/generated/
+artifacts/
 
 # Local runtime state and private integration material
 .runtime/
@@ -21,6 +21,7 @@ spikes/tailscale-web-push/web/generated/
 .impeccable/review/
 .impeccable/build/
 .impeccable/live/
+.impeccable/mocks/
 
 # Browser/test artifacts
 playwright-report/

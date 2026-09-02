@@ -1,0 +1,59 @@
+<div class="h-dvh overflow-y-auto overscroll-y-contain bg-vibe-canvas px-5 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-[calc(env(safe-area-inset-top)+1.25rem)] text-vibe-ink dark:bg-vibe-night dark:text-vibe-paper">
+  <header class="mx-auto flex w-full max-w-lg items-center justify-between py-2">
+    <a routerLink="/computer" class="grid min-h-11 min-w-11 place-items-center rounded-full border border-vibe-rule text-vibe-ink! dark:border-vibe-rule-dark dark:text-vibe-paper!" aria-label="Quay lại Máy tính">
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+    </a>
+    <p class="font-bold">Chẩn đoán</p>
+    <span class="size-11" aria-hidden="true"></span>
+  </header>
+
+  <main class="mx-auto w-full max-w-lg pt-8">
+    <h1 class="text-3xl font-bold tracking-[-0.04em]">VibePing có sẵn sàng?</h1>
+    <p class="mt-3 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">Bản báo cáo không chứa token, email, prompt hay đường dẫn trên máy.</p>
+
+    @if (diagnostics.state() === 'loading') {
+      <div class="mt-8 space-y-4" aria-label="Đang chạy chẩn đoán">
+        @for (item of [1, 2, 3]; track item) {
+          <span class="block h-20 animate-pulse rounded-xl bg-vibe-rule/70 dark:bg-vibe-rule-dark"></span>
+        }
+      </div>
+    } @else if (diagnostics.state() === 'unavailable') {
+      <section class="mt-8 border-y border-vibe-rule py-6 dark:border-vibe-rule-dark" aria-live="polite">
+        <h2 class="text-lg font-bold">Chưa chạy được chẩn đoán</h2>
+        <p class="mt-2 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">Kiểm tra Tailscale trên hai thiết bị rồi chạy lại.</p>
+      </section>
+    }
+
+    @if (diagnostics.report(); as report) {
+      <ol class="mt-8 divide-y divide-vibe-rule border-y border-vibe-rule dark:divide-vibe-rule-dark dark:border-vibe-rule-dark">
+        @for (check of report.checks; track check.key) {
+          <li class="flex gap-4 py-5">
+            <span class="mt-1 size-2.5 shrink-0 rounded-full" [class.bg-vibe-mint]="check.state === 'ready'" [class.bg-vibe-coral]="check.state !== 'ready'" aria-hidden="true"></span>
+            <div>
+              <h2 class="text-lg! font-bold">{{ check.label }}</h2>
+              <p class="mt-1 text-sm leading-5 text-vibe-muted dark:text-vibe-sage">{{ check.detail }}</p>
+              @if (check.action) {
+                <p class="mt-2 text-sm font-bold">Việc cần làm: {{ check.action }}</p>
+              }
+            </div>
+          </li>
+        }
+      </ol>
+
+      <details class="mt-7 border-y border-vibe-rule py-4 dark:border-vibe-rule-dark">
+        <summary class="min-h-11 cursor-pointer content-center font-bold">Báo cáo kỹ thuật đã làm sạch</summary>
+        <pre class="mt-4 overflow-x-auto whitespace-pre-wrap rounded-xl bg-vibe-ink p-4 text-xs leading-5 text-vibe-paper dark:bg-vibe-surface-dark">{{ report.technicalReport }}</pre>
+        <button type="button" class="mt-4 min-h-11 rounded-full border border-vibe-rule px-5 text-sm font-bold dark:border-vibe-rule-dark" (click)="diagnostics.copy()">Sao chép báo cáo</button>
+        @if (diagnostics.copyState() === 'copied') {
+          <p class="mt-3 text-sm font-semibold text-vibe-green dark:text-vibe-mint" aria-live="polite">Đã sao chép báo cáo.</p>
+        } @else if (diagnostics.copyState() === 'failed') {
+          <p class="mt-3 text-sm font-semibold" aria-live="polite">Chưa sao chép được. Bạn vẫn có thể chọn phần báo cáo phía trên.</p>
+        }
+      </details>
+    }
+
+    <button type="button" class="mt-7 min-h-12 w-full rounded-full bg-vibe-ink px-5 text-sm font-black text-vibe-paper disabled:opacity-60 dark:bg-vibe-mint dark:text-vibe-ink" [disabled]="diagnostics.running()" (click)="diagnostics.run()">
+      {{ diagnostics.running() ? 'Đang kiểm tra lại' : 'Chạy kiểm tra lại' }}
+    </button>
+  </main>
+</div>

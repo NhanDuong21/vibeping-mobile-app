@@ -1,0 +1,145 @@
+<div
+  class="min-h-dvh bg-vibe-canvas px-5 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-[calc(env(safe-area-inset-top)+1.25rem)] text-vibe-ink dark:bg-vibe-night dark:text-vibe-paper"
+>
+  <header class="mx-auto flex w-full max-w-lg items-center justify-between py-2">
+    <div class="flex items-center gap-3">
+      <span
+        class="grid size-11 place-items-center rounded-[14px] bg-vibe-ink text-sm font-black text-vibe-mint ring-1 ring-vibe-mint/30 dark:bg-vibe-surface-dark"
+        aria-hidden="true"
+      >V</span>
+      <div>
+        <p class="text-lg font-bold tracking-[-0.02em]">VibePing</p>
+        <p class="text-sm text-vibe-muted dark:text-vibe-sage">Thiết lập riêng tư</p>
+      </div>
+    </div>
+    <span class="size-2.5 rounded-full bg-vibe-mint" aria-hidden="true"></span>
+  </header>
+
+  <main class="mx-auto flex min-h-[calc(100dvh-7rem)] w-full max-w-lg items-center py-10">
+    <section class="w-full" aria-live="polite">
+      @switch (onboarding.stage()) {
+        @case ('loading') {
+          <p class="text-sm font-semibold text-vibe-muted dark:text-vibe-sage">Đang kiểm tra laptop…</p>
+          <h1 class="mt-3 text-3xl font-bold tracking-[-0.035em]">Chuẩn bị đường truyền riêng tư</h1>
+        }
+        @case ('welcome') {
+          <p class="text-sm font-bold uppercase tracking-[0.16em] text-vibe-green dark:text-vibe-mint">Bước 1 · Kết nối</p>
+          <h1 class="mt-4 max-w-sm text-balance text-4xl font-bold leading-[1.08] tracking-[-0.045em]">
+            Tín hiệu từ Codex, gửi thẳng đến điện thoại.
+          </h1>
+          <div class="mt-10 border-y border-vibe-rule py-5 dark:border-vibe-rule-dark">
+            <p class="text-sm text-vibe-muted dark:text-vibe-sage">Laptop</p>
+            <p class="mt-1 text-lg font-semibold">Đã kết nối riêng tư</p>
+          </div>
+          <button class="mt-8 min-h-12 w-full rounded-2xl bg-vibe-ink px-5 py-3.5 font-bold text-white dark:bg-vibe-mint dark:text-vibe-night" type="button" (click)="onboarding.continue()">
+            Tiếp tục
+          </button>
+        }
+        @case ('pairing') {
+          <p class="text-sm font-bold uppercase tracking-[0.16em] text-vibe-green dark:text-vibe-mint">Chỉ một lần</p>
+          <h1 class="mt-4 text-3xl font-bold tracking-[-0.035em]">Kết nối với laptop</h1>
+          <p class="mt-3 text-base leading-6 text-vibe-muted dark:text-vibe-sage">
+            Nhập mã đang hiển thị khi bạn mở VibePing trên laptop.
+          </p>
+          <label class="mt-8 block text-sm font-semibold" for="pairing-code">Mã kết nối</label>
+          <input
+            id="pairing-code"
+            class="mt-2 min-h-14 w-full rounded-2xl border border-vibe-rule bg-vibe-surface px-4 text-center font-mono text-xl font-bold uppercase tracking-[0.18em] dark:border-vibe-rule-dark dark:bg-vibe-surface-dark"
+            inputmode="text"
+            autocomplete="one-time-code"
+            maxlength="9"
+            placeholder="____-____"
+            [(ngModel)]="code"
+          />
+          <button class="mt-5 min-h-12 w-full rounded-2xl bg-vibe-ink px-5 py-3.5 font-bold text-white disabled:opacity-50 dark:bg-vibe-mint dark:text-vibe-night" type="button" [disabled]="!onboarding.canSubmit() || code.length < 8" (click)="submitCode()">
+            {{ onboarding.busy() ? 'Đang kết nối…' : 'Kết nối' }}
+          </button>
+        }
+        @case ('install') {
+          <p class="text-sm font-bold uppercase tracking-[0.16em] text-vibe-green dark:text-vibe-mint">Bước 2 · Cài đặt</p>
+          <h1 class="mt-4 text-3xl font-bold tracking-[-0.035em]">Cài VibePing lên Màn hình chính</h1>
+          <ol class="mt-7 space-y-4 text-base leading-6 text-vibe-muted dark:text-vibe-sage">
+            <li><strong class="text-vibe-ink dark:text-vibe-paper">1.</strong> Nhấn nút Chia sẻ trong Safari.</li>
+            <li><strong class="text-vibe-ink dark:text-vibe-paper">2.</strong> Chọn “Thêm vào MH chính”.</li>
+            <li><strong class="text-vibe-ink dark:text-vibe-paper">3.</strong> Mở VibePing từ biểu tượng vừa tạo.</li>
+            <li><strong class="text-vibe-ink dark:text-vibe-paper">4.</strong> Tiếp tục thiết lập trong ứng dụng.</li>
+          </ol>
+          <p class="mt-8 rounded-2xl bg-vibe-mint-soft p-4 text-sm font-semibold text-vibe-green dark:bg-vibe-mint/15 dark:text-vibe-mint">
+            VibePing sẽ không hỏi quyền thông báo trong tab Safari này.
+          </p>
+          <button class="mt-5 min-h-12 w-full rounded-2xl border border-vibe-rule px-5 py-3.5 font-bold dark:border-vibe-rule-dark" type="button" (click)="onboarding.checkInstalled()">
+            Tôi đã mở từ Màn hình chính
+          </button>
+        }
+        @case ('permission') {
+          <p class="text-sm font-bold uppercase tracking-[0.16em] text-vibe-green dark:text-vibe-mint">Bước 3 · Thông báo</p>
+          <h1 class="mt-4 text-3xl font-bold tracking-[-0.035em]">Bật thông báo</h1>
+          <p class="mt-3 max-w-sm text-base leading-6 text-vibe-muted dark:text-vibe-sage">
+            VibePing chỉ báo khi Codex hoàn tất hoặc thật sự cần bạn.
+          </p>
+          <button class="mt-8 min-h-12 w-full rounded-2xl bg-vibe-ink px-5 py-3.5 font-bold text-white disabled:opacity-50 dark:bg-vibe-mint dark:text-vibe-night" type="button" [disabled]="onboarding.busy()" (click)="onboarding.enableNotifications()">
+            {{ onboarding.busy() ? 'Đang bật…' : 'Bật thông báo' }}
+          </button>
+        }
+        @case ('denied') {
+          <h1 class="text-3xl font-bold tracking-[-0.035em]">Thông báo đang bị tắt</h1>
+          <p class="mt-3 text-base leading-6 text-vibe-muted dark:text-vibe-sage">
+            Mở Cài đặt trên iPhone, chọn VibePing, bật Thông báo rồi quay lại đây.
+          </p>
+          <button class="mt-8 min-h-12 w-full rounded-2xl border border-vibe-rule px-5 py-3.5 font-bold dark:border-vibe-rule-dark" type="button" (click)="onboarding.checkInstalled()">Kiểm tra lại</button>
+        }
+        @case ('test') {
+          <p class="text-sm font-bold uppercase tracking-[0.16em] text-vibe-green dark:text-vibe-mint">Bước 4 · Kiểm tra</p>
+          <h1 class="mt-4 text-3xl font-bold tracking-[-0.035em]">Gửi một tín hiệu thử</h1>
+          <p class="mt-3 text-base leading-6 text-vibe-muted dark:text-vibe-sage">
+            VibePing sẽ gửi sau 10 giây để bạn có thời gian khóa iPhone.
+          </p>
+          <button class="mt-8 min-h-12 w-full rounded-2xl bg-vibe-ink px-5 py-3.5 font-bold text-white dark:bg-vibe-mint dark:text-vibe-night" type="button" (click)="onboarding.sendTest()">Gửi sau 10 giây</button>
+        }
+        @case ('testPending') {
+          <p class="text-sm font-bold uppercase tracking-[0.16em] text-vibe-green dark:text-vibe-mint">Đã xếp hàng</p>
+          <h1 class="mt-4 text-3xl font-bold tracking-[-0.035em]">Hãy khóa iPhone</h1>
+          <p class="mt-3 text-base leading-6 text-vibe-muted dark:text-vibe-sage">Tín hiệu sẽ rời laptop sau 10 giây. VibePing đang chờ nơi chuyển tiếp xác nhận.</p>
+        }
+        @case ('testAccepted') {
+          <p class="text-sm font-bold uppercase tracking-[0.16em] text-vibe-green dark:text-vibe-mint">Nơi chuyển tiếp đã nhận</p>
+          <h1 class="mt-4 text-3xl font-bold tracking-[-0.035em]">Tín hiệu đã được gửi</h1>
+          <p class="mt-3 text-base leading-6 text-vibe-muted dark:text-vibe-sage">
+            Hãy kiểm tra Màn hình khóa. VibePing chưa thể tự xác nhận iPhone đã hiển thị thông báo.
+          </p>
+          <button class="mt-8 min-h-12 w-full rounded-2xl bg-vibe-ink px-5 py-3.5 font-bold text-white dark:bg-vibe-mint dark:text-vibe-night" type="button" (click)="onboarding.finishTest()">Tôi đã hiểu</button>
+        }
+        @case ('ready') {
+          <p class="text-sm font-bold uppercase tracking-[0.16em] text-vibe-green dark:text-vibe-mint">Hoàn tất</p>
+          <h1 class="mt-4 text-4xl font-bold tracking-[-0.045em]">VibePing đã sẵn sàng</h1>
+          <p class="mt-3 text-lg leading-7 text-vibe-muted dark:text-vibe-sage">Bạn có thể rời laptop. VibePing sẽ gọi khi cần.</p>
+          <button class="mt-8 min-h-12 w-full rounded-2xl bg-vibe-ink px-5 py-3.5 font-bold text-white dark:bg-vibe-mint dark:text-vibe-night" type="button" (click)="begin()">Bắt đầu</button>
+        }
+        @case ('tailscaleUnavailable') {
+          <h1 class="text-3xl font-bold tracking-[-0.035em]">Chưa có kết nối Tailscale</h1>
+          <p class="mt-3 text-base leading-6 text-vibe-muted dark:text-vibe-sage">Mở Tailscale trên iPhone, kết nối lại rồi tải lại VibePing.</p>
+        }
+        @case ('unsupported') {
+          <h1 class="text-3xl font-bold tracking-[-0.035em]">Trình duyệt này chưa hỗ trợ thông báo</h1>
+          <p class="mt-3 text-base leading-6 text-vibe-muted dark:text-vibe-sage">Hãy dùng Safari, thêm VibePing vào Màn hình chính rồi mở từ biểu tượng.</p>
+        }
+        @case ('notOwner') {
+          <h1 class="text-3xl font-bold tracking-[-0.035em]">Thiết bị này không phải chủ sở hữu</h1>
+          <p class="mt-3 text-base leading-6 text-vibe-muted dark:text-vibe-sage">VibePing chỉ nhận một chủ sở hữu trong mạng riêng.</p>
+        }
+        @case ('laptopUnavailable') {
+          <h1 class="text-3xl font-bold tracking-[-0.035em]">Chưa kết nối được với laptop</h1>
+          <p class="mt-3 text-base leading-6 text-vibe-muted dark:text-vibe-sage">Kiểm tra VibePing đang chạy trên laptop rồi thử lại.</p>
+          <button class="mt-8 min-h-12 w-full rounded-2xl border border-vibe-rule px-5 py-3.5 font-bold dark:border-vibe-rule-dark" type="button" (click)="onboarding.start()">Thử lại</button>
+        }
+      }
+
+      @if (onboarding.error(); as error) {
+        <div class="mt-6 border-l-2 border-vibe-coral pl-4" role="alert">
+          <p class="font-semibold">{{ error.title }}</p>
+          <p class="mt-1 text-sm text-vibe-muted dark:text-vibe-sage">{{ error.action }}</p>
+        </div>
+      }
+    </section>
+  </main>
+</div>

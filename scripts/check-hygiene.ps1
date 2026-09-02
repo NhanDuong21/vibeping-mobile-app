@@ -33,6 +33,14 @@ try {
         foreach ($match in $matches) { $failures.Add("Sensitive pattern: $match") }
     }
 
+    $codexSources = @(& rg --files apps/desktop/src/features/codex_attention apps/desktop/src/features/usage_limits)
+    if ($codexSources.Count -gt 0) {
+        $credentialAccess = @(& rg -n --no-heading --color never -i -e 'auth\.json|credentials\.(json|toml)|credential[_-]?file' -- $codexSources 2>$null)
+        foreach ($match in $credentialAccess) {
+            $failures.Add("Codex credential-file access is forbidden: $match")
+        }
+    }
+
     if ($failures.Count -gt 0) {
         foreach ($failure in $failures) { Write-Error $failure -ErrorAction Continue }
         exit 1

@@ -1,0 +1,44 @@
+VibePing 1.0.0-rc.1 — hướng dẫn cá nhân
+========================================
+
+Yêu cầu
+- Windows x64 và Tailscale đang kết nối trên laptop.
+- iPhone dùng cùng tailnet và đã thêm VibePing vào Màn hình chính.
+- Không bật Tailscale Funnel. VibePing chỉ dùng Tailscale Serve riêng tư.
+
+Bắt đầu
+1. Mở "Start VibePing.bat" bằng thao tác của bạn.
+2. Ghi lại mã ghép nối nếu cửa sổ hiển thị mã.
+3. Kết nối Tailscale trên iPhone rồi mở biểu tượng VibePing hiện có.
+4. Nhập mã một lần nếu ứng dụng yêu cầu.
+5. Nếu giao diện cũ còn mở, đóng VibePing, mở lại biểu tượng một lần, rồi tải lại một lần. Không xóa biểu tượng.
+
+Điều khiển
+- "Start VibePing.bat": khởi động nền, hiện trạng thái và địa chỉ riêng.
+- "Stop VibePing.bat": dừng an toàn, không xóa dữ liệu hay dừng Tailscale.
+- "Restart VibePing.bat": dừng và khởi động lại an toàn.
+- "Open VibePing.bat": mở địa chỉ .ts.net ổn định bằng trình duyệt mặc định.
+
+Codex
+- Chạy "vibeping.exe integrations codex status" để xem trạng thái.
+- Sau cài đặt hoặc sửa tích hợp, mở Codex và chạy /hooks để tự kiểm tra, tin cậy các hook VibePing.
+- VibePing không đọc tệp thông tin đăng nhập Codex.
+
+Khôi phục
+- Nếu thông báo bị tắt: mở Cài đặt iPhone > Thông báo > VibePing.
+- Nếu đăng ký cũ: trong VibePing mở Cài đặt và chọn đăng ký lại thông báo.
+- Nếu hạn mức chưa có: kiểm tra Codex đã đăng nhập rồi chọn làm mới trong Hạn mức Codex.
+- Sao lưu khi VibePing đã dừng: "vibeping.exe backup".
+- Khôi phục bản sao khi đã dừng: "vibeping.exe restore --file <duong-dan> --confirm".
+
+Gỡ VibePing
+1. Mở "Stop VibePing.bat".
+2. Chạy "vibeping.exe integrations codex remove" nếu muốn gỡ tích hợp Codex.
+3. Xóa thư mục gói release.
+4. Chỉ xóa %LOCALAPPDATA%\VibePing khi bạn chủ động muốn xóa toàn bộ lịch sử, danh tính gửi và đăng ký điện thoại.
+5. Không cần và không nên dừng hoặc gỡ Tailscale chỉ để gỡ VibePing.
+
+Giới hạn
+- Đây là release candidate cá nhân, chưa phải stable 1.0.0.
+- Kiểm thử iPhone thật và giai đoạn dùng thử bảy ngày vẫn đang chờ bạn hoàn tất.
+- VibePing không tự khởi động cùng Windows, không có điều khiển từ xa và không dùng hạ tầng công khai.

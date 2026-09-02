@@ -1,0 +1,91 @@
+<div
+  class="h-dvh overflow-y-auto overscroll-y-contain bg-vibe-canvas px-5 pb-[calc(env(safe-area-inset-bottom)+6.5rem)] pt-[calc(env(safe-area-inset-top)+1.25rem)] text-vibe-ink dark:bg-vibe-night dark:text-vibe-paper"
+>
+  <header class="mx-auto flex w-full max-w-lg items-center justify-between py-2">
+    <a
+      routerLink="/activity"
+      class="grid min-h-11 min-w-11 place-items-center rounded-full border border-vibe-rule text-xl font-bold text-vibe-ink! dark:border-vibe-rule-dark dark:text-vibe-paper!"
+      aria-label="Quay lại hoạt động"
+    >
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+    </a>
+    <p class="font-bold">Hạn mức Codex</p>
+    <span class="size-11" aria-hidden="true"></span>
+  </header>
+
+  <main class="mx-auto w-full max-w-lg pt-9">
+    <div class="flex items-end justify-between gap-5">
+      <div>
+        <h1 class="text-3xl font-bold tracking-[-0.035em]">Các chu kỳ đang dùng</h1>
+      </div>
+      <button
+        type="button"
+        class="min-h-11 rounded-full border border-vibe-rule px-4 text-sm font-bold disabled:opacity-50 dark:border-vibe-rule-dark"
+        [disabled]="usage.readerState() === 'refreshing'"
+        (click)="usage.refresh()"
+      >
+        {{ usage.readerState() === 'refreshing' ? 'Đang cập nhật' : 'Cập nhật' }}
+      </button>
+    </div>
+
+    @if (usage.state() === 'unavailable' || usage.readerState() === 'unavailable') {
+      <section class="mt-8 border-y border-vibe-rule py-6 dark:border-vibe-rule-dark" aria-live="polite">
+        <h2 class="text-lg font-bold">Chưa đọc được hạn mức Codex</h2>
+        <p class="mt-2 leading-6 text-vibe-muted dark:text-vibe-sage">
+          VibePing vẫn tiếp tục báo công việc bình thường. Hãy kiểm tra Codex đang đăng nhập rồi thử lại.
+        </p>
+      </section>
+    } @else if (usage.state() === 'noWindows') {
+      <p class="mt-8 leading-6 text-vibe-muted dark:text-vibe-sage">
+        Codex chưa trả về chu kỳ hạn mức nào được hỗ trợ.
+      </p>
+    } @else {
+      @if (usage.state() === 'stale') {
+        <p class="mt-6 rounded-xl bg-vibe-mint-soft px-4 py-3 text-sm font-semibold text-vibe-green dark:bg-vibe-mint/15 dark:text-vibe-mint">
+          Dữ liệu gần nhất đang được hiển thị. VibePing sẽ tự thử lại.
+        </p>
+      }
+      @if (usage.refreshFailed()) {
+        <p class="mt-6 rounded-xl bg-vibe-mint-soft px-4 py-3 text-sm font-semibold text-vibe-green dark:bg-vibe-mint/15 dark:text-vibe-mint">
+          Chưa cập nhật được. VibePing đang giữ dữ liệu gần nhất và sẽ tự thử lại.
+        </p>
+      }
+      <ol class="mt-7 divide-y divide-vibe-rule border-y border-vibe-rule dark:divide-vibe-rule-dark dark:border-vibe-rule-dark">
+        @for (window of usage.windows(); track window.windowKey) {
+          <li class="py-6">
+            <div class="flex items-baseline justify-between gap-4">
+              <h2 class="text-lg font-bold">{{ window.label }}</h2>
+              <span class="text-sm font-bold">{{ usage.statusLabel(window) }}</span>
+            </div>
+            <div
+              class="mt-4 h-2 overflow-hidden rounded-full bg-vibe-rule dark:bg-vibe-rule-dark"
+              role="progressbar"
+              [attr.aria-label]="window.label"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              [attr.aria-valuenow]="window.remainingPercent"
+            >
+              <span
+                class="block h-full rounded-full bg-vibe-mint"
+                [class.bg-vibe-amber]="window.remainingPercent <= 20 && window.remainingPercent > 5"
+                [class.bg-vibe-coral]="window.remainingPercent <= 5"
+                [style.width.%]="window.remainingPercent"
+              ></span>
+            </div>
+            <div class="mt-3 flex items-baseline justify-between gap-4">
+              <p class="text-2xl font-black tabular-nums">{{ usage.percentLabel(window) }}</p>
+              <p class="text-right text-sm text-vibe-muted dark:text-vibe-sage">
+                {{ usage.resetLabel(window) }}
+              </p>
+            </div>
+          </li>
+        }
+      </ol>
+      <p class="mt-5 text-sm leading-5 text-vibe-muted dark:text-vibe-sage">
+        Phần trăm là mức còn lại do Codex cung cấp, không phải số prompt còn dùng được.
+      </p>
+    }
+  </main>
+</div>
+
+<app-bottom-navigation />

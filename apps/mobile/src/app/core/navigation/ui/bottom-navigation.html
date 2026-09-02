@@ -1,0 +1,49 @@
+<nav
+  class="fixed inset-x-0 bottom-0 z-40 border-t border-vibe-rule bg-vibe-surface pb-[env(safe-area-inset-bottom)] dark:border-vibe-rule-dark dark:bg-vibe-night"
+  aria-label="Điều hướng chính"
+>
+  <div class="mx-auto grid h-16 w-full max-w-lg grid-cols-3 px-3">
+    <a
+      routerLink="/activity"
+      routerLinkActive="bg-vibe-mint-soft! text-vibe-green! dark:bg-vibe-mint/10! dark:text-vibe-mint!"
+      ariaCurrentWhenActive="page"
+      [routerLinkActiveOptions]="{ exact: false }"
+      class="relative grid min-h-11 place-items-center content-center gap-0.5 rounded-xl text-xs font-bold text-vibe-muted! dark:text-vibe-sage!"
+    >
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M4 18V9m5 9V5m5 13v-7m5 7V3" />
+      </svg>
+      Hoạt động
+      @if (activity.unreadCount() > 0) {
+        <span class="absolute right-[27%] top-2 min-w-5 rounded-full bg-vibe-coral px-1.5 py-0.5 text-center text-[10px] leading-4 text-white" aria-label="Hoạt động chưa đọc">
+          {{ activity.unreadCount() > 99 ? '99+' : activity.unreadCount() }}
+        </span>
+      }
+    </a>
+    <a
+      routerLink="/computer"
+      routerLinkActive="bg-vibe-mint-soft! text-vibe-green! dark:bg-vibe-mint/10! dark:text-vibe-mint!"
+      ariaCurrentWhenActive="page"
+      class="grid min-h-11 place-items-center content-center gap-0.5 rounded-xl text-xs font-bold text-vibe-muted! dark:text-vibe-sage!"
+    >
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="13" rx="2" />
+        <path d="M8 21h8m-4-4v4" />
+      </svg>
+      Máy tính
+    </a>
+    <a
+      routerLink="/settings"
+      routerLinkActive="bg-vibe-mint-soft! text-vibe-green! dark:bg-vibe-mint/10! dark:text-vibe-mint!"
+      ariaCurrentWhenActive="page"
+      [routerLinkActiveOptions]="{ exact: false }"
+      class="grid min-h-11 place-items-center content-center gap-0.5 rounded-xl text-xs font-bold text-vibe-muted! dark:text-vibe-sage!"
+    >
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21h-4v-.08A1.7 1.7 0 0 0 8.96 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15 1.7 1.7 0 0 0 3 14H3v-4h.08A1.7 1.7 0 0 0 4.6 8.96a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3h4v.08A1.7 1.7 0 0 0 15.04 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.12.37.35.7.66.92.28.2.6.29.94.29v4c-.34 0-.66.1-.94.29-.31.22-.54.54-.66.91Z" />
+      </svg>
+      Cài đặt
+    </a>
+  </div>
+</nav>

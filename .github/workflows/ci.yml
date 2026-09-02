@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  validation-gates:
+  validation:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,34 +19,47 @@ jobs:
         with:
           node-version: 24.15.0
           cache: pnpm
-      - name: Install frontend dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build and validate Gate 0 assets
+      - name: Install pinned Rust toolchain
         run: |
-          $ErrorActionPreference = 'Stop'
-          $PSNativeCommandUseErrorActionPreference = $true
+          rustup toolchain install 1.98.0 --profile minimal --component clippy,rustfmt
+          rustup default 1.98.0
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Playwright browser
+        run: pnpm exec playwright install chromium
+      - name: Install repository tooling
+        run: choco install ripgrep --no-progress -y
+      - name: Generate API contract
+        run: pnpm run generate:contracts
+      - name: Angular and PWA quality gates
+        run: |
+          pnpm run format:check
+          pnpm run lint
+          pnpm run typecheck
+          pnpm run test:mobile
+          pnpm run build:mobile
+          pnpm run check:contracts
+          pnpm run check:copy
+      - name: Preserve Gate 0 regression checks
+        run: |
           pnpm run build:gate0
           pnpm run check:js
           pnpm run check:pwa
-          pnpm test
-      - name: Install pinned Rust toolchain
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $PSNativeCommandUseErrorActionPreference = $true
-          rustup toolchain install 1.98.0 --profile minimal --component clippy,rustfmt
-          rustup default 1.98.0
+          pnpm run test:gate0
       - name: Rust quality gates
         run: |
-          $ErrorActionPreference = 'Stop'
-          $PSNativeCommandUseErrorActionPreference = $true
           cargo fmt --all -- --check
           cargo clippy --workspace --all-targets -- -D warnings
           cargo test --workspace
           cargo build --workspace --release
+      - name: Browser end-to-end checks
+        run: pnpm run e2e
       - name: Architecture and repository hygiene
         shell: pwsh
         run: |
-          $ErrorActionPreference = 'Stop'
-          $PSNativeCommandUseErrorActionPreference = $true
           .\scripts\check-architecture.ps1
           .\scripts\check-hygiene.ps1
+          pnpm audit --prod --audit-level high
+      - name: Windows release package
+        shell: powershell
+        run: .\scripts\package-windows.ps1 -SkipBuild

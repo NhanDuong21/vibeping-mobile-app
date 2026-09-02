@@ -14,14 +14,24 @@ Service-worker tests exercise JSON/text/fallback payload normalization and stabl
 
 The human records foreground, background, locked, app-switcher removed, cellular phone with Wi-Fi laptop, offline then online, tap-to-open/focus, and post-Rust-restart delivery. Gate 0 passes only after Lock Screen/background delivery and subscription survival across the restart.
 
-## Future Angular scope
+## Angular scope
 
-Future features test use cases and Signals separately from components, RxJS reconnection with marbles/fakes, contract compatibility, IndexedDB cache replacement, Vietnamese error mapping, accessibility, and one end-to-end vertical slice. Pages do not need tests for business logic they must not contain.
+Feature tests isolate stores and Signals from components, exercise asynchronous integration with fakes, verify contract compatibility, reject corrupted IndexedDB cache, cover Vietnamese recovery mapping, and retain end-to-end vertical slices. Pages do not need tests for business logic they do not contain.
+
+## Product interface audit
+
+The maintained Phase 9 Playwright audit covers every primary surface at 320/375/390/430 px across light and dark projects, with WCAG A/AA Axe checks, one visible page heading, 44 px interactive targets, horizontal-overflow detection, and 125% root-text stress. It also covers system theme, reduced motion, keyboard focus, the deliberate update state, offline cache, denied permission, stale notification registration, stopped desktop, and a safely mapped unexpected error. `scripts/check-mobile-copy.ps1` rejects common accidental English and raw technical terms in user-visible templates.
 
 ## Architecture and hygiene
 
-The architecture checker warns above 350 source lines, fails above 500, applies the stricter `main.rs` rule, and rejects forbidden catch-all filenames. The hygiene check rejects tracked runtime state/secrets and common credential patterns. Allowlist entries require a path, reason, and owner/decision reference.
+The architecture checker warns above 350 source lines, fails above 500, applies the stricter `main.rs` rule, and rejects forbidden catch-all filenames. The hygiene check rejects tracked runtime state/secrets, common credential patterns, and any Codex credential-file access in production source. Dependency gates run the production pnpm audit and RustSec `cargo audit`. Allowlist entries require a path, reason, and owner/decision reference.
 
 ## Live integrations
 
 Live Tailscale, Web Push, and Codex-account checks run locally and write only ignored evidence. CI never depends on a tailnet, physical phone, signed-in Codex account, or secret.
+
+## Windows release package
+
+The release build regenerates the API contract, builds Angular, embeds the resulting PWA into the Rust release executable, and packages an exact six-file Windows x64 directory plus ZIP and SHA-256. The package smoke test extracts the ZIP into a path containing spaces, removes Node.js, pnpm, Rust, and Cargo from the child `PATH`, and verifies Start/Stop/Restart, health, private-host headers, PWA assets, REST, SSE, the real sanitized allowance reader, Codex fixture ingestion, delayed queueing, persistence, and graceful cleanup on an alternate port.
+
+CI uses Windows and runs formatting, lint, typecheck, unit/integration tests, release builds, contract freshness, PWA/copy audits, Playwright, architecture, hygiene, dependency audits, and package construction. Live account, tailnet, subscription, and physical-notification assertions remain excluded from CI and explicitly manual.

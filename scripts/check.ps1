@@ -12,16 +12,29 @@ if (-not (Test-Path -LiteralPath $cargo)) {
 
 Push-Location $repoRoot
 try {
+    & pnpm run generate:contracts
+    & pnpm run build:mobile
+    & pnpm run format:check
+    & pnpm run lint
+    & pnpm run typecheck
+    & pnpm run test:mobile
+    & pnpm run check:contracts
     & pnpm run build:gate0
     & pnpm run check:js
     & pnpm run check:pwa
-    & pnpm test
+    & pnpm run test:gate0
     & $cargo fmt --all -- --check
     & $cargo clippy --workspace --all-targets -- -D warnings
     & $cargo test --workspace
-    & $cargo build --workspace --release
+    # Gate 0 may be the live private-origin process; never replace its executable in place.
+    & $cargo build -p vibeping -p vibeping-gate1 --release
+    & pnpm run e2e
     & (Join-Path $PSScriptRoot 'check-architecture.ps1')
     & (Join-Path $PSScriptRoot 'check-hygiene.ps1')
+    & (Join-Path $PSScriptRoot 'check-mobile-copy.ps1')
+    & (Join-Path $PSScriptRoot 'check-dependencies.ps1')
+    & (Join-Path $PSScriptRoot 'package-windows.ps1') -SkipBuild
+    Write-Host 'VibePing validation passed: contracts, builds, format, lint, tests, E2E, architecture, hygiene, copy, dependencies, and package.'
 }
 finally {
     Pop-Location

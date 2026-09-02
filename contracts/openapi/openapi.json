@@ -1,0 +1,1224 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "VibePing API",
+    "description": "",
+    "license": {
+      "name": "MIT OR Apache-2.0",
+      "identifier": "MIT OR Apache-2.0"
+    },
+    "version": "1.0.0-rc.1"
+  },
+  "paths": {
+    "/api/v1/activity": {
+      "get": {
+        "tags": [
+          "activity_http"
+        ],
+        "operationId": "activity",
+        "responses": {
+          "200": {
+            "description": "Current Codex work and recent activity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivitySnapshot"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/bootstrap": {
+      "get": {
+        "tags": [
+          "http"
+        ],
+        "operationId": "bootstrap",
+        "responses": {
+          "200": {
+            "description": "Initial client snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BootstrapResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/computer/status": {
+      "get": {
+        "tags": [
+          "computer_http"
+        ],
+        "operationId": "computer_status",
+        "responses": {
+          "200": {
+            "description": "Operational laptop status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/diagnostics": {
+      "get": {
+        "tags": [
+          "computer_http"
+        ],
+        "operationId": "diagnostics",
+        "responses": {
+          "200": {
+            "description": "Sanitized diagnostic report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiagnosticsReport"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/diagnostics/run": {
+      "post": {
+        "tags": [
+          "computer_http"
+        ],
+        "operationId": "run_diagnostics",
+        "responses": {
+          "200": {
+            "description": "Fresh sanitized diagnostic report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiagnosticsReport"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/events": {
+      "get": {
+        "tags": [
+          "activity_http"
+        ],
+        "operationId": "events",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cursor-paginated activity feed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventFeed"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid cursor or limit"
+          }
+        }
+      }
+    },
+    "/api/v1/events/read-all": {
+      "post": {
+        "tags": [
+          "activity_http"
+        ],
+        "operationId": "read_all",
+        "responses": {
+          "200": {
+            "description": "All activity events marked read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadStateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/events/{id}": {
+      "get": {
+        "tags": [
+          "activity_http"
+        ],
+        "operationId": "event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Activity event identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Activity event detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityEvent"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Activity event not found"
+          }
+        }
+      }
+    },
+    "/api/v1/events/{id}/read": {
+      "post": {
+        "tags": [
+          "activity_http"
+        ],
+        "operationId": "read_event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Activity event identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Activity event marked read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadStateResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Activity event not found"
+          }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "tags": [
+          "http"
+        ],
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "Application health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/pairing/claim": {
+      "post": {
+        "tags": [
+          "pairing_http"
+        ],
+        "operationId": "claim",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PairingClaimRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Owner paired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PairingClaimResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pairing request"
+          },
+          "401": {
+            "description": "Private identity required"
+          },
+          "409": {
+            "description": "Pairing code unavailable"
+          },
+          "429": {
+            "description": "Pairing attempt limit reached"
+          }
+        }
+      }
+    },
+    "/api/v1/pairing/status": {
+      "get": {
+        "tags": [
+          "pairing_http"
+        ],
+        "operationId": "status",
+        "responses": {
+          "200": {
+            "description": "Private owner pairing status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PairingStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/preferences": {
+      "get": {
+        "tags": [
+          "preferences_http"
+        ],
+        "operationId": "get",
+        "responses": {
+          "200": {
+            "description": "Production notification and display preferences",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preferences"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "preferences_http"
+        ],
+        "operationId": "put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Preferences"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Saved production preferences",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preferences"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid preferences"
+          }
+        }
+      }
+    },
+    "/api/v1/push/public-key": {
+      "get": {
+        "tags": [
+          "notifications_http"
+        ],
+        "operationId": "public_key",
+        "responses": {
+          "200": {
+            "description": "Persistent browser push sender key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicKeyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/push/subscriptions": {
+      "post": {
+        "tags": [
+          "notifications_http"
+        ],
+        "operationId": "subscribe",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionRegistrationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Push subscription saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid subscription"
+          },
+          "401": {
+            "description": "Private identity required"
+          }
+        }
+      }
+    },
+    "/api/v1/push/subscriptions/{id}": {
+      "delete": {
+        "tags": [
+          "notifications_http"
+        ],
+        "operationId": "unsubscribe",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Subscription identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/push/test": {
+      "post": {
+        "tags": [
+          "notifications_http"
+        ],
+        "operationId": "test_push",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestPushRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Delayed test push queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestPushResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Phone is not ready"
+          },
+          "429": {
+            "description": "Test rate limited"
+          }
+        }
+      }
+    },
+    "/api/v1/stream": {
+      "get": {
+        "tags": [
+          "http"
+        ],
+        "operationId": "stream",
+        "responses": {
+          "200": {
+            "description": "Foreground live event stream",
+            "content": {
+              "text/event-stream": {}
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/usage-limits": {
+      "get": {
+        "tags": [
+          "usage_limits_http"
+        ],
+        "operationId": "get_limits",
+        "responses": {
+          "200": {
+            "description": "Latest normalized Codex allowance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageLimitsSnapshot"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/usage-limits/refresh": {
+      "post": {
+        "tags": [
+          "usage_limits_http"
+        ],
+        "operationId": "refresh_limits",
+        "responses": {
+          "200": {
+            "description": "Refreshed Codex allowance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageLimitsSnapshot"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Codex allowance reader unavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActionResponse": {
+        "type": "object",
+        "required": [
+          "state"
+        ],
+        "properties": {
+          "state": {
+            "type": "string"
+          }
+        }
+      },
+      "ActivityEvent": {
+        "type": "object",
+        "required": [
+          "id",
+          "eventType",
+          "title",
+          "summary",
+          "projectName",
+          "occurredAt",
+          "isRead"
+        ],
+        "properties": {
+          "eventType": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "isRead": {
+            "type": "boolean"
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "ActivitySnapshot": {
+        "type": "object",
+        "required": [
+          "events",
+          "cursor"
+        ],
+        "properties": {
+          "currentWork": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CurrentWork"
+              }
+            ]
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActivityEvent"
+            }
+          }
+        }
+      },
+      "BootstrapResponse": {
+        "type": "object",
+        "required": [
+          "serverTime",
+          "connection",
+          "cursor",
+          "usageLimits",
+          "unreadCount"
+        ],
+        "properties": {
+          "connection": {
+            "$ref": "#/components/schemas/ConnectionSnapshot"
+          },
+          "currentWork": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CurrentWork"
+              }
+            ]
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "serverTime": {
+            "type": "string"
+          },
+          "unreadCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "usageLimits": {
+            "$ref": "#/components/schemas/UsageLimitsSnapshot"
+          }
+        }
+      },
+      "BrowserSubscription": {
+        "type": "object",
+        "required": [
+          "endpoint",
+          "keys"
+        ],
+        "properties": {
+          "endpoint": {
+            "type": "string"
+          },
+          "expirationTime": {},
+          "keys": {
+            "$ref": "#/components/schemas/SubscriptionKeys"
+          }
+        }
+      },
+      "ComputerStatus": {
+        "type": "object",
+        "required": [
+          "desktop",
+          "codex",
+          "allowanceReader",
+          "notifications",
+          "privateConnection",
+          "startedAt"
+        ],
+        "properties": {
+          "allowanceReader": {
+            "type": "string"
+          },
+          "codex": {
+            "type": "string"
+          },
+          "desktop": {
+            "type": "string"
+          },
+          "lastSignalAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "notifications": {
+            "type": "string"
+          },
+          "privateConnection": {
+            "type": "string"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ConnectionSnapshot": {
+        "type": "object",
+        "required": [
+          "desktop",
+          "codex",
+          "privateConnection"
+        ],
+        "properties": {
+          "codex": {
+            "type": "string"
+          },
+          "desktop": {
+            "type": "string"
+          },
+          "privateConnection": {
+            "type": "string"
+          }
+        }
+      },
+      "CurrentWork": {
+        "type": "object",
+        "required": [
+          "projectName",
+          "state",
+          "startedAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "projectName": {
+            "type": "string"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "state": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DiagnosticCheck": {
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "state",
+          "detail"
+        ],
+        "properties": {
+          "action": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "detail": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        }
+      },
+      "DiagnosticsReport": {
+        "type": "object",
+        "required": [
+          "generatedAt",
+          "checks",
+          "technicalReport"
+        ],
+        "properties": {
+          "checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiagnosticCheck"
+            }
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "technicalReport": {
+            "type": "string"
+          }
+        }
+      },
+      "ErrorEnvelope": {
+        "type": "object",
+        "required": [
+          "code",
+          "requestId"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "requestId": {
+            "type": "string"
+          }
+        }
+      },
+      "EventFeed": {
+        "type": "object",
+        "required": [
+          "events",
+          "unreadCount"
+        ],
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActivityEvent"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unreadCount": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "HealthResponse": {
+        "type": "object",
+        "required": [
+          "status",
+          "service",
+          "version"
+        ],
+        "properties": {
+          "service": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "NotificationPreferences": {
+        "type": "object",
+        "required": [
+          "completion",
+          "permission",
+          "preview",
+          "finalFailure",
+          "allowance"
+        ],
+        "properties": {
+          "allowance": {
+            "type": "boolean"
+          },
+          "completion": {
+            "type": "boolean"
+          },
+          "finalFailure": {
+            "type": "boolean"
+          },
+          "permission": {
+            "type": "boolean"
+          },
+          "preview": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PairingClaimRequest": {
+        "type": "object",
+        "required": [
+          "code",
+          "installationId",
+          "displayMode",
+          "notificationPermission"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "displayMode": {
+            "type": "string"
+          },
+          "installationId": {
+            "type": "string"
+          },
+          "notificationPermission": {
+            "type": "string"
+          }
+        }
+      },
+      "PairingClaimResponse": {
+        "type": "object",
+        "required": [
+          "state",
+          "deviceId"
+        ],
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        }
+      },
+      "PairingStatusResponse": {
+        "type": "object",
+        "required": [
+          "state",
+          "ownerMatch",
+          "privateIdentityReady",
+          "csrfToken"
+        ],
+        "properties": {
+          "codeExpiresAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "csrfToken": {
+            "type": "string"
+          },
+          "ownerMatch": {
+            "type": "boolean"
+          },
+          "privateIdentityReady": {
+            "type": "boolean"
+          },
+          "state": {
+            "type": "string"
+          }
+        }
+      },
+      "Preferences": {
+        "type": "object",
+        "required": [
+          "notifications",
+          "allowanceThresholdPercent",
+          "criticalAllowanceNotifications",
+          "quietHours",
+          "privacyMode",
+          "theme",
+          "retentionDays"
+        ],
+        "properties": {
+          "allowanceThresholdPercent": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "criticalAllowanceNotifications": {
+            "type": "boolean"
+          },
+          "notifications": {
+            "$ref": "#/components/schemas/NotificationPreferences"
+          },
+          "privacyMode": {
+            "type": "string"
+          },
+          "quietHours": {
+            "$ref": "#/components/schemas/QuietHours"
+          },
+          "retentionDays": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "theme": {
+            "type": "string"
+          }
+        }
+      },
+      "PublicKeyResponse": {
+        "type": "object",
+        "required": [
+          "publicKey"
+        ],
+        "properties": {
+          "publicKey": {
+            "type": "string"
+          }
+        }
+      },
+      "QuietHours": {
+        "type": "object",
+        "required": [
+          "enabled",
+          "start",
+          "end",
+          "timezoneOffsetMinutes",
+          "allowUrgent"
+        ],
+        "properties": {
+          "allowUrgent": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "end": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string"
+          },
+          "timezoneOffsetMinutes": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ReadStateResponse": {
+        "type": "object",
+        "required": [
+          "state",
+          "unreadCount"
+        ],
+        "properties": {
+          "state": {
+            "type": "string"
+          },
+          "unreadCount": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "SubscriptionKeys": {
+        "type": "object",
+        "required": [
+          "p256dh",
+          "auth"
+        ],
+        "properties": {
+          "auth": {
+            "type": "string"
+          },
+          "p256dh": {
+            "type": "string"
+          }
+        }
+      },
+      "SubscriptionRegistrationRequest": {
+        "type": "object",
+        "required": [
+          "installationId",
+          "displayMode",
+          "notificationPermission",
+          "subscription"
+        ],
+        "properties": {
+          "displayMode": {
+            "type": "string"
+          },
+          "installationId": {
+            "type": "string"
+          },
+          "notificationPermission": {
+            "type": "string"
+          },
+          "subscription": {
+            "$ref": "#/components/schemas/BrowserSubscription"
+          }
+        }
+      },
+      "SubscriptionResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "state"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        }
+      },
+      "TestPushRequest": {
+        "type": "object",
+        "required": [
+          "installationId"
+        ],
+        "properties": {
+          "installationId": {
+            "type": "string"
+          }
+        }
+      },
+      "TestPushResponse": {
+        "type": "object",
+        "required": [
+          "state",
+          "queued",
+          "sendAfter"
+        ],
+        "properties": {
+          "queued": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sendAfter": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        }
+      },
+      "UsageLimitWindow": {
+        "type": "object",
+        "required": [
+          "windowKey",
+          "label",
+          "windowKind",
+          "remainingPercent",
+          "durationMinutes",
+          "resetsAt",
+          "reached"
+        ],
+        "properties": {
+          "durationMinutes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "label": {
+            "type": "string"
+          },
+          "reached": {
+            "type": "boolean"
+          },
+          "remainingPercent": {
+            "type": "number",
+            "format": "double"
+          },
+          "resetsAt": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "windowKey": {
+            "type": "string"
+          },
+          "windowKind": {
+            "type": "string"
+          }
+        }
+      },
+      "UsageLimitsSnapshot": {
+        "type": "object",
+        "required": [
+          "state",
+          "windows",
+          "cursor"
+        ],
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "readAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "state": {
+            "type": "string"
+          },
+          "windows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UsageLimitWindow"
+            }
+          }
+        }
+      }
+    }
+  }
+}
