@@ -10,7 +10,7 @@ VibePing is an operational utility. The interface should feel calm, precise, and
 - Reserve a calm mint/green accent for readiness, focus, and primary action; warnings and failures use restrained amber and red.
 - Prefer open layout, clear rules, and sparse containers. Avoid nested cards, giant heroes, decorative gradients, glass effects, fake charts, and ornamental badges.
 - Use a local system UI stack: `ui-sans-serif`, `system-ui`, `-apple-system`, `BlinkMacSystemFont`, `Segoe UI`, sans-serif. No external font or icon CDN.
-- Use a simple local VibePing mark: dark/tinted field, mint signal ring, and a legible V.
+- Use the official local VibePing app icon in product mastheads and install surfaces; do not substitute a text lettermark.
 
 ## Type and spacing
 

@@ -12,6 +12,30 @@ import {
 
 test.use({ serviceWorkers: "block" });
 
+test("product mastheads use the installed VibePing app icon", async ({
+  page,
+}) => {
+  await routeProduct(page);
+
+  for (const path of ["/onboarding", "/activity"]) {
+    await page.goto(path);
+    const logo = page.locator('header img[src="/assets/logo-icon-192.png"]');
+    await expect(logo).toBeVisible();
+    await expect(logo).toHaveAttribute("alt", "");
+    const image = await logo.evaluate((element: HTMLImageElement) => ({
+      complete: element.complete,
+      currentPath: new URL(element.currentSrc).pathname,
+      naturalWidth: element.naturalWidth,
+    }));
+    expect(image.complete).toBe(true);
+    expect(image.currentPath).toMatch(/^\/assets\/logo-icon-(192|512)\.png$/);
+    expect(image.naturalWidth).toBeGreaterThanOrEqual(40);
+    await expect(
+      page.locator("header").getByText("V", { exact: true }),
+    ).toHaveCount(0);
+  }
+});
+
 test("all primary surfaces hold their quality bar at target widths and text stress", async ({
   page,
 }, testInfo) => {
