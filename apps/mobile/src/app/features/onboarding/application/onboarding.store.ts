@@ -11,6 +11,10 @@ import {
   rememberSubscription,
 } from '../../../core/notifications/registration';
 import { clientErrorCopy, type ClientErrorCopy } from '../../../core/error-mapping/client-error';
+import {
+  rememberOnboardingCompleted,
+  rememberOnboardingStarted,
+} from '../data/onboarding-completion';
 
 export type OnboardingStage =
   | 'loading'
@@ -45,6 +49,7 @@ export class OnboardingStore {
   readonly canSubmit = computed(() => !this.#busy());
 
   async start(): Promise<void> {
+    rememberOnboardingStarted();
     this.#busy.set(true);
     this.#error.set(null);
     try {
@@ -127,6 +132,7 @@ export class OnboardingStore {
 
   async sendTest(): Promise<void> {
     if (!this.#status || this.#busy()) return;
+    rememberOnboardingCompleted();
     this.#stage.set('testPending');
     this.#busy.set(true);
     this.#error.set(null);
@@ -150,6 +156,7 @@ export class OnboardingStore {
   }
 
   finishTest(): void {
+    rememberOnboardingCompleted();
     this.#stage.set('ready');
   }
 

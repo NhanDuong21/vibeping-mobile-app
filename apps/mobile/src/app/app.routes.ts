@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { onboardingEntryGuard } from './features/onboarding/application/onboarding-entry.guard';
 
 export const routes: Routes = [
   {
@@ -8,6 +9,7 @@ export const routes: Routes = [
   },
   {
     path: 'onboarding',
+    canMatch: [onboardingEntryGuard],
     loadComponent: () =>
       import('./features/onboarding/ui/onboarding-page').then((module) => module.OnboardingPage),
   },

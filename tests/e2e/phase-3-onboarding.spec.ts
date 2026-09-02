@@ -20,6 +20,34 @@ async function mockStart(
   );
 }
 
+test("completed setup opens Activity instead of repeating onboarding", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("vibeping.onboarding-state", "completed");
+  });
+
+  await page.goto("/");
+
+  await expect(page).toHaveURL(/\/activity$/);
+  await expect(
+    page.getByRole("heading", { name: "Bạn có thể rời laptop" }),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Tiếp tục" })).toHaveCount(0);
+});
+
+test("existing subscriptions skip onboarding after an app update", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("vibeping.subscription-id", "subscription-existing");
+  });
+
+  await page.goto("/onboarding");
+
+  await expect(page).toHaveURL(/\/activity$/);
+});
+
 test("regular Safari tab gives install instructions and never asks permission", async ({
   page,
 }) => {
