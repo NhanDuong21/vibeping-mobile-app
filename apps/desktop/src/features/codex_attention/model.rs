@@ -16,6 +16,7 @@ pub struct CodexIngress {
 #[serde(rename_all = "snake_case")]
 pub enum CodexSignal {
     Started,
+    Progressed,
     PermissionRequired,
     TestPassed,
     TestFailed,

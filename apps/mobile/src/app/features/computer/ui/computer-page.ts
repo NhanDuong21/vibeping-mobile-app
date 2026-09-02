@@ -25,6 +25,7 @@ export class ComputerPage implements OnInit {
       desktop: { running: 'Đang chạy trên laptop' },
       codex: {
         connected: 'Tích hợp đang nhận tín hiệu',
+        needsReview: 'Mở /hooks trong Codex và duyệt VibePing một lần',
         reconnecting: 'Đang kết nối lại',
         notInstalled: 'Chưa cài tích hợp',
       },

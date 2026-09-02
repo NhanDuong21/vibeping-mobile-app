@@ -51,6 +51,17 @@ pub async fn bootstrap(
         .unread_count()
         .await
         .map_err(|_| ApiError::unavailable("BOOTSTRAP_UNAVAILABLE"))?;
+    let codex = if !state.data_dir.join("codex-integration.json").is_file() {
+        "notInstalled"
+    } else if activity
+        .has_started_signal()
+        .await
+        .map_err(|_| ApiError::unavailable("BOOTSTRAP_UNAVAILABLE"))?
+    {
+        "ready"
+    } else {
+        "needsReview"
+    };
     let usage_limits = UsageLimitStore::new(state.database.clone())
         .snapshot()
         .await
@@ -59,7 +70,7 @@ pub async fn bootstrap(
         server_time: Utc::now().to_rfc3339(),
         connection: ConnectionSnapshot {
             desktop: "running",
-            codex: "pending",
+            codex,
             private_connection: "local",
         },
         cursor: state.started_at.timestamp_millis().to_string(),
@@ -80,6 +91,7 @@ pub async fn stream(
 ) -> Result<Sse<impl futures_core::Stream<Item = Result<Event, Infallible>>>, ApiError> {
     authorize_if_claimed(&state, &headers).await?;
     let mut activity = state.activity_events.subscribe();
+    let mut work = state.work_events.subscribe();
     let mut usage = state.usage_events.subscribe();
     let events = async_stream::stream! {
         yield Ok(Event::default().event("connected").data("{\"type\":\"system.connected\"}"));
@@ -87,6 +99,9 @@ pub async fn stream(
             tokio::select! {
                 result = activity.recv() => if let Ok(data) = result {
                     yield Ok(Event::default().event("activity").data(data));
+                },
+                result = work.recv() => if let Ok(data) = result {
+                    yield Ok(Event::default().event("work").data(data));
                 },
                 result = usage.recv() => if let Ok(data) = result {
                     yield Ok(Event::default().event("allowance").data(data));

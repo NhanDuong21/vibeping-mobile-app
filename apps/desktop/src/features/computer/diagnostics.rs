@@ -27,7 +27,7 @@ impl ComputerStore {
                 "Kết nối Codex",
                 status.codex == "connected",
                 "Tích hợp Codex và bộ đọc hạn mức đang sẵn sàng.",
-                "Trên laptop, chạy sửa tích hợp rồi kiểm tra /hooks trong Codex.",
+                codex_recovery(&status.codex),
             ),
             check(
                 "notifications",
@@ -89,5 +89,13 @@ fn check(
         }
         .into(),
         action: (!ready).then(|| recovery.into()),
+    }
+}
+
+fn codex_recovery(state: &str) -> &'static str {
+    if state == "needsReview" {
+        "Trên laptop, mở /hooks trong Codex và duyệt VibePing một lần."
+    } else {
+        "Trên laptop, chạy sửa tích hợp rồi kiểm tra /hooks trong Codex."
     }
 }

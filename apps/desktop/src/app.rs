@@ -23,6 +23,7 @@ pub struct ApplicationState {
     pub csrf_token: String,
     pub started_at: DateTime<Utc>,
     pub activity_events: broadcast::Sender<String>,
+    pub work_events: broadcast::Sender<String>,
     pub usage_events: broadcast::Sender<String>,
     pub usage_refresh: mpsc::Sender<RefreshRequest>,
     usage_refresh_receiver: Arc<Mutex<Option<mpsc::Receiver<RefreshRequest>>>>,
@@ -36,6 +37,7 @@ pub async fn build_state(config: &RuntimeConfig) -> Result<Arc<ApplicationState>
     migration::import_gate0_once(config.data_dir(), &database).await?;
     VapidIdentity::load_or_create(config.data_dir())?;
     let (activity_events, _) = broadcast::channel(64);
+    let (work_events, _) = broadcast::channel(64);
     let (usage_events, _) = broadcast::channel(32);
     let (usage_refresh, usage_refresh_receiver) = mpsc::channel(8);
     Ok(Arc::new(ApplicationState {
@@ -44,6 +46,7 @@ pub async fn build_state(config: &RuntimeConfig) -> Result<Arc<ApplicationState>
         csrf_token: uuid::Uuid::new_v4().to_string(),
         started_at: Utc::now(),
         activity_events,
+        work_events,
         usage_events,
         usage_refresh,
         usage_refresh_receiver: Arc::new(Mutex::new(Some(usage_refresh_receiver))),
@@ -82,12 +85,18 @@ pub async fn run_with_shutdown(
         while let Some(value) = ingress.recv().await {
             let refresh_usage = value.signal == CodexSignal::Completed;
             match store.ingest(&value).await {
-                Ok(Some(event)) => {
-                    if let Ok(json) = serde_json::to_string(&event) {
+                Ok(event) => {
+                    if let Ok(current_work) = store.current_work().await
+                        && let Ok(json) = serde_json::to_string(&current_work)
+                    {
+                        let _ = activity_state.work_events.send(json);
+                    }
+                    if let Some(event) = event
+                        && let Ok(json) = serde_json::to_string(&event)
+                    {
                         let _ = activity_state.activity_events.send(json);
                     }
                 }
-                Ok(None) => {}
                 Err(error) => {
                     let reason = infrastructure::observability::SafeErrorCode::from_error(
                         "ACTIVITY_PERSIST_FAILED",

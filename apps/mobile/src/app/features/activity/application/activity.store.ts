@@ -1,6 +1,11 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { ApiClient, type ActivityEventDto, type BootstrapDto } from '../../../core/api/api-client';
+import {
+  ApiClient,
+  type ActivityEventDto,
+  type BootstrapDto,
+  type CurrentWorkDto,
+} from '../../../core/api/api-client';
 import { EVENT_SOURCE_FACTORY } from '../../../core/connectivity/event-source';
 import { ActivityCache, type CachedActivity } from '../data/activity-cache';
 
@@ -23,12 +28,14 @@ export class ActivityStore {
   readonly #detailState = signal<DetailState>('idle');
   readonly #selected = signal<ActivityEventDto | null>(null);
   #pendingReadAll = false;
+  #pendingWork: CurrentWorkDto | null | undefined;
   #stream?: EventSource;
   #started = false;
 
   readonly state = this.#state.asReadonly();
   readonly current = computed(() => this.#bootstrap()?.currentWork ?? null);
   readonly allowance = computed(() => this.#bootstrap()?.usageLimits ?? null);
+  readonly codexNeedsReview = computed(() => this.#bootstrap()?.connection.codex === 'needsReview');
   readonly events = this.#events.asReadonly();
   readonly unreadCount = this.#unreadCount.asReadonly();
   readonly hasMore = computed(() => Boolean(this.#nextCursor()));
@@ -149,7 +156,11 @@ export class ActivityStore {
         firstValueFrom(this.#api.bootstrap()),
         firstValueFrom(this.#api.events()),
       ]);
-      this.#bootstrap.set(bootstrap);
+      this.#bootstrap.set(
+        this.#pendingWork === undefined
+          ? bootstrap
+          : { ...bootstrap, currentWork: this.#takePendingWork() },
+      );
       this.#events.set(mergeEvents(this.#events(), feed.events));
       this.#nextCursor.set(feed.nextCursor ?? null);
       this.#unreadCount.set(
@@ -169,6 +180,7 @@ export class ActivityStore {
   #connectStream(): void {
     const stream = this.#eventSourceFactory('/api/v1/stream');
     stream.addEventListener('activity', (event) => this.#receiveActivity(event));
+    stream.addEventListener('work', (event) => this.#receiveWork(event));
     stream.onopen = () => {
       if (this.#state() === 'cached' || this.#state() === 'partial') void this.#sync();
     };
@@ -195,6 +207,31 @@ export class ActivityStore {
       }
     }
     void this.#sync();
+  }
+
+  #receiveWork(raw: Event): void {
+    if (!(raw instanceof MessageEvent)) return;
+    try {
+      const current = JSON.parse(String(raw.data)) as unknown;
+      if (current !== null && !isCurrentWork(current)) throw new Error('invalid current work');
+      const bootstrap = this.#bootstrap();
+      if (!bootstrap) {
+        this.#pendingWork = current;
+        void this.#sync();
+        return;
+      }
+      this.#bootstrap.set({ ...bootstrap, currentWork: current });
+      this.#savedAt.set(new Date());
+      void this.#persist();
+    } catch {
+      void this.#sync();
+    }
+  }
+
+  #takePendingWork(): CurrentWorkDto | null {
+    const current = this.#pendingWork ?? null;
+    this.#pendingWork = undefined;
+    return current;
   }
 
   async #markReadLocally(id: string): Promise<void> {
@@ -280,4 +317,15 @@ export function mergeEvents(
 
 function localUnread(events: ActivityEventDto[]): number {
   return events.filter((event) => !event.isRead).length;
+}
+
+function isCurrentWork(value: unknown): value is CurrentWorkDto {
+  if (!value || typeof value !== 'object') return false;
+  const current = value as Partial<CurrentWorkDto>;
+  return (
+    typeof current.projectName === 'string' &&
+    (current.state === 'running' || current.state === 'waiting') &&
+    typeof current.startedAt === 'string' &&
+    typeof current.updatedAt === 'string'
+  );
 }

@@ -43,7 +43,8 @@ pub fn install(codex_override: Option<PathBuf>, repair: bool) -> Result<String> 
         read_state(&paths)?.and_then(|state| state.previous_notify)
     } else {
         existing
-    };
+    }
+    .filter(|command| !is_vibeping_notify(command));
     config["notify"] = value(string_array(&owned_notify));
     let hooks = merge_hooks(read_json(&hooks_path)?, &executable);
     backup_if_present(&paths, &config_path)?;
@@ -120,7 +121,7 @@ pub fn forward_previous(payload: &str) -> Result<()> {
     let Some(command) = state.previous_notify else {
         return Ok(());
     };
-    if command.is_empty() || command == state.owned_notify {
+    if command.is_empty() || command == state.owned_notify || is_vibeping_notify(&command) {
         return Ok(());
     }
     let mut child = Command::new(&command[0]);
@@ -237,6 +238,16 @@ fn ready(value: bool) -> &'static str {
     if value { "sẵn sàng" } else { "cần sửa" }
 }
 
+fn is_vibeping_notify(command: &[String]) -> bool {
+    matches!(
+        command.get(1..4),
+        Some([integration, codex, notify])
+            if integration == "integrations"
+                && codex == "codex"
+                && notify == "ingest-notify"
+    )
+}
+
 #[cfg(windows)]
 fn hide_window(command: &mut Command) {
     use std::os::windows::process::CommandExt;
@@ -285,5 +296,19 @@ mod tests {
         ];
         candidates.sort_by_key(|(path, _)| native_candidate_rank(path));
         assert_eq!(candidates[0].0, PathBuf::from("codex.exe"));
+    }
+
+    #[test]
+    fn previous_vibeping_notifier_is_never_forwarded_recursively() {
+        assert!(is_vibeping_notify(&[
+            "C:\\old\\vibeping.exe".into(),
+            "integrations".into(),
+            "codex".into(),
+            "ingest-notify".into(),
+        ]));
+        assert!(!is_vibeping_notify(&[
+            "C:\\other\\notify.exe".into(),
+            "--message".into(),
+        ]));
     }
 }

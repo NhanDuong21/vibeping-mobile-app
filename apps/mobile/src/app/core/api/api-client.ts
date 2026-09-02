@@ -13,6 +13,7 @@ export type SubscriptionResponseDto = components['schemas']['SubscriptionRespons
 export type TestPushResponseDto = components['schemas']['TestPushResponse'];
 export type ActivitySnapshotDto = components['schemas']['ActivitySnapshot'];
 export type ActivityEventDto = components['schemas']['ActivityEvent'];
+export type CurrentWorkDto = components['schemas']['CurrentWork'];
 export type EventFeedDto = components['schemas']['EventFeed'];
 export type ReadStateDto = components['schemas']['ReadStateResponse'];
 export type UsageLimitsSnapshotDto = components['schemas']['UsageLimitsSnapshot'];

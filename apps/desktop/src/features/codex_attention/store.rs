@@ -27,6 +27,10 @@ impl ActivityStore {
         let policy = policy::load(&mut transaction).await?;
         let event = match ingress.signal {
             CodexSignal::Started => event_for(ingress, "codex.turn.started"),
+            CodexSignal::Progressed => {
+                set_state(&mut transaction, ingress, "running").await?;
+                None
+            }
             CodexSignal::PermissionRequired => {
                 set_state(&mut transaction, ingress, "waiting").await?;
                 event_for(ingress, "codex.attention.permission_required")
@@ -39,7 +43,10 @@ impl ActivityStore {
                 set_test(&mut transaction, ingress, "failed").await?;
                 None
             }
-            CodexSignal::PreviewReady => event_for(ingress, "codex.preview.ready"),
+            CodexSignal::PreviewReady => {
+                set_state(&mut transaction, ingress, "running").await?;
+                event_for(ingress, "codex.preview.ready")
+            }
             CodexSignal::Stopped | CodexSignal::Completed => {
                 finish_turn(&mut transaction, ingress).await?
             }

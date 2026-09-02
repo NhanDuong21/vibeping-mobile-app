@@ -99,6 +99,52 @@ describe('ActivityStore', () => {
     store.stop();
   });
 
+  it('applies current work and completion from SSE without waiting for a REST refresh', async () => {
+    const listeners = new Map<string, EventListener>();
+    const api = {
+      bootstrap: vi.fn().mockReturnValue(of({ ...bootstrap, currentWork: null })),
+      events: vi.fn().mockReturnValue(of({ events: [], nextCursor: null, unreadCount: 0 })),
+      pairingStatus: vi.fn().mockReturnValue(throwError(() => new Error('offline'))),
+    };
+    const stream = {
+      addEventListener: vi.fn((name: string, listener: EventListener) =>
+        listeners.set(name, listener),
+      ),
+      close: vi.fn(),
+    } as unknown as EventSource;
+    TestBed.configureTestingModule({
+      providers: [
+        ActivityStore,
+        { provide: ApiClient, useValue: api },
+        {
+          provide: ActivityCache,
+          useValue: { read: vi.fn().mockResolvedValue(null), write: vi.fn() },
+        },
+        { provide: EVENT_SOURCE_FACTORY, useValue: () => stream },
+      ],
+    });
+    const store = TestBed.inject(ActivityStore);
+    store.start();
+    await vi.waitFor(() => expect(store.state()).toBe('ready'));
+    const currentWork = {
+      projectName: 'vibeping-mobile-app',
+      state: 'running',
+      startedAt: '2026-09-02T00:03:00Z',
+      updatedAt: '2026-09-02T00:03:00Z',
+    };
+
+    listeners.get('work')?.(new MessageEvent('work', { data: JSON.stringify(currentWork) }));
+    expect(store.headline()).toBe('Codex đang làm việc');
+    expect(store.current()).toEqual(currentWork);
+    expect(api.bootstrap).toHaveBeenCalledTimes(1);
+
+    listeners.get('work')?.(new MessageEvent('work', { data: 'null' }));
+    expect(store.headline()).toBe('Bạn có thể rời laptop');
+    expect(store.current()).toBeNull();
+    expect(api.bootstrap).toHaveBeenCalledTimes(1);
+    store.stop();
+  });
+
   it('preserves optimistic read state while reconciling duplicate records', () => {
     expect(mergeEvents([{ ...event, isRead: true }], [event])).toEqual([
       { ...event, isRead: true },

@@ -68,7 +68,11 @@
         </div>
       } @else {
         <p class="mt-4 max-w-md text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
-          Khi Codex bắt đầu công việc, trạng thái sẽ xuất hiện tại đây.
+          @if (activity.codexNeedsReview()) {
+            Trên laptop, mở <strong class="font-bold text-vibe-ink dark:text-vibe-paper">/hooks</strong> trong Codex và duyệt VibePing một lần để nhận trạng thái realtime.
+          } @else {
+            Khi Codex bắt đầu công việc, trạng thái sẽ xuất hiện tại đây.
+          }
         </p>
       }
     </section>

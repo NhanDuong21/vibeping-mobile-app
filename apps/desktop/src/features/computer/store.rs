@@ -4,7 +4,7 @@ use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
 use sqlx::SqlitePool;
 
-use crate::features::usage_limits::UsageLimitStore;
+use crate::features::{codex_attention::ActivityStore, usage_limits::UsageLimitStore};
 
 use super::ComputerStatus;
 
@@ -38,10 +38,14 @@ impl ComputerStore {
                 .await
                 .context("Không đọc được tín hiệu gần nhất")?;
         let installed = self.data_dir.join("codex-integration.json").is_file();
-        let codex = match (installed, allowance.state.as_str()) {
-            (false, _) => "notInstalled",
-            (true, "available" | "noWindows") => "connected",
-            (true, _) => "reconnecting",
+        let hook_ready = ActivityStore::new(self.pool.clone())
+            .has_started_signal()
+            .await?;
+        let codex = match (installed, hook_ready, allowance.state.as_str()) {
+            (false, _, _) => "notInstalled",
+            (true, false, _) => "needsReview",
+            (true, true, "available" | "noWindows") => "connected",
+            (true, true, _) => "reconnecting",
         };
         Ok(ComputerStatus {
             desktop: "running".into(),

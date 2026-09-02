@@ -34,28 +34,20 @@ pub fn merge_hooks(mut root: Value, executable: &Path) -> Value {
     }
     let hooks = hooks.as_object_mut().expect("object");
     let command = hook_command(executable);
-    for (event, matcher) in [
-        ("UserPromptSubmit", None),
-        ("PermissionRequest", None),
-        ("PostToolUse", Some("Bash|mcp__codex_app__open_in_codex")),
-        ("Stop", None),
+    for event in [
+        "UserPromptSubmit",
+        "PermissionRequest",
+        "PostToolUse",
+        "Stop",
     ] {
         let entries = hooks.entry(event).or_insert_with(|| json!([]));
         if !entries.is_array() {
             *entries = json!([]);
         }
         let entries = entries.as_array_mut().expect("array");
-        if entries
-            .iter()
-            .any(|entry| entry.to_string().contains(OWNER_MARKER))
-        {
-            continue;
-        }
+        entries.retain(|entry| !entry.to_string().contains(OWNER_MARKER));
         let hook = json!({"type": "command", "command": command, "timeout": 5});
-        entries.push(match matcher {
-            Some(value) => json!({"matcher": value, "hooks": [hook]}),
-            None => json!({"hooks": [hook]}),
-        });
+        entries.push(json!({"hooks": [hook]}));
     }
     root
 }
@@ -183,5 +175,6 @@ mod tests {
         assert_eq!(repaired, repaired_again);
         assert_eq!(repaired.to_string().matches("keep-me").count(), 1);
         assert_eq!(repaired.to_string().matches(OWNER_MARKER).count(), 4);
+        assert!(repaired["hooks"]["PostToolUse"][0].get("matcher").is_none());
     }
 }

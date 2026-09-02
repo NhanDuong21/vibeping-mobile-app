@@ -59,6 +59,56 @@ fn classifier_recognizes_documented_attention_and_test_signals() {
             .signal,
         CodexSignal::TestPassed
     );
+    let progress = json!({
+        "hook_event_name": "PostToolUse", "session_id": "s", "turn_id": "t",
+        "tool_name": "apply_patch", "tool_input": {"patch": "private"},
+        "tool_response": {"exit_code": 0}
+    });
+    assert_eq!(
+        normalize("hook", progress.to_string().as_bytes())
+            .unwrap()
+            .unwrap()
+            .signal,
+        CodexSignal::Progressed
+    );
+}
+
+#[tokio::test]
+async fn progress_resumes_waiting_work_without_creating_feed_noise() {
+    let temp = tempdir().unwrap();
+    let pool = database::connect(&temp.path().join("progress.sqlite3"))
+        .await
+        .unwrap();
+    let store = ActivityStore::new(pool);
+    store
+        .ingest(&ingress("progress", CodexSignal::Started))
+        .await
+        .unwrap();
+    store
+        .ingest(&ingress("progress", CodexSignal::PermissionRequired))
+        .await
+        .unwrap();
+    assert_eq!(
+        store.current_work().await.unwrap().unwrap().state,
+        "waiting"
+    );
+
+    let event = store
+        .ingest(&ingress("progress", CodexSignal::Progressed))
+        .await
+        .unwrap();
+    assert!(event.is_none());
+    assert_eq!(
+        store.current_work().await.unwrap().unwrap().state,
+        "running"
+    );
+    assert_eq!(store.snapshot().await.unwrap().events.len(), 2);
+
+    store
+        .ingest(&ingress("progress", CodexSignal::Stopped))
+        .await
+        .unwrap();
+    assert!(store.current_work().await.unwrap().is_none());
 }
 
 #[tokio::test]

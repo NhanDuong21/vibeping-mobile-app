@@ -54,9 +54,15 @@ fn classify_tool(value: &Value) -> Option<CodexSignal> {
     if tool == "mcp__codex_app__open_in_codex" && response_succeeded(value) {
         return Some(CodexSignal::PreviewReady);
     }
-    let input = value.get("tool_input")?.to_string().to_ascii_lowercase();
+    let Some(input) = value
+        .get("tool_input")
+        .map(Value::to_string)
+        .map(|input| input.to_ascii_lowercase())
+    else {
+        return Some(CodexSignal::Progressed);
+    };
     if !is_test_command(tool, &input) {
-        return None;
+        return Some(CodexSignal::Progressed);
     }
     Some(if response_succeeded(value) {
         CodexSignal::TestPassed

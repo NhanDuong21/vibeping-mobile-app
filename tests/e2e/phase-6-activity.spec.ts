@@ -13,7 +13,18 @@ const completed = {
   isRead: false,
 };
 
-async function routeBootstrap(page: Page, unreadCount = 1): Promise<void> {
+const runningWork = {
+  projectName: "vibeping-mobile-app",
+  state: "running",
+  startedAt: "2026-09-02T00:00:00Z",
+  updatedAt: "2026-09-02T00:02:00Z",
+};
+
+async function routeBootstrap(
+  page: Page,
+  unreadCount = 1,
+  currentWork: typeof runningWork | null = runningWork,
+): Promise<void> {
   await page.route("**/api/v1/bootstrap", (route) =>
     route.fulfill({
       contentType: "application/json",
@@ -26,12 +37,7 @@ async function routeBootstrap(page: Page, unreadCount = 1): Promise<void> {
           codex: "ready",
           privateConnection: "local",
         },
-        currentWork: {
-          projectName: "vibeping-mobile-app",
-          state: "running",
-          startedAt: "2026-09-02T00:00:00Z",
-          updatedAt: "2026-09-02T00:02:00Z",
-        },
+        currentWork,
         unreadCount,
         usageLimits: {
           state: "available",
@@ -156,6 +162,31 @@ test("SSE reconnect and duplicate delivery add one activity item", async ({
   await page.goto("/activity");
   await expect(page.getByText("Đã hoàn tất", { exact: true })).toHaveCount(1);
   await expect(page.getByText("1 mới")).toBeVisible();
+});
+
+test("SSE updates current Codex work immediately without reloading the page", async ({
+  page,
+}) => {
+  await page.route("**/sw.js", (route) => route.abort());
+  await routeBootstrap(page, 0, null);
+  await page.route(/\/api\/v1\/events(\?.*)?$/, (route) =>
+    route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({ events: [], nextCursor: null, unreadCount: 0 }),
+    }),
+  );
+  await page.route("**/api/v1/stream", (route) =>
+    route.fulfill({
+      contentType: "text/event-stream",
+      body: `event: work\ndata: ${JSON.stringify(runningWork)}\n\n`,
+    }),
+  );
+
+  await page.goto("/activity");
+  await expect(
+    page.getByRole("heading", { name: "Codex đang làm việc" }),
+  ).toBeVisible();
+  await expect(page.getByText("vibeping-mobile-app")).toBeVisible();
 });
 
 test("a missing notification deep link has a calm recovery path", async ({
