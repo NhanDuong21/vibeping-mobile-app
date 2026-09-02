@@ -30,6 +30,7 @@ try {
     & pnpm run e2e
     & (Join-Path $PSScriptRoot 'check-architecture.ps1')
     & (Join-Path $PSScriptRoot 'check-hygiene.ps1')
+    & (Join-Path $PSScriptRoot 'check-mobile-copy.ps1')
     & (Join-Path $PSScriptRoot 'check-dependencies.ps1')
 }
 finally {

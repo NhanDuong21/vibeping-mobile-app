@@ -18,12 +18,12 @@ import {
       (click)="changed.emit()"
     >
       <span
-        class="relative h-7 w-12 rounded-full transition-colors"
+        class="relative h-7 w-12 rounded-full transition-colors motion-reduce:transition-none"
         [class]="checked ? 'bg-vibe-mint' : 'bg-vibe-rule dark:bg-vibe-rule-dark'"
         aria-hidden="true"
       >
         <span
-          class="absolute left-1 top-1 size-5 rounded-full bg-white shadow-sm transition-transform"
+          class="absolute left-1 top-1 size-5 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none"
           [class.translate-x-5]="checked"
         ></span>
       </span>

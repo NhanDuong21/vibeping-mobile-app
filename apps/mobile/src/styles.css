@@ -22,7 +22,7 @@
   --color-vibe-mint-soft: #d9f8e8;
   --color-vibe-green: #17643f;
   --color-vibe-amber: #c78a2e;
-  --color-vibe-coral: #ce655f;
+  --color-vibe-coral: #b84b47;
 }
 
 :root {
@@ -54,12 +54,12 @@ html.dark body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  html:focus-within {
     scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
+  }
+
+  .animate-pulse {
+    animation: none !important;
+    opacity: 0.72;
   }
 }

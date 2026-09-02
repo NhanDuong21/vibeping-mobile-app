@@ -19,6 +19,7 @@ Gate 0 preserves the proven standards-based iPhone Web Push path from a stable p
 | Phase 6 | COMPLETE | The mobile Activity product now has a paginated unread feed, exact event detail links, bottom navigation, live reconciliation, IndexedDB recovery, stale states, and a deliberate app-update banner. |
 | Phase 7 | COMPLETE | Computer readiness, production notification preferences, overnight quiet hours, privacy/theme/retention controls, subscription recovery, and sanitized diagnostics are available on mobile. |
 | Phase 8 | COMPLETE | Database migration recovery, confirmed backup/restore/reset commands, lifecycle and push fault handling, private-host and browser security, cache/XSS safety, redaction, dependency audits, and Windows owner ACLs are hardened. |
+| Phase 9 | COMPLETE | Every required mobile surface and recovery state has completed the bounded Impeccable, accessibility, responsive, theme, motion, keyboard, copy, and performance audit. |
 
 ## Constraints
 
