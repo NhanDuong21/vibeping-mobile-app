@@ -18,7 +18,7 @@ Hierarchy comes from size, weight, and whitespace rather than display typography
 
 ## Themes
 
-Light, dark, and system themes are first-class. The Gate 0 spike follows the system preference. Future product settings may select light or dark explicitly while retaining system as the default. Theme changes must preserve semantic color meaning and contrast.
+Light is the default for a calm, readable first launch. Light, dark, and system themes remain first-class choices in product settings, and a user's later choice is retained. Theme changes must preserve semantic color meaning and contrast.
 
 ## Authoring rules
 

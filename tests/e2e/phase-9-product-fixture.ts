@@ -154,6 +154,17 @@ export async function routeProduct(page: Page): Promise<void> {
   );
 }
 
+export async function useExplicitProjectTheme(
+  page: Page,
+  testInfo: TestInfo,
+): Promise<void> {
+  const theme = testInfo.project.name.includes("dark") ? "dark" : "light";
+  await page.addInitScript((selectedTheme: "light" | "dark") => {
+    localStorage.setItem("vibeping.theme.light-default-migrated", "1");
+    localStorage.setItem("vibeping.theme", selectedTheme);
+  }, theme);
+}
+
 export async function measurableFindings(
   page: Page,
   surface: string,

@@ -34,7 +34,7 @@ async fn previous_schema_is_backed_up_and_migrated() {
     let temp = tempdir().unwrap();
     let path = temp.path().join("previous.sqlite3");
     let pool = open_pool(&path).await.unwrap();
-    MIGRATOR.run_to(5, &pool).await.unwrap();
+    MIGRATOR.run_to(6, &pool).await.unwrap();
     pool.close().await;
 
     let upgraded = connect(&path).await.unwrap();
@@ -43,6 +43,11 @@ async fn previous_schema_is_backed_up_and_migrated() {
         .await
         .unwrap();
     assert_eq!(preferences, 1);
+    let theme: String = sqlx::query_scalar("SELECT theme FROM preferences WHERE id = 1")
+        .fetch_one(&upgraded)
+        .await
+        .unwrap();
+    assert_eq!(theme, "light");
     assert_eq!(backup_count(temp.path()), 1);
 }
 
@@ -59,7 +64,7 @@ async fn failed_migration_restores_the_exact_pre_migration_database() {
     let before = std::fs::read(&path).unwrap();
     let mut migrations = MIGRATOR.iter().cloned().collect::<Vec<_>>();
     migrations.push(Migration::new(
-        7,
+        8,
         "broken".into(),
         MigrationType::Simple,
         "CREATE TABLE partial(id INTEGER); THIS IS NOT SQL;".into_sql_str(),

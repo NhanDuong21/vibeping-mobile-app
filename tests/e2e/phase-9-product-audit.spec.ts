@@ -8,13 +8,15 @@ import {
   pairing,
   routeProduct,
   seedActivityCache,
+  useExplicitProjectTheme,
 } from "./phase-9-product-fixture";
 
 test.use({ serviceWorkers: "block" });
 
 test("product mastheads use the installed VibePing app icon", async ({
   page,
-}) => {
+}, testInfo) => {
+  await useExplicitProjectTheme(page, testInfo);
   await routeProduct(page);
 
   for (const path of ["/onboarding", "/activity"]) {
@@ -39,6 +41,7 @@ test("product mastheads use the installed VibePing app icon", async ({
 test("all primary surfaces hold their quality bar at target widths and text stress", async ({
   page,
 }, testInfo) => {
+  await useExplicitProjectTheme(page, testInfo);
   await routeProduct(page);
   const surfaces = [
     {
@@ -122,6 +125,7 @@ test("all primary surfaces hold their quality bar at target widths and text stre
 test("recovery surfaces remain calm, actionable, and technically opaque", async ({
   page,
 }, testInfo) => {
+  await useExplicitProjectTheme(page, testInfo);
   await page.addInitScript(() => {
     const original = window.matchMedia.bind(window);
     window.matchMedia = (query: string) =>
@@ -208,6 +212,22 @@ test("recovery surfaces remain calm, actionable, and technically opaque", async 
     .withTags(["wcag2a", "wcag2aa"])
     .analyze();
   expect(accessibility.violations).toEqual([]);
+});
+
+test("fresh launch defaults to light even when the device prefers dark", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await routeProduct(page);
+
+  await page.goto("/activity");
+
+  await expect(page.locator("html")).not.toHaveClass(/dark/);
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute(
+    "content",
+    "#f3f7f4",
+  );
+  await expect(page.locator("html")).toHaveCSS("color-scheme", "light");
 });
 
 test("system theme, reduced motion, and keyboard focus retain usable feedback", async ({

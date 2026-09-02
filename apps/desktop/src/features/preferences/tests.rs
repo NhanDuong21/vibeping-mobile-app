@@ -14,7 +14,7 @@ async fn preferences_validate_persist_and_apply_retention() {
         .unwrap();
     let store = PreferenceStore::new(pool.clone());
     let mut value = store.get().await.unwrap();
-    assert_eq!(value.theme, "system");
+    assert_eq!(value.theme, "light");
     value.theme = "dark".into();
     value.retention_days = 7;
     value.allowance_threshold_percent = 25;

@@ -54,7 +54,7 @@ async fn backup_restore_and_notification_reset_require_confirmation() {
         .fetch_one(&pool)
         .await
         .unwrap();
-    assert_eq!(theme, "system");
+    assert_eq!(theme, "light");
     seed_subscription(&pool).await;
     pool.close().await;
 
