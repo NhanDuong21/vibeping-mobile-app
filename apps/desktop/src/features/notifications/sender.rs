@@ -11,7 +11,9 @@ use web_push_native::{Auth, WebPushBuilder, p256::PublicKey};
 
 use super::{VapidIdentity, store::DeliveryJob};
 
-const VAPID_SUBJECT: &str = "https://vibeping.local";
+// Apple Web Push rejects the non-public `.local` contact with HTTP 403.
+// Keep this aligned with the sender identity proven by the Gate 0 delivery path.
+const VAPID_SUBJECT: &str = "https://github.com/NhanDuong21/vibeping-mobile-app";
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct DeliveryOutcome {
@@ -103,7 +105,7 @@ mod tests {
     use serde_json::Value;
     use tempfile::tempdir;
 
-    use super::{classify, deliver};
+    use super::{VAPID_SUBJECT, classify, deliver};
     use crate::features::notifications::store::DeliveryJob;
 
     #[test]
@@ -118,6 +120,14 @@ mod tests {
                 .pointer("/notification/data/onActionClick/default/operation")
                 .and_then(Value::as_str),
             Some("navigateLastFocusedOrOpen")
+        );
+    }
+
+    #[test]
+    fn apple_vapid_subject_uses_the_proven_public_contact_uri() {
+        assert_eq!(
+            VAPID_SUBJECT,
+            "https://github.com/NhanDuong21/vibeping-mobile-app"
         );
     }
 

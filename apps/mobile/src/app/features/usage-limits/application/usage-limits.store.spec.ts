@@ -68,4 +68,30 @@ describe('UsageLimitsStore', () => {
     );
     expect(label).toBe('Đặt lại sau 30 phút');
   });
+
+  it('adds the weekday and next-week context to longer reset windows', () => {
+    TestBed.configureTestingModule({
+      providers: [
+        UsageLimitsStore,
+        { provide: ApiClient, useValue: {} },
+        { provide: EVENT_SOURCE_FACTORY, useValue: () => ({}) },
+      ],
+    });
+    const store = TestBed.inject(UsageLimitsStore);
+    const now = new Date(2026, 8, 2, 10, 0);
+    const nextMonday = new Date(2026, 8, 7, 9, 0);
+    const label = store.resetLabel(
+      {
+        windowKey: 'weekly',
+        label: 'Chu kỳ tuần',
+        windowKind: 'secondary',
+        remainingPercent: 70,
+        durationMinutes: 10_080,
+        resetsAt: Math.floor(nextMonday.getTime() / 1000),
+        reached: false,
+      },
+      now,
+    );
+    expect(label).toBe('Đặt lại Thứ Hai tuần sau, 09:00 · 07/09');
+  });
 });
