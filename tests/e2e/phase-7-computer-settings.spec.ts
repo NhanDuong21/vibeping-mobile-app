@@ -68,7 +68,7 @@ test("computer summarizes readiness and queues a delayed notification test", asy
 
   await page.goto("/computer");
   await expect(page.getByRole("heading", { name: "Máy tính" })).toBeVisible();
-  await expect(page.getByText("Tích hợp đang nhận tín hiệu")).toBeVisible();
+  await expect(page.getByText("Đã nhận tín hiệu từ Codex")).toBeVisible();
   await expect(
     page.getByText("Đang dùng kết nối Tailscale riêng tư"),
   ).toBeVisible();
@@ -81,6 +81,64 @@ test("computer summarizes readiness and queues a delayed notification test", asy
   await expect(
     page.getByRole("link", { name: /Chạy chẩn đoán/ }),
   ).toBeVisible();
+});
+
+test("leave-laptop readiness stays blocked until Codex hooks are reviewed", async ({
+  page,
+}) => {
+  await page.route("**/api/v1/bootstrap", (route) =>
+    route.fulfill({
+      json: {
+        serverTime: "2026-09-02T01:01:00Z",
+        cursor: "1",
+        unreadCount: 0,
+        connection: {
+          desktop: "running",
+          codex: "needsReview",
+          privateConnection: "local",
+        },
+        currentWork: null,
+        usageLimits: {
+          state: "available",
+          readAt: null,
+          windows: [],
+          cursor: "1",
+        },
+      },
+    }),
+  );
+  await page.route(/\/api\/v1\/events(\?.*)?$/, (route) =>
+    route.fulfill({ json: { events: [], nextCursor: null, unreadCount: 0 } }),
+  );
+  await page.route("**/api/v1/computer/status", (route) =>
+    route.fulfill({
+      json: {
+        desktop: "running",
+        codex: "needsReview",
+        allowanceReader: "available",
+        notifications: "ready",
+        privateConnection: "ready",
+        lastSignalAt: null,
+        startedAt: "2026-09-02T00:00:00Z",
+      },
+    }),
+  );
+
+  await page.goto("/activity");
+  await expect(
+    page.getByRole("heading", { name: "Chưa nhận đủ tín hiệu từ Codex" }),
+  ).toBeVisible();
+  await expect(page.getByText("Cần hoàn tất 1 bước")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Bạn có thể rời laptop" }),
+  ).toHaveCount(0);
+
+  await page.getByRole("link", { name: "Xem cách thực hiện" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Cần hoàn tất kết nối Codex" }),
+  ).toBeVisible();
+  await page.getByText("Xem hướng dẫn").click();
+  await expect(page.getByText("/hooks")).toBeVisible();
 });
 
 test("settings persist all behavior controls including overnight quiet hours", async ({

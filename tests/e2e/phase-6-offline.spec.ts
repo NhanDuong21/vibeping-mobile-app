@@ -98,7 +98,7 @@ test("IndexedDB version one upgrades to the current activity cache schema", asyn
   });
   await page.goto("/activity?cache=upgrade");
   await expect(
-    page.getByRole("heading", { name: "Bạn có thể rời laptop" }),
+    page.getByRole("heading", { name: "Chưa theo dõi được Codex" }),
   ).toBeVisible();
   const schema = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {

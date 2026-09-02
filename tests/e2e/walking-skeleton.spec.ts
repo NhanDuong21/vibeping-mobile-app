@@ -31,7 +31,7 @@ test.describe("production walking skeleton", () => {
       const activity = page.waitForResponse(/\/api\/v1\/events(\?.*)?$/);
       await page.goto(`/activity?viewport=${viewport.width}`);
       await expect(
-        page.getByRole("heading", { name: "Bạn có thể rời laptop" }),
+        page.getByRole("heading", { name: "Chưa theo dõi được Codex" }),
       ).toBeVisible();
       expect((await activity).ok()).toBe(true);
       const widths = await page.evaluate(() => ({

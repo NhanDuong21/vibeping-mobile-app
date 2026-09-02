@@ -164,7 +164,7 @@ test("SSE reconnect and duplicate delivery add one activity item", async ({
   await expect(page.getByText("1 mới")).toBeVisible();
 });
 
-test("SSE updates current Codex work immediately without reloading the page", async ({
+test("a closed SSE stream never leaves stale current-work readiness", async ({
   page,
 }) => {
   await page.route("**/sw.js", (route) => route.abort());
@@ -184,9 +184,11 @@ test("SSE updates current Codex work immediately without reloading the page", as
 
   await page.goto("/activity");
   await expect(
-    page.getByRole("heading", { name: "Codex đang làm việc" }),
+    page.getByRole("heading", { name: "Chưa kết nối được với laptop" }),
   ).toBeVisible();
-  await expect(page.getByText("vibeping-mobile-app")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Codex đang làm việc" }),
+  ).toHaveCount(0);
 });
 
 test("a missing notification deep link has a calm recovery path", async ({

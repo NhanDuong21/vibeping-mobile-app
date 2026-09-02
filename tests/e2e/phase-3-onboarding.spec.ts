@@ -31,7 +31,7 @@ test("completed setup opens Activity instead of repeating onboarding", async ({
 
   await expect(page).toHaveURL(/\/activity$/);
   await expect(
-    page.getByRole("heading", { name: "Bạn có thể rời laptop" }),
+    page.getByRole("heading", { name: "Chưa theo dõi được Codex" }),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "Tiếp tục" })).toHaveCount(0);
 });

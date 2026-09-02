@@ -8,8 +8,9 @@ import {
 } from '../../../core/api/api-client';
 import { EVENT_SOURCE_FACTORY } from '../../../core/connectivity/event-source';
 import { ActivityCache, type CachedActivity } from '../data/activity-cache';
+import { readinessView, type ReadinessSourceState, type ReadinessView } from './readiness';
 
-type ActivityState = 'loading' | 'ready' | 'cached' | 'partial' | 'unavailable';
+type ActivityState = ReadinessSourceState;
 type DetailState = 'idle' | 'loading' | 'ready' | 'missing';
 const STALE_AFTER_MS = 10 * 60 * 1000;
 
@@ -27,6 +28,7 @@ export class ActivityStore {
   readonly #pendingReadIds = new Set<string>();
   readonly #detailState = signal<DetailState>('idle');
   readonly #selected = signal<ActivityEventDto | null>(null);
+  readonly #streamConnected = signal(false);
   #pendingReadAll = false;
   #pendingWork: CurrentWorkDto | null | undefined;
   #stream?: EventSource;
@@ -47,11 +49,14 @@ export class ActivityStore {
       this.#state() === 'cached' || Boolean(saved && Date.now() - saved.getTime() > STALE_AFTER_MS)
     );
   });
-  readonly headline = computed(() => {
-    const current = this.current();
-    if (!current) return 'Bạn có thể rời laptop';
-    return current.state === 'waiting' ? 'Codex đang chờ bạn' : 'Codex đang làm việc';
-  });
+  readonly readiness = computed<ReadinessView>(() =>
+    readinessView(
+      this.#state(),
+      this.#streamConnected(),
+      this.#bootstrap()?.connection,
+      this.current(),
+    ),
+  );
 
   start(): void {
     if (this.#started) return;
@@ -65,6 +70,7 @@ export class ActivityStore {
   stop(): void {
     this.#stream?.close();
     this.#stream = undefined;
+    this.#streamConnected.set(false);
     this.#started = false;
     globalThis.removeEventListener?.('online', this.#online);
     globalThis.removeEventListener?.('offline', this.#offline);
@@ -181,13 +187,19 @@ export class ActivityStore {
     const stream = this.#eventSourceFactory('/api/v1/stream');
     stream.addEventListener('activity', (event) => this.#receiveActivity(event));
     stream.addEventListener('work', (event) => this.#receiveWork(event));
-    stream.onopen = () => {
-      if (this.#state() === 'cached' || this.#state() === 'partial') void this.#sync();
-    };
+    stream.addEventListener('connected', () => this.#streamOpened());
+    stream.onopen = () => this.#streamOpened();
     stream.onerror = () => {
+      this.#streamConnected.set(false);
       if (this.#events().length || this.#bootstrap()) this.#state.set('cached');
+      else if (this.#state() !== 'loading') this.#state.set('unavailable');
     };
     this.#stream = stream;
+  }
+
+  #streamOpened(): void {
+    this.#streamConnected.set(true);
+    if (['cached', 'partial', 'unavailable'].includes(this.#state())) void this.#sync();
   }
 
   #receiveActivity(raw: Event): void {

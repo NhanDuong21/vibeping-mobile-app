@@ -24,13 +24,13 @@ export class ComputerPage implements OnInit {
     const labels: Record<string, Record<string, string>> = {
       desktop: { running: 'Đang chạy trên laptop' },
       codex: {
-        connected: 'Tích hợp đang nhận tín hiệu',
-        needsReview: 'Đang chờ tín hiệu từ lượt Codex tiếp theo',
+        connected: 'Đã nhận tín hiệu từ Codex',
+        needsReview: 'Cần duyệt kết nối một lần trên laptop',
         reconnecting: 'Đang kết nối lại',
         notInstalled: 'Chưa cài tích hợp',
       },
       allowance: {
-        available: 'Đang đọc được các chu kỳ',
+        available: 'Đã cập nhật được hạn mức',
         noWindows: 'Đã kết nối, chưa có chu kỳ',
         stale: 'Đang giữ dữ liệu gần nhất',
         unavailable: 'Chưa đọc được hạn mức',

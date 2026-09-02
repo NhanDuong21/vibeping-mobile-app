@@ -77,6 +77,10 @@ describe('ActivityStore', () => {
       bootstrap: vi.fn().mockReturnValue(throwError(() => new Error('offline'))),
       events: vi.fn().mockReturnValue(throwError(() => new Error('offline'))),
     };
+    const stream = {
+      addEventListener: vi.fn(),
+      close: vi.fn(),
+    } as unknown as EventSource;
     TestBed.configureTestingModule({
       providers: [
         ActivityStore,
@@ -87,12 +91,13 @@ describe('ActivityStore', () => {
         },
         {
           provide: EVENT_SOURCE_FACTORY,
-          useValue: () => ({ addEventListener: vi.fn(), close: vi.fn() }),
+          useValue: () => stream,
         },
       ],
     });
     const store = TestBed.inject(ActivityStore);
     store.start();
+    stream.onerror?.(new Event('error'));
     await vi.waitFor(() => expect(store.state()).toBe('cached'));
     expect(store.events()).toEqual([event]);
     expect(store.isStale()).toBe(true);
@@ -126,6 +131,7 @@ describe('ActivityStore', () => {
     const store = TestBed.inject(ActivityStore);
     store.start();
     await vi.waitFor(() => expect(store.state()).toBe('ready'));
+    stream.onopen?.(new Event('open'));
     const currentWork = {
       projectName: 'vibeping-mobile-app',
       state: 'running',
@@ -134,12 +140,12 @@ describe('ActivityStore', () => {
     };
 
     listeners.get('work')?.(new MessageEvent('work', { data: JSON.stringify(currentWork) }));
-    expect(store.headline()).toBe('Codex đang làm việc');
+    expect(store.readiness().title).toBe('Codex đang làm việc');
     expect(store.current()).toEqual(currentWork);
     expect(api.bootstrap).toHaveBeenCalledTimes(1);
 
     listeners.get('work')?.(new MessageEvent('work', { data: 'null' }));
-    expect(store.headline()).toBe('Bạn có thể rời laptop');
+    expect(store.readiness().title).toBe('Bạn có thể rời laptop');
     expect(store.current()).toBeNull();
     expect(api.bootstrap).toHaveBeenCalledTimes(1);
     store.stop();
@@ -176,11 +182,48 @@ describe('ActivityStore', () => {
     const store = TestBed.inject(ActivityStore);
     store.start();
     await vi.waitFor(() => expect(store.codexNeedsReview()).toBe(true));
+    stream.onopen?.(new Event('open'));
+    expect(store.readiness().kind).toBe('codexReview');
 
     listeners.get('work')?.(new MessageEvent('work', { data: 'null' }));
 
     await vi.waitFor(() => expect(store.codexNeedsReview()).toBe(false));
+    expect(store.readiness().kind).toBe('ready');
     expect(api.bootstrap).toHaveBeenCalledTimes(2);
+    store.stop();
+  });
+
+  it('removes the leave-laptop message as soon as the live stream disconnects', async () => {
+    const api = {
+      bootstrap: vi.fn().mockReturnValue(of(bootstrap)),
+      events: vi.fn().mockReturnValue(of({ events: [], nextCursor: null, unreadCount: 0 })),
+      pairingStatus: vi.fn().mockReturnValue(throwError(() => new Error('offline'))),
+    };
+    const stream = {
+      addEventListener: vi.fn(),
+      close: vi.fn(),
+    } as unknown as EventSource;
+    TestBed.configureTestingModule({
+      providers: [
+        ActivityStore,
+        { provide: ApiClient, useValue: api },
+        {
+          provide: ActivityCache,
+          useValue: { read: vi.fn().mockResolvedValue(null), write: vi.fn() },
+        },
+        { provide: EVENT_SOURCE_FACTORY, useValue: () => stream },
+      ],
+    });
+    const store = TestBed.inject(ActivityStore);
+    store.start();
+    await vi.waitFor(() => expect(store.state()).toBe('ready'));
+    stream.onopen?.(new Event('open'));
+    expect(store.readiness().title).toBe('Bạn có thể rời laptop');
+
+    stream.onerror?.(new Event('error'));
+
+    expect(store.readiness().kind).toBe('offline');
+    expect(store.readiness().title).toBe('Chưa kết nối được với laptop');
     store.stop();
   });
 
