@@ -2,7 +2,7 @@
 
 VibePing is a personal-production tool that notifies one user's iPhone when Codex finishes, needs attention, leaves final tests failing, has a preview ready, or approaches a usage allowance. This repository is building toward a personal release candidate; it is not a declared stable v1.0 release.
 
-Gate 0 preserves the proven standards-based iPhone Web Push path from a stable private Tailscale Serve origin. Gate 1 preserves the proven signed-in Codex allowance path through the official App Server protocol. The production Angular/Ionic PWA and Rust/SQLite process now build on that evidence without replacing either spike.
+Gate 0 preserves the proven standards-based iPhone Web Push evidence from the stable private Tailscale Serve origin. Gate 1 preserves the proven signed-in Codex allowance path through the official App Server protocol. The self-contained Rust/SQLite release candidate now serves the Angular/Ionic PWA at that same private origin; the Gate 0 source, state, and rollback path remain preserved.
 
 ## Current status
 
@@ -20,6 +20,7 @@ Gate 0 preserves the proven standards-based iPhone Web Push path from a stable p
 | Phase 7 | COMPLETE | Computer readiness, production notification preferences, overnight quiet hours, privacy/theme/retention controls, subscription recovery, and sanitized diagnostics are available on mobile. |
 | Phase 8 | COMPLETE | Database migration recovery, confirmed backup/restore/reset commands, lifecycle and push fault handling, private-host and browser security, cache/XSS safety, redaction, dependency audits, and Windows owner ACLs are hardened. |
 | Phase 9 | COMPLETE | Every required mobile surface and recovery state has completed the bounded Impeccable, accessibility, responsive, theme, motion, keyboard, copy, and performance audit. |
+| Phase 10 | COMPLETE | The `1.0.0-rc.1` Windows x64 package, clean-environment smoke test, reversible Gate 0 cutover, stable private origin, native Codex integration, and morning acceptance handoff are ready. |
 
 ## Constraints
 
@@ -45,6 +46,16 @@ Run the production browser suite after building the release executable:
 ```powershell
 pnpm run e2e
 ```
+
+Build and package the self-contained Windows x64 release candidate:
+
+```powershell
+pnpm run build:release
+pnpm run package:windows
+pnpm run e2e:release
+```
+
+The ignored output is `artifacts/VibePing-Windows-x64-v1.0.0-rc.1/`, its ZIP, and its SHA-256 file. The six-file package needs no Node.js, pnpm, Rust, or Cargo installation on the user machine.
 
 Control the production process explicitly (there is no auto-start):
 
@@ -80,9 +91,9 @@ vibeping integrations codex remove
 
 After install or repair, open Codex and run `/hooks` to review and trust the exact VibePing definitions. This human trust step is intentionally not bypassed.
 
-Production imports the known Gate 0 VAPID and phone-registration files once, after first copying them to a timestamped local backup. The original Gate 0 directory is never modified or deleted. The stable private origin stays on Gate 0 until the reversible Phase 10 cutover.
+Production imports the known Gate 0 VAPID and phone-registration files once, after first copying them to a timestamped local backup. The original Gate 0 directory is never modified or deleted. Phase 10 completed the reversible cutover while preserving the existing private origin, Tailscale Serve mapping, and Funnel-off state.
 
-Start the Gate 0 server and private Tailscale Serve origin:
+Use the preserved Gate 0 launcher only for an intentional rollback after stopping the release candidate:
 
 ```powershell
 .\spikes\tailscale-web-push\scripts\Start-Gate0.ps1

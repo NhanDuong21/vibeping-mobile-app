@@ -1,8 +1,5 @@
 import { Injectable } from '@angular/core';
-import type {
-  ActivityEventDto,
-  BootstrapDto,
-} from '../../../core/api/api-client';
+import type { ActivityEventDto, BootstrapDto } from '../../../core/api/api-client';
 
 export const ACTIVITY_CACHE_VERSION = 2;
 const DATABASE_NAME = 'vibeping-mobile';

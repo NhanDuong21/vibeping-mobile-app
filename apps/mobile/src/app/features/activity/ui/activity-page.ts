@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  OnDestroy,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { BottomNavigation } from '../../../core/navigation/ui/bottom-navigation';
 import { ConnectivityStore } from '../../../core/connectivity/connectivity.store';

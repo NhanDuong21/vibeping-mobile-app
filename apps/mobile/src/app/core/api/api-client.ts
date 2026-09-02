@@ -8,10 +8,8 @@ export type PairingStatusDto = components['schemas']['PairingStatusResponse'];
 export type PairingClaimDto = components['schemas']['PairingClaimRequest'];
 export type PairingClaimResponseDto = components['schemas']['PairingClaimResponse'];
 export type PublicKeyDto = components['schemas']['PublicKeyResponse'];
-export type SubscriptionRegistrationDto =
-  components['schemas']['SubscriptionRegistrationRequest'];
-export type SubscriptionResponseDto =
-  components['schemas']['SubscriptionResponse'];
+export type SubscriptionRegistrationDto = components['schemas']['SubscriptionRegistrationRequest'];
+export type SubscriptionResponseDto = components['schemas']['SubscriptionResponse'];
 export type TestPushResponseDto = components['schemas']['TestPushResponse'];
 export type ActivitySnapshotDto = components['schemas']['ActivitySnapshot'];
 export type ActivityEventDto = components['schemas']['ActivityEvent'];
@@ -80,10 +78,7 @@ export class ApiClient {
     return this.#http.get<PreferencesDto>('/api/v1/preferences');
   }
 
-  savePreferences(
-    request: PreferencesDto,
-    csrfToken: string,
-  ): Observable<PreferencesDto> {
+  savePreferences(request: PreferencesDto, csrfToken: string): Observable<PreferencesDto> {
     return this.#http.put<PreferencesDto>(
       '/api/v1/preferences',
       request,
@@ -107,10 +102,7 @@ export class ApiClient {
     return this.#http.get<PairingStatusDto>('/api/v1/pairing/status');
   }
 
-  claimPairing(
-    request: PairingClaimDto,
-    csrfToken: string,
-  ): Observable<PairingClaimResponseDto> {
+  claimPairing(request: PairingClaimDto, csrfToken: string): Observable<PairingClaimResponseDto> {
     return this.#http.post<PairingClaimResponseDto>(
       '/api/v1/pairing/claim',
       request,
@@ -140,10 +132,7 @@ export class ApiClient {
     );
   }
 
-  testPush(
-    installationId: string,
-    csrfToken: string,
-  ): Observable<TestPushResponseDto> {
+  testPush(installationId: string, csrfToken: string): Observable<TestPushResponseDto> {
     return this.#http.post<TestPushResponseDto>(
       '/api/v1/push/test',
       { installationId },

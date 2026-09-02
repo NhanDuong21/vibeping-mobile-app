@@ -32,9 +32,14 @@ describe('ActivityStore', () => {
       events: vi.fn().mockReturnValue(of({ events: [event], nextCursor: null, unreadCount: 1 })),
       pairingStatus: vi.fn().mockReturnValue(throwError(() => new Error('offline'))),
     };
-    const cache = { read: vi.fn().mockResolvedValue(null), write: vi.fn().mockResolvedValue(undefined) };
+    const cache = {
+      read: vi.fn().mockResolvedValue(null),
+      write: vi.fn().mockResolvedValue(undefined),
+    };
     const stream = {
-      addEventListener: vi.fn((name: string, listener: EventListener) => listeners.set(name, listener)),
+      addEventListener: vi.fn((name: string, listener: EventListener) =>
+        listeners.set(name, listener),
+      ),
       close: vi.fn(),
     } as unknown as EventSource;
     TestBed.configureTestingModule({
@@ -76,8 +81,14 @@ describe('ActivityStore', () => {
       providers: [
         ActivityStore,
         { provide: ApiClient, useValue: api },
-        { provide: ActivityCache, useValue: { read: () => Promise.resolve(cached), write: vi.fn() } },
-        { provide: EVENT_SOURCE_FACTORY, useValue: () => ({ addEventListener: vi.fn(), close: vi.fn() }) },
+        {
+          provide: ActivityCache,
+          useValue: { read: () => Promise.resolve(cached), write: vi.fn() },
+        },
+        {
+          provide: EVENT_SOURCE_FACTORY,
+          useValue: () => ({ addEventListener: vi.fn(), close: vi.fn() }),
+        },
       ],
     });
     const store = TestBed.inject(ActivityStore);

@@ -185,12 +185,22 @@ fn where_candidates() -> Result<Vec<(PathBuf, String)>> {
         .arg("codex")
         .output()
         .context("Không tìm được lệnh Codex")?;
-    Ok(String::from_utf8_lossy(&output.stdout)
+    let mut candidates = String::from_utf8_lossy(&output.stdout)
         .lines()
         .map(str::trim)
         .filter(|value| !value.is_empty())
         .map(|value| (PathBuf::from(value), "PATH".into()))
-        .collect())
+        .collect::<Vec<_>>();
+    candidates.sort_by_key(|(path, _)| native_candidate_rank(path));
+    Ok(candidates)
+}
+
+fn native_candidate_rank(path: &Path) -> u8 {
+    u8::from(
+        !path
+            .extension()
+            .is_some_and(|extension| extension.eq_ignore_ascii_case("exe")),
+    )
 }
 
 fn probe(path: &Path, arguments: &[&str]) -> Result<String> {
@@ -264,5 +274,16 @@ mod tests {
         assert_eq!(selected.version, "codex-cli 9.9.9");
         assert_eq!(selected.source, "chỉ định");
         assert!(select_codex(Vec::new(), |_, _| Ok(String::new())).is_err());
+    }
+
+    #[test]
+    fn native_windows_executable_is_preferred_over_script_shims() {
+        let mut candidates: Vec<(PathBuf, String)> = vec![
+            (PathBuf::from("codex.cmd"), "PATH".into()),
+            (PathBuf::from("codex"), "PATH".into()),
+            (PathBuf::from("codex.exe"), "PATH".into()),
+        ];
+        candidates.sort_by_key(|(path, _)| native_candidate_rank(path));
+        assert_eq!(candidates[0].0, PathBuf::from("codex.exe"));
     }
 }

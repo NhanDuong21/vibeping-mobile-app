@@ -9,23 +9,17 @@ export const routes: Routes = [
   {
     path: 'onboarding',
     loadComponent: () =>
-      import('./features/onboarding/ui/onboarding-page').then(
-        (module) => module.OnboardingPage,
-      ),
+      import('./features/onboarding/ui/onboarding-page').then((module) => module.OnboardingPage),
   },
   {
     path: 'activity',
     loadComponent: () =>
-      import('./features/activity/ui/activity-page').then(
-        (module) => module.ActivityPage,
-      ),
+      import('./features/activity/ui/activity-page').then((module) => module.ActivityPage),
   },
   {
     path: 'activity/events/:id',
     loadComponent: () =>
-      import('./features/activity/ui/event-detail-page').then(
-        (module) => module.EventDetailPage,
-      ),
+      import('./features/activity/ui/event-detail-page').then((module) => module.EventDetailPage),
   },
   {
     path: 'usage-limits',
@@ -37,16 +31,12 @@ export const routes: Routes = [
   {
     path: 'computer',
     loadComponent: () =>
-      import('./features/computer/ui/computer-page').then(
-        (module) => module.ComputerPage,
-      ),
+      import('./features/computer/ui/computer-page').then((module) => module.ComputerPage),
   },
   {
     path: 'settings',
     loadComponent: () =>
-      import('./features/settings/ui/settings-page').then(
-        (module) => module.SettingsPage,
-      ),
+      import('./features/settings/ui/settings-page').then((module) => module.SettingsPage),
   },
   {
     path: 'settings/notifications',
@@ -56,9 +46,7 @@ export const routes: Routes = [
   {
     path: 'diagnostics',
     loadComponent: () =>
-      import('./features/diagnostics/ui/diagnostics-page').then(
-        (module) => module.DiagnosticsPage,
-      ),
+      import('./features/diagnostics/ui/diagnostics-page').then((module) => module.DiagnosticsPage),
   },
   { path: '**', redirectTo: 'onboarding' },
 ];

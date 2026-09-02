@@ -1,15 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import {
-  ApiClient,
-  type ActivityEventDto,
-  type BootstrapDto,
-} from '../../../core/api/api-client';
+import { ApiClient, type ActivityEventDto, type BootstrapDto } from '../../../core/api/api-client';
 import { EVENT_SOURCE_FACTORY } from '../../../core/connectivity/event-source';
-import {
-  ActivityCache,
-  type CachedActivity,
-} from '../data/activity-cache';
+import { ActivityCache, type CachedActivity } from '../data/activity-cache';
 
 type ActivityState = 'loading' | 'ready' | 'cached' | 'partial' | 'unavailable';
 type DetailState = 'idle' | 'loading' | 'ready' | 'missing';
@@ -43,7 +36,9 @@ export class ActivityStore {
   readonly detailState = this.#detailState.asReadonly();
   readonly isStale = computed(() => {
     const saved = this.#savedAt();
-    return this.#state() === 'cached' || Boolean(saved && Date.now() - saved.getTime() > STALE_AFTER_MS);
+    return (
+      this.#state() === 'cached' || Boolean(saved && Date.now() - saved.getTime() > STALE_AFTER_MS)
+    );
   });
   readonly headline = computed(() => {
     const current = this.current();
@@ -160,11 +155,7 @@ export class ActivityStore {
       this.#unreadCount.set(
         this.#pendingReadAll
           ? 0
-          : Math.max(
-              0,
-              feed.unreadCount - this.#pendingReadIds.size,
-              localUnread(this.#events()),
-            ),
+          : Math.max(0, feed.unreadCount - this.#pendingReadIds.size, localUnread(this.#events())),
       );
       this.#savedAt.set(new Date());
       this.#state.set('ready');

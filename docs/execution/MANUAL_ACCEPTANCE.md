@@ -2,6 +2,19 @@
 
 No row in this document is passed by automation. The human completes these checks after the release candidate is running at the existing private origin.
 
+## Morning handoff
+
+1. Mở `Start VibePing.bat` nếu VibePing chưa chạy.
+2. Kết nối Tailscale trên iPhone.
+3. Mở biểu tượng VibePing hiện có trên Màn hình chính.
+4. Hoàn tất ghép nối/cập nhật một lần nếu được hỏi. Nếu vẫn thấy giao diện Gate 0, đóng VibePing, mở lại một lần, rồi tải lại một lần; không xóa biểu tượng và không đăng ký thông báo lại trừ khi ứng dụng yêu cầu.
+5. Xác nhận trạng thái điện thoại đã sẵn sàng.
+6. Lên lịch thông báo thử sau 10 giây.
+7. Khóa iPhone trước khi hết 10 giây.
+8. Ghi lại kết quả hiển thị, âm thanh/rung và hành vi khi chạm thông báo.
+
+Do Angular service worker thay thế worker Gate 0 tại cùng scope, lần mở đầu tiên có thể cần đúng một vòng đóng/mở/tải lại để worker mới giành quyền điều khiển. Đây là bước cập nhật một lần, không phải cài lại PWA.
+
 ## Installation and update
 
 - [ ] Tailscale is connected on the iPhone.

@@ -32,9 +32,7 @@ export class DiagnosticsStore {
     this.#running.set(true);
     try {
       const pairing = await firstValueFrom(this.#api.pairingStatus());
-      this.#report.set(
-        await firstValueFrom(this.#api.runDiagnostics(pairing.csrfToken)),
-      );
+      this.#report.set(await firstValueFrom(this.#api.runDiagnostics(pairing.csrfToken)));
       this.#state.set('ready');
     } catch {
       this.#state.set('unavailable');

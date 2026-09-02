@@ -109,9 +109,7 @@ export class PreferencesStore {
     this.#saveFailed.set(false);
     try {
       const pairing = await firstValueFrom(this.#api.pairingStatus());
-      const saved = await firstValueFrom(
-        this.#api.savePreferences(draft, pairing.csrfToken),
-      );
+      const saved = await firstValueFrom(this.#api.savePreferences(draft, pairing.csrfToken));
       this.#draft.set(saved);
       this.#saved.set(true);
     } catch {
@@ -135,9 +133,9 @@ export class PreferencesStore {
       const pairing = await firstValueFrom(this.#api.pairingStatus());
       const existingId = subscriptionId();
       if (existingId) {
-        await firstValueFrom(
-          this.#api.removeSubscription(existingId, pairing.csrfToken),
-        ).catch(() => undefined);
+        await firstValueFrom(this.#api.removeSubscription(existingId, pairing.csrfToken)).catch(
+          () => undefined,
+        );
       }
       const existing = await firstValueFrom(this.#push.subscription);
       if (existing) await existing.unsubscribe();
@@ -147,10 +145,7 @@ export class PreferencesStore {
         serverPublicKey: sender.publicKey,
       });
       const saved = await firstValueFrom(
-        this.#api.saveSubscription(
-          registrationFor(subscription),
-          pairing.csrfToken,
-        ),
+        this.#api.saveSubscription(registrationFor(subscription), pairing.csrfToken),
       );
       rememberSubscription(saved.id);
       this.#recovery.set('ready');

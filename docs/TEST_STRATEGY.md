@@ -29,3 +29,9 @@ The architecture checker warns above 350 source lines, fails above 500, applies 
 ## Live integrations
 
 Live Tailscale, Web Push, and Codex-account checks run locally and write only ignored evidence. CI never depends on a tailnet, physical phone, signed-in Codex account, or secret.
+
+## Windows release package
+
+The release build regenerates the API contract, builds Angular, embeds the resulting PWA into the Rust release executable, and packages an exact six-file Windows x64 directory plus ZIP and SHA-256. The package smoke test extracts the ZIP into a path containing spaces, removes Node.js, pnpm, Rust, and Cargo from the child `PATH`, and verifies Start/Stop/Restart, health, private-host headers, PWA assets, REST, SSE, the real sanitized allowance reader, Codex fixture ingestion, delayed queueing, persistence, and graceful cleanup on an alternate port.
+
+CI uses Windows and runs formatting, lint, typecheck, unit/integration tests, release builds, contract freshness, PWA/copy audits, Playwright, architecture, hygiene, dependency audits, and package construction. Live account, tailnet, subscription, and physical-notification assertions remain excluded from CI and explicitly manual.

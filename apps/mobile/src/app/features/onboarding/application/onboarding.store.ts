@@ -2,10 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { SwPush } from '@angular/service-worker';
 import { firstValueFrom, take } from 'rxjs';
-import {
-  ApiClient,
-  type PairingStatusDto,
-} from '../../../core/api/api-client';
+import { ApiClient, type PairingStatusDto } from '../../../core/api/api-client';
 import {
   installationId,
   isStandalone,
@@ -13,10 +10,7 @@ import {
   registrationFor,
   rememberSubscription,
 } from '../../../core/notifications/registration';
-import {
-  clientErrorCopy,
-  type ClientErrorCopy,
-} from '../../../core/error-mapping/client-error';
+import { clientErrorCopy, type ClientErrorCopy } from '../../../core/error-mapping/client-error';
 
 export type OnboardingStage =
   | 'loading'
@@ -140,9 +134,7 @@ export class OnboardingStore {
       const response = await firstValueFrom(
         this.#api.testPush(this.#installationId, this.#status.csrfToken),
       );
-      this.#stage.set(
-        response.state === 'providerAccepted' ? 'testAccepted' : 'test',
-      );
+      this.#stage.set(response.state === 'providerAccepted' ? 'testAccepted' : 'test');
       if (response.state !== 'providerAccepted') {
         this.#error.set({
           title: 'Tín hiệu vẫn đang chờ gửi.',
@@ -189,10 +181,7 @@ export class OnboardingStore {
       throw new Error('SUBSCRIPTION_INVALID');
     }
     const response = await firstValueFrom(
-      this.#api.saveSubscription(
-        registrationFor(subscription),
-        this.#status.csrfToken,
-      ),
+      this.#api.saveSubscription(registrationFor(subscription), this.#status.csrfToken),
     );
     rememberSubscription(response.id);
   }

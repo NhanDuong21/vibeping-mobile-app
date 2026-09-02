@@ -35,7 +35,8 @@ export class ThemeStore {
   };
 
   #apply(): void {
-    const dark = this.#preference() === 'dark' ||
+    const dark =
+      this.#preference() === 'dark' ||
       (this.#preference() === 'system' && this.#media?.matches === true);
     document.documentElement.classList.toggle('dark', dark);
     document.documentElement.style.colorScheme = dark ? 'dark' : 'light';

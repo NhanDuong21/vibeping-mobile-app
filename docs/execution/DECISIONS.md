@@ -77,3 +77,13 @@ The Windows data root uses an inheritance-free ACL for the current user SID and 
 ## 2026-09-02 — Finish the interface with one bounded polish round
 
 Phase 9 keeps the established Quiet Signal direction and product architecture. The initial Impeccable audit found one real WCAG contrast failure on the unread badge, excessive repeated eyebrow labels, ambiguous Unicode arrows, a development-machine name in onboarding, and an over-broad reduced-motion reset. One bounded fix round corrected those issues, added explicit motion handling only where movement exists, and introduced maintained accessibility and Vietnamese-copy gates. A single light/dark screenshot confirmation then closed the visual loop; later non-visual tests do not reopen it.
+
+## 2026-09-02 — Ship a portable release candidate, not a developer checkout
+
+The personal Windows x64 package contains exactly one embedded `vibeping.exe`, four explicit-action BAT launchers, and one Vietnamese guide. BAT files are UTF-8 with BOM and CRLF so Windows PowerShell 5.1 and `cmd.exe` preserve Vietnamese copy and `%~dp0` paths containing spaces. The package does not auto-start and requires no Node.js, pnpm, Rust, or Cargo on the user machine.
+
+Codex discovery prefers a native official `codex.exe` over npm command shims. This keeps the installed integration functional after developer runtimes are removed from `PATH`, while preserving the documented notify/hooks flow and its mandatory `/hooks` trust review.
+
+## 2026-09-02 — Cut over without changing private identity
+
+Phase 10 first copied the complete Gate 0 rollback state, verified sender/subscription hashes, and passed the packaged binary on an alternate port. The final process then imported Gate 0 VAPID and subscription data copy-only into protected production storage, retained the source and a timestamped backup, and took over only the existing loopback port. Tailscale Serve remained tailnet-only at the same private origin and Funnel remained off. Rollback means gracefully stopping the release candidate and starting the preserved Gate 0 process; it never changes the Serve mapping or deletes phone identity.

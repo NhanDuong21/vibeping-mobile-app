@@ -14,6 +14,7 @@ Push-Location $repoRoot
 try {
     & pnpm run generate:contracts
     & pnpm run build:mobile
+    & pnpm run format:check
     & pnpm run lint
     & pnpm run typecheck
     & pnpm run test:mobile
@@ -32,6 +33,8 @@ try {
     & (Join-Path $PSScriptRoot 'check-hygiene.ps1')
     & (Join-Path $PSScriptRoot 'check-mobile-copy.ps1')
     & (Join-Path $PSScriptRoot 'check-dependencies.ps1')
+    & (Join-Path $PSScriptRoot 'package-windows.ps1') -SkipBuild
+    Write-Host 'VibePing validation passed: contracts, builds, format, lint, tests, E2E, architecture, hygiene, copy, dependencies, and package.'
 }
 finally {
     Pop-Location

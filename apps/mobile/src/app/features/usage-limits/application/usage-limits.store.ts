@@ -1,9 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom, take, type Subscription } from 'rxjs';
-import {
-  ApiClient,
-  type UsageLimitsSnapshotDto,
-} from '../../../core/api/api-client';
+import { ApiClient, type UsageLimitsSnapshotDto } from '../../../core/api/api-client';
 import { EVENT_SOURCE_FACTORY } from '../../../core/connectivity/event-source';
 
 type UsageWindow = UsageLimitsSnapshotDto['windows'][number];
@@ -48,9 +45,7 @@ export class UsageLimitsStore {
     this.#refreshFailed.set(false);
     try {
       const pairing = await firstValueFrom(this.#api.pairingStatus());
-      const snapshot = await firstValueFrom(
-        this.#api.refreshUsageLimits(pairing.csrfToken),
-      );
+      const snapshot = await firstValueFrom(this.#api.refreshUsageLimits(pairing.csrfToken));
       this.#snapshot.set(snapshot);
       this.#readerState.set('ready');
     } catch {

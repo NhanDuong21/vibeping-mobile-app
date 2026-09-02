@@ -56,8 +56,12 @@ describe('UsageLimitsStore', () => {
     const store = TestBed.inject(UsageLimitsStore);
     const label = store.resetLabel(
       {
-        windowKey: 'key', label: 'Chu kỳ 2 giờ', windowKind: 'primary',
-        remainingPercent: 50, durationMinutes: 120, resetsAt: 1_800,
+        windowKey: 'key',
+        label: 'Chu kỳ 2 giờ',
+        windowKind: 'primary',
+        remainingPercent: 50,
+        durationMinutes: 120,
+        resetsAt: 1_800,
         reached: false,
       },
       new Date(0),

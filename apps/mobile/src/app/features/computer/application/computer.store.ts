@@ -32,12 +32,8 @@ export class ComputerStore {
     this.#testState.set('sending');
     try {
       const pairing = await firstValueFrom(this.#api.pairingStatus());
-      const result = await firstValueFrom(
-        this.#api.testPush(installationId(), pairing.csrfToken),
-      );
-      this.#testState.set(
-        result.state === 'providerAccepted' ? 'accepted' : 'failed',
-      );
+      const result = await firstValueFrom(this.#api.testPush(installationId(), pairing.csrfToken));
+      this.#testState.set(result.state === 'providerAccepted' ? 'accepted' : 'failed');
     } catch {
       this.#testState.set('failed');
     }
