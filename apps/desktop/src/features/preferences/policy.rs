@@ -36,10 +36,10 @@ impl DeliveryPolicy {
     }
 
     pub fn push_body(&self, project: &str, summary: &str) -> String {
-        if self.privacy_mode == "private" {
-            "Mở VibePing để xem chi tiết.".into()
-        } else {
-            format!("{project} · {summary}")
+        match self.privacy_mode.as_str() {
+            "private" => "Mở VibePing để xem chi tiết.".into(),
+            "project" => format!("{project} · Mở VibePing để xem chi tiết."),
+            _ => format!("{project} · {summary}"),
         }
     }
 

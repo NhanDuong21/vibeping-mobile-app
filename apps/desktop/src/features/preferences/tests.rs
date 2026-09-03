@@ -36,6 +36,8 @@ async fn preferences_validate_persist_and_apply_retention() {
     let saved = store.save(&value).await.unwrap();
     assert_eq!(saved.theme, "dark");
     assert_eq!(saved.allowance_threshold_percent, 25);
+    value.privacy_mode = "project".into();
+    assert!(value.validate());
     let remaining: Vec<String> = sqlx::query_scalar("SELECT id FROM activity_events ORDER BY id")
         .fetch_all(&pool)
         .await
@@ -46,6 +48,15 @@ async fn preferences_validate_persist_and_apply_retention() {
     assert!(!value.validate());
     value.quiet_hours.start = value.quiet_hours.end.clone();
     value.quiet_hours.enabled = true;
+    assert!(!value.validate());
+    value.quiet_hours.enabled = false;
+    value.allowance_threshold_percent = 27;
+    assert!(!value.validate());
+    value.allowance_threshold_percent = 20;
+    value.retention_days = 365;
+    assert!(!value.validate());
+    value.retention_days = 30;
+    value.privacy_mode = "unknown".into();
     assert!(!value.validate());
 }
 
@@ -120,6 +131,17 @@ async fn notification_toggles_and_private_mode_change_real_delivery() {
         .unwrap();
     assert_eq!(body, "Mở VibePing để xem chi tiết.");
     assert!(!body.contains("Dự án riêng"));
+
+    value.privacy_mode = "project".into();
+    preferences.save(&value).await.unwrap();
+    complete_turn(&pool, "project").await;
+    let project_body: String = sqlx::query_scalar(
+        "SELECT body FROM notification_jobs WHERE dedupe_key = 'project:codex.turn.completed'",
+    )
+    .fetch_one(&pool)
+    .await
+    .unwrap();
+    assert_eq!(project_body, "Dự án riêng · Mở VibePing để xem chi tiết.");
 }
 
 #[tokio::test]

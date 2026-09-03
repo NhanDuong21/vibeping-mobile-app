@@ -1,30 +1,28 @@
 import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { BottomNavigation } from '../../../core/navigation/ui/bottom-navigation';
-import { ConnectivityStore } from '../../../core/connectivity/connectivity.store';
 import { PullToRefresh } from '../../../core/refresh/pull-to-refresh';
 import { UpdateStore } from '../../../core/updates/update.store';
 import { ActivityStore } from '../application/activity.store';
+import { ActivityList } from './activity-list';
+import { LiveStatusCard } from './live-status-card';
 
 @Component({
   selector: 'app-activity-page',
-  imports: [RouterLink, BottomNavigation, PullToRefresh],
+  imports: [RouterLink, BottomNavigation, PullToRefresh, ActivityList, LiveStatusCard],
   templateUrl: './activity-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ActivityPage implements OnInit, OnDestroy {
-  protected readonly connectivity = inject(ConnectivityStore);
   protected readonly activity = inject(ActivityStore);
   protected readonly updates = inject(UpdateStore);
 
   ngOnInit(): void {
-    this.connectivity.start();
     this.activity.start();
     this.updates.start();
   }
 
   ngOnDestroy(): void {
-    this.connectivity.stop();
     this.activity.stop();
     this.updates.stop();
   }

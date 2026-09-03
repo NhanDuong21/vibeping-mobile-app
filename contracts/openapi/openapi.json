@@ -196,7 +196,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ActivityEvent"
+                  "$ref": "#/components/schemas/ActivityEventDetail"
                 }
               }
             }
@@ -606,6 +606,27 @@
           }
         }
       },
+      "ActivityEventDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ActivityEvent"
+          },
+          {
+            "type": "object",
+            "required": [
+              "timeline"
+            ],
+            "properties": {
+              "timeline": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ActivityTimelineStage"
+                }
+              }
+            }
+          }
+        ]
+      },
       "ActivitySnapshot": {
         "type": "object",
         "required": [
@@ -631,6 +652,22 @@
             "items": {
               "$ref": "#/components/schemas/ActivityEvent"
             }
+          }
+        }
+      },
+      "ActivityTimelineStage": {
+        "type": "object",
+        "required": [
+          "eventType",
+          "occurredAt"
+        ],
+        "properties": {
+          "eventType": {
+            "type": "string"
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -751,10 +788,18 @@
         "required": [
           "projectName",
           "state",
+          "lastTestState",
+          "previewReady",
           "startedAt",
           "updatedAt"
         ],
         "properties": {
+          "lastTestState": {
+            "type": "string"
+          },
+          "previewReady": {
+            "type": "boolean"
+          },
           "projectName": {
             "type": "string"
           },

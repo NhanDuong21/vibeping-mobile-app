@@ -16,6 +16,8 @@ const completed = {
 const runningWork = {
   projectName: "vibeping-mobile-app",
   state: "running",
+  lastTestState: "unknown",
+  previewReady: false,
   startedAt: "2026-09-02T00:00:00Z",
   updatedAt: "2026-09-02T00:02:00Z",
 };
@@ -96,7 +98,19 @@ test("mixed unread activity paginates and opens an exact detail deep link", asyn
   await page.route("**/api/v1/events/event-permission", (route) =>
     route.fulfill({
       contentType: "application/json",
-      body: JSON.stringify(permission),
+      body: JSON.stringify({
+        ...permission,
+        timeline: [
+          {
+            eventType: "codex.turn.started",
+            occurredAt: "2026-09-02T00:01:00Z",
+          },
+          {
+            eventType: "codex.attention.permission_required",
+            occurredAt: permission.occurredAt,
+          },
+        ],
+      }),
     }),
   );
   await page.route("**/api/v1/pairing/status", (route) =>
@@ -125,6 +139,17 @@ test("mixed unread activity paginates and opens an exact detail deep link", asyn
   ).toBeVisible();
   await expect(page.getByText("2 mới")).toBeVisible();
   await expect(page.getByText(completed.projectName).first()).toBeVisible();
+  const navLink = page.getByRole("link", { name: /Hoạt động chưa đọc/ });
+  await expect(navLink).toHaveAttribute("aria-current", "page");
+  const icon = navLink.locator("svg");
+  const badge = navLink.getByLabel("Hoạt động chưa đọc");
+  const [iconBox, badgeBox] = await Promise.all([
+    icon.boundingBox(),
+    badge.boundingBox(),
+  ]);
+  expect(iconBox && badgeBox && badgeBox.x >= iconBox.x + iconBox.width).toBe(
+    true,
+  );
   const olderPage = page.waitForResponse(
     (response) =>
       response.url().includes("/api/v1/events?") &&
@@ -133,11 +158,13 @@ test("mixed unread activity paginates and opens an exact detail deep link", asyn
   await page.getByRole("button", { name: "Xem hoạt động cũ hơn" }).click();
   expect((await olderPage).ok()).toBe(true);
   await expect(page.locator('a[href^="/activity/events/"]')).toHaveCount(3);
-  await page.getByText("Cần xác nhận").click();
+  await page.getByText("Codex đang chờ bạn").last().click();
   await expect(page).toHaveURL(/\/activity\/events\/event-permission$/);
   await expect(
-    page.getByRole("heading", { name: "Codex cần bạn xác nhận" }),
+    page.getByRole("heading", { name: "Codex đang chờ bạn" }),
   ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Diễn biến" })).toBeVisible();
+  await expect(page.locator("app-bottom-navigation:visible")).toHaveCount(0);
   await expect(page.getByText("Đã đọc")).toBeVisible();
 });
 
@@ -160,7 +187,9 @@ test("SSE reconnect and duplicate delivery add one activity item", async ({
     }),
   );
   await page.goto("/activity");
-  await expect(page.getByText("Đã hoàn tất", { exact: true })).toHaveCount(1);
+  await expect(
+    page.getByText("Công việc đã hoàn tất", { exact: true }),
+  ).toHaveCount(1);
   await expect(page.getByText("1 mới")).toBeVisible();
 });
 

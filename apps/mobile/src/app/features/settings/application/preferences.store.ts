@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { SwPush } from '@angular/service-worker';
 import { firstValueFrom } from 'rxjs';
 import { ApiClient, type PreferencesDto } from '../../../core/api/api-client';
@@ -12,8 +12,11 @@ import {
 import { ThemeStore } from '../../../core/theme/theme.store';
 
 type SettingState = 'loading' | 'ready' | 'unavailable';
+type SaveState = 'idle' | 'saving' | 'saved' | 'failed';
+type NotificationHealth = 'loading' | 'healthy' | 'stale' | 'denied' | 'unsupported';
 type NotificationRecovery = 'idle' | 'working' | 'ready' | 'denied' | 'unsupported' | 'failed';
 type NotificationKey = keyof PreferencesDto['notifications'];
+type PrivacyMode = 'standard' | 'project' | 'private';
 
 @Injectable({ providedIn: 'root' })
 export class PreferencesStore {
@@ -22,24 +25,30 @@ export class PreferencesStore {
   readonly #theme = inject(ThemeStore);
   readonly #state = signal<SettingState>('loading');
   readonly #draft = signal<PreferencesDto | null>(null);
-  readonly #saving = signal(false);
-  readonly #saved = signal(false);
-  readonly #saveFailed = signal(false);
+  readonly #saveState = signal<SaveState>('idle');
+  readonly #notificationHealth = signal<NotificationHealth>('loading');
   readonly #recovery = signal<NotificationRecovery>('idle');
+  #saveRequested = false;
+  #saveLoop?: Promise<void>;
 
   readonly state = this.#state.asReadonly();
   readonly draft = this.#draft.asReadonly();
-  readonly saving = this.#saving.asReadonly();
-  readonly saved = this.#saved.asReadonly();
-  readonly saveFailed = this.#saveFailed.asReadonly();
+  readonly saveState = this.#saveState.asReadonly();
+  readonly saving = computed(() => this.#saveState() === 'saving');
+  readonly saved = computed(() => this.#saveState() === 'saved');
+  readonly saveFailed = computed(() => this.#saveState() === 'failed');
+  readonly notificationHealth = this.#notificationHealth.asReadonly();
   readonly recovery = this.#recovery.asReadonly();
 
   async load(): Promise<void> {
+    this.#state.set('loading');
     try {
       const value = await firstValueFrom(this.#api.preferences());
       this.#draft.set(value);
       this.#theme.set(value.theme);
+      this.#saveState.set('idle');
       this.#state.set('ready');
+      await this.#loadNotificationHealth();
     } catch {
       this.#state.set('unavailable');
     }
@@ -88,7 +97,7 @@ export class PreferencesStore {
     }));
   }
 
-  setPrivacyMode(mode: 'standard' | 'private'): void {
+  setPrivacyMode(mode: PrivacyMode): void {
     this.#update((value) => ({ ...value, privacyMode: mode }));
   }
 
@@ -102,29 +111,21 @@ export class PreferencesStore {
   }
 
   async save(): Promise<void> {
-    const draft = this.#draft();
-    if (!draft || this.#saving()) return;
-    this.#saving.set(true);
-    this.#saved.set(false);
-    this.#saveFailed.set(false);
-    try {
-      const pairing = await firstValueFrom(this.#api.pairingStatus());
-      const saved = await firstValueFrom(this.#api.savePreferences(draft, pairing.csrfToken));
-      this.#draft.set(saved);
-      this.#saved.set(true);
-    } catch {
-      this.#saveFailed.set(true);
-    } finally {
-      this.#saving.set(false);
-    }
+    if (!this.#draft()) return;
+    this.#saveRequested = true;
+    this.#saveState.set('saving');
+    this.#saveLoop ??= this.#drainSaves();
+    await this.#saveLoop;
   }
 
   async resetNotifications(): Promise<void> {
     if (notificationPermission() === 'denied') {
+      this.#notificationHealth.set('denied');
       this.#recovery.set('denied');
       return;
     }
     if (!this.#push.isEnabled) {
+      this.#notificationHealth.set('unsupported');
       this.#recovery.set('unsupported');
       return;
     }
@@ -148,6 +149,7 @@ export class PreferencesStore {
         this.#api.saveSubscription(registrationFor(subscription), pairing.csrfToken),
       );
       rememberSubscription(saved.id);
+      this.#notificationHealth.set('healthy');
       this.#recovery.set('ready');
     } catch {
       this.#recovery.set('failed');
@@ -158,7 +160,43 @@ export class PreferencesStore {
     const current = this.#draft();
     if (!current) return;
     this.#draft.set(change(current));
-    this.#saved.set(false);
-    this.#saveFailed.set(false);
+    void this.save();
+  }
+
+  async #drainSaves(): Promise<void> {
+    try {
+      while (this.#saveRequested) {
+        this.#saveRequested = false;
+        const requested = this.#draft();
+        if (!requested) return;
+        try {
+          const pairing = await firstValueFrom(this.#api.pairingStatus());
+          const saved = await firstValueFrom(
+            this.#api.savePreferences(requested, pairing.csrfToken),
+          );
+          if (this.#draft() === requested) this.#draft.set(saved);
+          if (!this.#saveRequested) this.#saveState.set('saved');
+        } catch {
+          this.#saveRequested = false;
+          this.#saveState.set('failed');
+        }
+      }
+    } finally {
+      this.#saveLoop = undefined;
+    }
+  }
+
+  async #loadNotificationHealth(): Promise<void> {
+    if (notificationPermission() === 'denied') {
+      this.#notificationHealth.set('denied');
+      return;
+    }
+    try {
+      const status = await firstValueFrom(this.#api.computerStatus());
+      this.#notificationHealth.set(status.notifications === 'ready' ? 'healthy' : 'stale');
+    } catch {
+      if (!this.#push.isEnabled) this.#notificationHealth.set('unsupported');
+      else this.#notificationHealth.set(subscriptionId() ? 'healthy' : 'stale');
+    }
   }
 }

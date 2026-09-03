@@ -1,4 +1,4 @@
-use chrono::Utc;
+use chrono::{Duration, Utc};
 use serde_json::json;
 use tempfile::tempdir;
 
@@ -13,6 +13,13 @@ fn ingress(turn: &str, signal: CodexSignal) -> CodexIngress {
         project_name: "vibeping".into(),
         signal,
         occurred_at: Utc::now(),
+    }
+}
+
+fn ingress_at(turn: &str, signal: CodexSignal, offset_seconds: i64) -> CodexIngress {
+    CodexIngress {
+        occurred_at: Utc::now() + Duration::seconds(offset_seconds),
+        ..ingress(turn, signal)
     }
 }
 
@@ -79,7 +86,7 @@ async fn hook_readiness_ignores_notify_only_and_accepts_any_hook_signal() {
     let pool = database::connect(&temp.path().join("hook-readiness.sqlite3"))
         .await
         .unwrap();
-    let store = ActivityStore::new(pool);
+    let store = ActivityStore::new(pool.clone());
 
     store
         .ingest(&ingress("notify", CodexSignal::Completed))
@@ -171,6 +178,91 @@ async fn failed_then_fixed_turn_completes_without_failure_event() {
 }
 
 #[tokio::test]
+async fn current_work_exposes_real_test_and_preview_state() {
+    let temp = tempdir().unwrap();
+    let pool = database::connect(&temp.path().join("live-state.sqlite3"))
+        .await
+        .unwrap();
+    let store = ActivityStore::new(pool);
+    store
+        .ingest(&ingress_at("live", CodexSignal::Started, 0))
+        .await
+        .unwrap();
+    store
+        .ingest(&ingress_at("live", CodexSignal::TestFailed, 1))
+        .await
+        .unwrap();
+    let failed = store.current_work().await.unwrap().unwrap();
+    assert_eq!(failed.last_test_state, "failed");
+    assert!(!failed.preview_ready);
+
+    store
+        .ingest(&ingress_at("live", CodexSignal::TestPassed, 2))
+        .await
+        .unwrap();
+    store
+        .ingest(&ingress_at("live", CodexSignal::PreviewReady, 3))
+        .await
+        .unwrap();
+    let preview = store.current_work().await.unwrap().unwrap();
+    assert_eq!(preview.last_test_state, "passed");
+    assert!(preview.preview_ready);
+}
+
+#[tokio::test]
+async fn activity_detail_timeline_contains_only_stored_stages() {
+    let temp = tempdir().unwrap();
+    let pool = database::connect(&temp.path().join("timeline.sqlite3"))
+        .await
+        .unwrap();
+    let store = ActivityStore::new(pool.clone());
+    for (offset, signal) in [
+        (0, CodexSignal::Started),
+        (1, CodexSignal::Progressed),
+        (2, CodexSignal::PermissionRequired),
+        (3, CodexSignal::PreviewReady),
+    ] {
+        store
+            .ingest(&ingress_at("timeline", signal, offset))
+            .await
+            .unwrap();
+    }
+    let completed = store
+        .ingest(&ingress_at("timeline", CodexSignal::Completed, 4))
+        .await
+        .unwrap()
+        .unwrap();
+    let detail = store.event_detail(&completed.id).await.unwrap().unwrap();
+    let stages: Vec<&str> = detail
+        .timeline
+        .iter()
+        .map(|stage| stage.event_type.as_str())
+        .collect();
+    assert_eq!(
+        stages,
+        vec![
+            "codex.turn.started",
+            "codex.attention.permission_required",
+            "codex.preview.ready",
+            "codex.turn.completed"
+        ]
+    );
+
+    sqlx::query(
+        "INSERT INTO activity_events (id, dedupe_key, event_type, title, summary, project_name, \
+         occurred_at, created_at) VALUES ('standalone', 'standalone', 'codex.allowance.low', \
+         'Hạn mức thấp', 'Mở VibePing để xem.', 'VibePing', ?, ?)",
+    )
+    .bind(Utc::now())
+    .bind(Utc::now())
+    .execute(&pool)
+    .await
+    .unwrap();
+    let standalone = store.event_detail("standalone").await.unwrap().unwrap();
+    assert!(standalone.timeline.is_empty());
+}
+
+#[tokio::test]
 async fn final_failure_and_duplicates_create_one_attention_event_each() {
     let temp = tempdir().unwrap();
     let pool = database::connect(&temp.path().join("events.sqlite3"))
@@ -242,7 +334,15 @@ async fn activity_feed_handles_empty_history_pagination_and_read_state() {
     let id = first.events[0].id.clone();
     let state = store.mark_read(&id).await.unwrap().unwrap();
     assert_eq!(state.unread_count, 2);
-    assert!(store.event(&id).await.unwrap().unwrap().is_read);
+    assert!(
+        store
+            .event_detail(&id)
+            .await
+            .unwrap()
+            .unwrap()
+            .event
+            .is_read
+    );
     assert!(store.mark_read("missing").await.unwrap().is_none());
     assert_eq!(store.mark_all_read().await.unwrap().unread_count, 0);
 }

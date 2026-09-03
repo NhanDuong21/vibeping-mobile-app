@@ -47,7 +47,7 @@ impl ActivityStore {
                 None
             }
             CodexSignal::PreviewReady => {
-                set_state(&mut transaction, ingress, "running").await?;
+                set_preview(&mut transaction, ingress).await?;
                 event_for(ingress, "codex.preview.ready")
             }
             CodexSignal::Stopped | CodexSignal::Completed => {
@@ -68,7 +68,7 @@ impl ActivityStore {
 
     pub async fn snapshot(&self) -> Result<ActivitySnapshot> {
         let current_work = sqlx::query_as::<_, CurrentWork>(
-            "SELECT project_name, state, started_at, updated_at FROM codex_turns \
+            "SELECT project_name, state, last_test_state, preview_ready, started_at, updated_at FROM codex_turns \
              WHERE state IN ('running', 'waiting') ORDER BY updated_at DESC LIMIT 1",
         )
         .fetch_optional(&self.pool)
@@ -154,6 +154,21 @@ async fn set_test(
         .execute(&mut **transaction)
         .await
         .context("Không cập nhật được kết quả kiểm tra")?;
+    Ok(())
+}
+
+async fn set_preview(
+    transaction: &mut Transaction<'_, Sqlite>,
+    value: &CodexIngress,
+) -> Result<()> {
+    sqlx::query(
+        "UPDATE codex_turns SET preview_ready = 1, state = 'running', updated_at = ? WHERE turn_key = ?",
+    )
+    .bind(value.occurred_at)
+    .bind(&value.turn_key)
+    .execute(&mut **transaction)
+    .await
+    .context("Không cập nhật được bản xem trước")?;
     Ok(())
 }
 

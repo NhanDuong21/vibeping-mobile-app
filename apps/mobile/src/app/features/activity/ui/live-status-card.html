@@ -1,0 +1,101 @@
+<section
+  class="overflow-hidden rounded-2xl border border-vibe-rule bg-vibe-surface transition-colors duration-200 ease-out motion-reduce:transition-none dark:border-vibe-rule-dark dark:bg-vibe-surface-dark"
+  aria-labelledby="live-status-heading"
+  aria-live="polite"
+>
+  <div class="p-4">
+    <div class="flex items-start gap-3">
+      <span
+        class="mt-1.5 size-3 shrink-0 rounded-full"
+        [class.bg-vibe-mint]="
+          activity.readiness().kind === 'ready' ||
+          activity.readiness().kind === 'working' ||
+          activity.readiness().kind === 'completed'
+        "
+        [class.vibe-active-pulse]="activity.motionActive()"
+        [class.bg-vibe-amber]="
+          activity.readiness().kind === 'checking' ||
+          activity.readiness().kind === 'preview' ||
+          activity.readiness().kind === 'codexSetup' ||
+          activity.readiness().kind === 'codexReview'
+        "
+        [class.bg-vibe-coral]="
+          activity.readiness().kind === 'stopped' ||
+          activity.readiness().kind === 'offline' ||
+          activity.readiness().kind === 'waiting' ||
+          activity.readiness().kind === 'failed'
+        "
+        aria-hidden="true"
+      ></span>
+      <div class="min-w-0 flex-1">
+        <h1
+          id="live-status-heading"
+          class="text-balance text-[1.625rem] font-bold leading-[1.14] tracking-[-0.035em]"
+        >
+          {{ activity.readiness().title }}
+        </h1>
+        <p class="mt-2.5 max-w-md text-[0.9375rem] leading-6 text-vibe-muted dark:text-vibe-sage">
+          {{ activity.readiness().detail }}
+        </p>
+      </div>
+    </div>
+
+    @if (activity.current(); as current) {
+      @if (
+        activity.readiness().kind === 'working' ||
+        activity.readiness().kind === 'waiting' ||
+        activity.readiness().kind === 'failed' ||
+        activity.readiness().kind === 'preview'
+      ) {
+        <div class="mt-4 border-t border-vibe-rule pt-4 dark:border-vibe-rule-dark">
+          <p class="break-words text-base font-bold leading-6">{{ workTitle() }}</p>
+          <p class="mt-1 break-words text-sm text-vibe-muted dark:text-vibe-sage">
+            <span class="block truncate">{{ projectName() }}</span>
+          </p>
+          <div
+            class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-vibe-muted dark:text-vibe-sage"
+          >
+            <span>{{ elapsed() }}</span>
+            <span>Tín hiệu gần nhất · {{ lastSignal() }}</span>
+          </div>
+        </div>
+      }
+    } @else if (activity.readiness().kind === 'completed') {
+      <div class="mt-4 border-t border-vibe-rule pt-4 dark:border-vibe-rule-dark">
+        <p class="break-words text-base font-bold leading-6">{{ recentTitle() }}</p>
+        <p class="mt-1 break-words text-sm text-vibe-muted dark:text-vibe-sage">
+          {{ projectName() }} · {{ recentTime() }}
+        </p>
+      </div>
+    }
+
+    @if (
+      activity.readiness().kind === 'codexSetup' || activity.readiness().kind === 'codexReview'
+    ) {
+      <a
+        routerLink="/computer"
+        class="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-vibe-ink! px-5 text-sm font-black text-vibe-paper! transition-opacity active:opacity-75 dark:bg-vibe-mint! dark:text-vibe-ink!"
+      >
+        Xem cách thực hiện
+        <svg
+          class="size-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="m9 18 6-6-6-6" />
+        </svg>
+      </a>
+    }
+  </div>
+
+  @if (activity.motionActive()) {
+    <div class="h-0.5 overflow-hidden bg-vibe-mint/15" aria-label="Codex vẫn đang làm việc">
+      <span class="vibe-signal-sweep block h-full w-1/3 bg-vibe-mint"></span>
+    </div>
+  }
+</section>

@@ -25,14 +25,14 @@ test("product mastheads use the installed VibePing app icon", async ({
     await expect(logo).toBeVisible();
     await expect(logo).toHaveAttribute("alt", "");
     await expect
-      .poll(() => logo.evaluate((element: HTMLImageElement) => element.naturalWidth))
+      .poll(() =>
+        logo.evaluate((element: HTMLImageElement) => element.naturalWidth),
+      )
       .toBeGreaterThanOrEqual(40);
     const image = await logo.evaluate((element: HTMLImageElement) => ({
       complete: element.complete,
-      currentPath: new URL(
-        element.currentSrc,
-        element.ownerDocument.baseURI,
-      ).pathname,
+      currentPath: new URL(element.currentSrc, element.ownerDocument.baseURI)
+        .pathname,
       naturalWidth: element.naturalWidth,
     }));
     expect(image.complete).toBe(true);
@@ -66,7 +66,7 @@ test("all primary surfaces hold their quality bar at target widths and text stre
       name: "event-detail",
       path: "/activity/events/phase-9-event",
       width: 390,
-      heading: event.title,
+      heading: "Codex đang chờ bạn",
     },
     {
       name: "allowance",
@@ -128,6 +128,35 @@ test("all primary surfaces hold their quality bar at target widths and text stre
   expect(findings).toEqual([]);
 });
 
+test("refined surfaces fit every required phone width", async ({
+  page,
+}, testInfo) => {
+  await useExplicitProjectTheme(page, testInfo);
+  await routeProduct(page);
+  const widths = [320, 375, 390, 430];
+  const surfaces = [
+    { name: "activity", path: "/activity" },
+    { name: "event-detail", path: "/activity/events/phase-9-event" },
+    { name: "computer", path: "/computer" },
+    { name: "settings", path: "/settings" },
+  ];
+
+  for (const width of widths) {
+    await page.setViewportSize({ width, height: 844 });
+    for (const surface of surfaces) {
+      await page.goto(surface.path);
+      const widthMetrics = await page.evaluate(() => ({
+        client: document.documentElement.clientWidth,
+        scroll: document.documentElement.scrollWidth,
+      }));
+      expect(
+        widthMetrics.scroll,
+        `${surface.name} overflows at ${width}px`,
+      ).toBeLessThanOrEqual(widthMetrics.client);
+    }
+  }
+});
+
 test("recovery surfaces remain calm, actionable, and technically opaque", async ({
   page,
 }, testInfo) => {
@@ -167,7 +196,9 @@ test("recovery surfaces remain calm, actionable, and technically opaque", async 
     }),
   );
   await page.goto("/computer?subscription=stale");
-  await expect(page.getByText("Cần đăng ký lại trên iPhone")).toBeVisible();
+  await expect(
+    page.getByText("Điện thoại cần bật lại thông báo"),
+  ).toBeVisible();
   await capture(page, testInfo, "390-stale-subscription");
 
   await page.route("**/api/v1/computer/status", (route) =>
@@ -241,12 +272,69 @@ test("system theme, reduced motion, and keyboard focus retain usable feedback", 
 }, testInfo) => {
   await routeProduct(page);
   const dark = testInfo.project.name.includes("dark");
+  await page.addInitScript(() => {
+    Object.defineProperty(Notification, "permission", {
+      configurable: true,
+      get: () => "granted" as NotificationPermission,
+    });
+  });
   await page.emulateMedia({
     colorScheme: dark ? "dark" : "light",
     reducedMotion: "reduce",
   });
+  await page.route("**/api/v1/bootstrap", (route) =>
+    route.fulfill({
+      json: {
+        serverTime: "2026-09-02T01:01:00Z",
+        cursor: "1",
+        unreadCount: 1,
+        connection: {
+          desktop: "running",
+          codex: "ready",
+          privateConnection: "local",
+        },
+        currentWork: {
+          projectName: event.projectName,
+          state: "running",
+          lastTestState: "unknown",
+          previewReady: false,
+          startedAt: "2026-09-02T00:50:00Z",
+          updatedAt: "2026-09-02T01:00:00Z",
+        },
+        usageLimits: {
+          state: "available",
+          readAt: null,
+          windows: [],
+          cursor: "1",
+        },
+      },
+    }),
+  );
+  await page.goto("/activity?motion=reduced");
+  await expect(
+    page.getByRole("heading", { name: "Codex đang làm việc" }),
+  ).toBeVisible();
+  expect(
+    await page
+      .locator(".vibe-active-pulse")
+      .evaluateAll((elements) =>
+        elements.map((element) => getComputedStyle(element).animationName),
+      ),
+  ).toEqual(["none", "none"]);
+  await expect(page.locator(".vibe-signal-sweep")).toHaveCSS(
+    "animation-name",
+    "none",
+  );
+  await expect(page.locator("app-live-status-card")).not.toContainText(/\d+%/);
+
   await page.goto("/settings");
   await expect(page.locator("html")).toHaveClass(dark ? /dark/ : /^(?!.*dark)/);
+  await expect(
+    page.getByRole("button", { name: "Bật lại thông báo" }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Xem cách bật lại" }),
+  ).toHaveCount(0);
   const toggleTransition = await page
     .locator("app-toggle-switch span")
     .first()

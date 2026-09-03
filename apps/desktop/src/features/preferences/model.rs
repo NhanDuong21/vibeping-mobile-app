@@ -35,10 +35,13 @@ pub struct Preferences {
 
 impl Preferences {
     pub fn validate(&self) -> bool {
-        (1..=50).contains(&self.allowance_threshold_percent)
-            && (7..=365).contains(&self.retention_days)
+        matches!(self.allowance_threshold_percent, 10 | 15 | 20 | 25 | 30)
+            && matches!(self.retention_days, 7 | 14 | 30 | 60 | 90)
             && (-720..=840).contains(&self.quiet_hours.timezone_offset_minutes)
-            && matches!(self.privacy_mode.as_str(), "standard" | "private")
+            && matches!(
+                self.privacy_mode.as_str(),
+                "standard" | "project" | "private"
+            )
             && matches!(self.theme.as_str(), "system" | "light" | "dark")
             && parse_time(&self.quiet_hours.start).is_some()
             && parse_time(&self.quiet_hours.end).is_some()

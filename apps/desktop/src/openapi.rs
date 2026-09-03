@@ -2,8 +2,8 @@ use utoipa::OpenApi;
 
 use crate::features::{
     codex_attention::{
-        ActivityEvent, ActivitySnapshot, CurrentWork, EventFeed, ReadStateResponse,
-        http as activity_http,
+        ActivityEvent, ActivityEventDetail, ActivitySnapshot, ActivityTimelineStage, CurrentWork,
+        EventFeed, ReadStateResponse, http as activity_http,
     },
     computer::{ComputerStatus, DiagnosticCheck, DiagnosticsReport, http as computer_http},
     notifications::{
@@ -69,6 +69,8 @@ use crate::features::{
         TestPushResponse,
         ActionResponse,
         ActivityEvent,
+        ActivityEventDetail,
+        ActivityTimelineStage,
         ActivitySnapshot,
         EventFeed,
         ReadStateResponse,

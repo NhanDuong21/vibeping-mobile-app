@@ -63,8 +63,14 @@ async fn failed_migration_restores_the_exact_pre_migration_database() {
     pool.close().await;
     let before = std::fs::read(&path).unwrap();
     let mut migrations = MIGRATOR.iter().cloned().collect::<Vec<_>>();
+    let broken_version = migrations
+        .iter()
+        .map(|migration| migration.version)
+        .max()
+        .unwrap_or_default()
+        + 1;
     migrations.push(Migration::new(
-        8,
+        broken_version,
         "broken".into(),
         MigrationType::Simple,
         "CREATE TABLE partial(id INTEGER); THIS IS NOT SQL;".into_sql_str(),

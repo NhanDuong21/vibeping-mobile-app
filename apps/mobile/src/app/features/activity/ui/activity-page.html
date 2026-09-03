@@ -1,8 +1,8 @@
 <app-pull-to-refresh
-  class="block h-dvh overflow-y-auto overscroll-y-contain bg-vibe-canvas px-5 pb-[calc(env(safe-area-inset-bottom)+6.5rem)] pt-[calc(env(safe-area-inset-top)+1rem)] text-vibe-ink selection:bg-vibe-mint/30 dark:bg-vibe-night dark:text-vibe-paper"
+  class="block h-dvh overflow-y-auto overscroll-y-contain bg-vibe-canvas px-5 pb-[calc(env(safe-area-inset-bottom)+5.75rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] text-vibe-ink selection:bg-vibe-mint/30 dark:bg-vibe-night dark:text-vibe-paper"
 >
   <header class="mx-auto flex w-full max-w-lg items-center justify-between py-2">
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2.5">
       <img
         src="/assets/logo-icon-192.png"
         srcset="/assets/logo-icon-192.png 192w, /assets/logo-icon-512.png 512w"
@@ -14,26 +14,41 @@
         aria-hidden="true"
       />
       <div>
-        <p class="font-bold tracking-[-0.02em]">VibePing</p>
+        <p class="text-[0.9375rem] font-bold tracking-[-0.02em]">VibePing</p>
         <p class="text-xs text-vibe-muted dark:text-vibe-sage">Tín hiệu riêng tư</p>
       </div>
     </div>
-    <span class="flex items-center gap-2 text-xs font-bold">
+    <span class="flex max-w-[48%] items-center justify-end gap-2 text-right text-xs font-bold">
       <span
-        class="size-2.5 rounded-full"
-        [class.bg-vibe-mint]="connectivity.state() === 'online'"
-        [class.bg-vibe-amber]="connectivity.state() === 'loading'"
-        [class.bg-vibe-coral]="connectivity.state() === 'offline'"
+        class="size-2.5 shrink-0 rounded-full"
+        [class.bg-vibe-mint]="
+          activity.readiness().kind === 'ready' ||
+          activity.readiness().kind === 'working' ||
+          activity.readiness().kind === 'completed'
+        "
+        [class.vibe-active-pulse]="activity.motionActive()"
+        [class.bg-vibe-amber]="
+          activity.readiness().kind === 'checking' ||
+          activity.readiness().kind === 'preview' ||
+          activity.readiness().kind === 'codexSetup' ||
+          activity.readiness().kind === 'codexReview'
+        "
+        [class.bg-vibe-coral]="
+          activity.readiness().kind === 'stopped' ||
+          activity.readiness().kind === 'offline' ||
+          activity.readiness().kind === 'waiting' ||
+          activity.readiness().kind === 'failed'
+        "
         aria-hidden="true"
       ></span>
-      {{ connectivity.view().label }}
+      {{ activity.readiness().label }}
     </span>
   </header>
 
-  <main class="mx-auto w-full max-w-lg pb-4 pt-8">
+  <main class="mx-auto w-full max-w-lg pb-3 pt-6">
     @if (updates.available()) {
       <section
-        class="mb-7 flex items-center justify-between gap-4 rounded-2xl bg-vibe-ink px-4 py-3 text-vibe-paper dark:bg-vibe-surface-dark"
+        class="mb-5 flex items-center justify-between gap-3 rounded-2xl bg-vibe-ink px-4 py-3 text-vibe-paper dark:bg-vibe-surface-dark"
         aria-live="polite"
       >
         <div>
@@ -44,7 +59,7 @@
         </div>
         <button
           type="button"
-          class="min-h-11 shrink-0 rounded-full bg-vibe-mint px-4 text-sm font-black text-vibe-ink disabled:opacity-60"
+          class="min-h-11 shrink-0 rounded-full bg-vibe-mint px-4 text-sm font-black text-vibe-ink transition-opacity active:opacity-75 disabled:opacity-60"
           [disabled]="updates.installing()"
           (click)="updates.install()"
         >
@@ -55,96 +70,31 @@
 
     @if (activity.isStale()) {
       <p
-        class="mb-6 rounded-xl border border-vibe-amber/35 bg-vibe-amber/10 px-4 py-3 text-sm font-semibold"
+        class="mb-5 rounded-xl border border-vibe-amber/35 bg-vibe-amber/10 px-4 py-3 text-sm font-semibold"
         aria-live="polite"
       >
         Đang hiển thị dữ liệu đã lưu. VibePing sẽ đồng bộ khi laptop kết nối lại.
       </p>
     }
 
-    <section
-      class="rounded-2xl border border-vibe-rule bg-vibe-surface p-5 dark:border-vibe-rule-dark dark:bg-vibe-surface-dark"
-      aria-labelledby="activity-heading"
-      aria-live="polite"
-    >
-      <h1
-        id="activity-heading"
-        class="max-w-sm text-balance text-[1.75rem] font-bold leading-[1.12] tracking-[-0.035em]"
-      >
-        {{ activity.readiness().title }}
-      </h1>
+    <app-live-status-card />
 
-      <p class="mt-3 max-w-md text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
-        {{ activity.readiness().detail }}
-      </p>
-
-      <span class="mt-3 flex items-center gap-2 text-xs font-bold">
-        <span
-          class="size-2.5 rounded-full"
-          [class.bg-vibe-mint]="
-            activity.readiness().kind === 'ready' || activity.readiness().kind === 'working'
-          "
-          [class.bg-vibe-amber]="
-            activity.readiness().kind === 'checking' ||
-            activity.readiness().kind === 'codexSetup' ||
-            activity.readiness().kind === 'codexReview'
-          "
-          [class.bg-vibe-coral]="
-            activity.readiness().kind === 'offline' || activity.readiness().kind === 'waiting'
-          "
-          aria-hidden="true"
-        ></span>
-        {{ activity.readiness().label }}
-      </span>
-
-      @if (activity.current(); as current) {
-        @if (activity.readiness().kind === 'working' || activity.readiness().kind === 'waiting') {
-          <p
-            class="mt-4 break-words border-t border-vibe-rule pt-4 font-bold dark:border-vibe-rule-dark"
-          >
-            {{ current.projectName }}
-          </p>
-        }
-      }
-
-      @if (
-        activity.readiness().kind === 'codexSetup' || activity.readiness().kind === 'codexReview'
-      ) {
-        <a
-          routerLink="/computer"
-          class="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-vibe-ink! px-5 text-sm font-black text-vibe-paper! dark:bg-vibe-mint! dark:text-vibe-ink!"
-        >
-          Xem cách thực hiện
-          <svg
-            class="size-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="m9 18 6-6-6-6" />
-          </svg>
-        </a>
-      }
-    </section>
-
-    <section class="mt-10" aria-labelledby="allowance-heading">
+    <section class="mt-6" aria-labelledby="allowance-heading">
       <div
-        class="flex items-end justify-between gap-4 border-b border-vibe-rule pb-3 dark:border-vibe-rule-dark"
+        class="flex items-end justify-between gap-4 border-b border-vibe-rule pb-2.5 dark:border-vibe-rule-dark"
       >
-        <h2 id="allowance-heading" class="text-lg font-bold tracking-[-0.02em]">Hạn mức Codex</h2>
+        <h2 id="allowance-heading" class="text-[1.375rem] font-bold tracking-[-0.025em]">
+          Hạn mức Codex
+        </h2>
         <a
           routerLink="/usage-limits"
-          class="min-h-11 content-center text-sm font-bold text-vibe-green! dark:text-vibe-mint!"
+          class="min-h-11 content-center text-sm font-bold text-vibe-green! transition-opacity active:opacity-60 dark:text-vibe-mint!"
           >Xem chi tiết</a
         >
       </div>
       @if (activity.allowance(); as allowance) {
         @if (allowance.windows.length) {
-          <div class="grid grid-cols-2 gap-x-6 gap-y-4 py-5">
+          <div class="grid grid-cols-2 gap-x-5 gap-y-3 py-4">
             @for (window of allowance.windows.slice(0, 2); track window.windowKey) {
               <div class="min-w-0">
                 <p class="truncate text-xs font-semibold text-vibe-muted dark:text-vibe-sage">
@@ -153,123 +103,25 @@
                 <p class="mt-1 text-2xl font-black tabular-nums">
                   {{ window.remainingPercent.toFixed(0) }}%
                 </p>
-                <p class="mt-1 text-xs font-bold">
+                <p class="mt-0.5 text-xs font-bold">
                   {{ allowanceStatus(window.remainingPercent, window.reached) }}
                 </p>
               </div>
             }
           </div>
         } @else {
-          <p class="py-5 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
+          <p class="py-4 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
             Chưa có chu kỳ hạn mức để hiển thị.
           </p>
         }
       } @else {
-        <p class="py-5 text-sm text-vibe-muted dark:text-vibe-sage">Đang đọc các chu kỳ hiện có.</p>
+        <p class="py-4 text-sm text-vibe-muted dark:text-vibe-sage">Đang đọc các chu kỳ hiện có.</p>
       }
     </section>
 
-    <section class="mt-10" aria-labelledby="recent-heading">
-      <div
-        class="flex min-h-11 items-center justify-between gap-4 border-b border-vibe-rule dark:border-vibe-rule-dark"
-      >
-        <div class="flex items-center gap-2">
-          <h2 id="recent-heading" class="text-lg font-bold tracking-[-0.02em]">Hoạt động</h2>
-          @if (activity.unreadCount() > 0) {
-            <span class="rounded-full bg-vibe-coral px-2 py-0.5 text-xs font-black text-white"
-              >{{ activity.unreadCount() }} mới</span
-            >
-          }
-        </div>
-        @if (activity.unreadCount() > 0) {
-          <button
-            type="button"
-            class="min-h-11 text-sm font-bold text-vibe-green dark:text-vibe-mint"
-            (click)="activity.markAllRead()"
-          >
-            Đọc tất cả
-          </button>
-        }
-      </div>
-
-      @if (activity.events().length) {
-        <ol class="divide-y divide-vibe-rule dark:divide-vibe-rule-dark">
-          @for (event of activity.events(); track event.id) {
-            <li>
-              <a
-                [routerLink]="['/activity/events', event.id]"
-                class="grid min-h-24 grid-cols-[auto_1fr_auto] gap-3 py-4 text-vibe-ink! dark:text-vibe-paper!"
-              >
-                <span
-                  class="mt-2 size-2.5 rounded-full"
-                  [class.bg-vibe-coral]="
-                    event.eventType === 'codex.test.failed' ||
-                    event.eventType === 'codex.allowance.exhausted'
-                  "
-                  [class.bg-vibe-amber]="
-                    event.eventType === 'codex.attention.permission_required' ||
-                    event.eventType === 'codex.allowance.low' ||
-                    event.eventType === 'codex.allowance.critical'
-                  "
-                  [class.bg-vibe-mint]="
-                    !event.isRead &&
-                    !event.eventType.includes('failed') &&
-                    !event.eventType.includes('allowance') &&
-                    event.eventType !== 'codex.attention.permission_required'
-                  "
-                  [class.bg-vibe-rule]="event.isRead"
-                  aria-hidden="true"
-                ></span>
-                <div class="min-w-0">
-                  <p class="font-bold" [class.font-black]="!event.isRead">
-                    {{ activity.label(event) }}
-                  </p>
-                  <p class="mt-1 break-words text-sm font-semibold">{{ event.projectName }}</p>
-                  <p
-                    class="mt-1 line-clamp-2 text-sm leading-5 text-vibe-muted dark:text-vibe-sage"
-                  >
-                    {{ event.summary }}
-                  </p>
-                </div>
-                <time class="shrink-0 pt-0.5 text-[11px] text-vibe-muted dark:text-vibe-sage">{{
-                  activity.time(event)
-                }}</time>
-              </a>
-            </li>
-          }
-        </ol>
-        @if (activity.hasMore()) {
-          <button
-            type="button"
-            class="mt-5 min-h-11 w-full rounded-full border border-vibe-rule text-sm font-bold dark:border-vibe-rule-dark"
-            (click)="activity.loadMore()"
-          >
-            Xem hoạt động cũ hơn
-          </button>
-        }
-      } @else if (activity.state() === 'loading') {
-        <div class="space-y-5 py-6" aria-label="Đang tải hoạt động">
-          <span
-            class="block h-16 animate-pulse rounded-xl bg-vibe-rule/70 dark:bg-vibe-rule-dark"
-          ></span>
-          <span
-            class="block h-16 animate-pulse rounded-xl bg-vibe-rule/70 dark:bg-vibe-rule-dark"
-          ></span>
-        </div>
-      } @else if (activity.state() === 'unavailable') {
-        <div class="py-7" aria-live="polite">
-          <p class="font-bold">Chưa đọc được hoạt động</p>
-          <p class="mt-2 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
-            Mở Tailscale trên điện thoại và laptop, rồi thử lại.
-          </p>
-        </div>
-      } @else {
-        <p class="py-7 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
-          Chưa có hoạt động nào. VibePing chỉ lưu tín hiệu cần thiết, không lưu prompt hay đầu ra
-          Codex.
-        </p>
-      }
-    </section>
+    <div class="mt-6">
+      <app-activity-list />
+    </div>
   </main>
 </app-pull-to-refresh>
 

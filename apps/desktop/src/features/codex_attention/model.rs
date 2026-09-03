@@ -42,8 +42,25 @@ pub struct ActivityEvent {
 pub struct CurrentWork {
     pub project_name: String,
     pub state: String,
+    pub last_test_state: String,
+    pub preview_ready: bool,
     pub started_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Clone, Debug, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct ActivityTimelineStage {
+    pub event_type: String,
+    pub occurred_at: DateTime<Utc>,
+}
+
+#[derive(Clone, Debug, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct ActivityEventDetail {
+    #[serde(flatten)]
+    pub event: ActivityEvent,
+    pub timeline: Vec<ActivityTimelineStage>,
 }
 
 #[derive(Clone, Debug, Serialize, ToSchema)]

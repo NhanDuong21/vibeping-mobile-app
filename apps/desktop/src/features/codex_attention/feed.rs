@@ -15,7 +15,7 @@ impl ActivityStore {
 
     pub async fn current_work(&self) -> Result<Option<CurrentWork>> {
         sqlx::query_as(
-            "SELECT project_name, state, started_at, updated_at FROM codex_turns \
+            "SELECT project_name, state, last_test_state, preview_ready, started_at, updated_at FROM codex_turns \
              WHERE state IN ('running', 'waiting') ORDER BY updated_at DESC LIMIT 1",
         )
         .fetch_optional(&self.pool)
@@ -65,17 +65,6 @@ impl ActivityStore {
             next_cursor,
             unread_count: self.unread_count().await?,
         })
-    }
-
-    pub async fn event(&self, id: &str) -> Result<Option<ActivityEvent>> {
-        sqlx::query_as(
-            "SELECT id, event_type, title, summary, project_name, occurred_at, is_read \
-             FROM activity_events WHERE id = ?",
-        )
-        .bind(id)
-        .fetch_optional(&self.pool)
-        .await
-        .context("Không đọc được chi tiết hoạt động")
     }
 
     pub async fn mark_read(&self, id: &str) -> Result<Option<ReadStateResponse>> {

@@ -38,7 +38,7 @@ export class ComputerPage implements OnInit {
       },
       notifications: {
         ready: 'iPhone đã đăng ký nhận',
-        needsAttention: 'Cần đăng ký lại trên iPhone',
+        needsAttention: 'Điện thoại cần bật lại thông báo',
       },
       private: {
         ready: 'Đang dùng kết nối Tailscale riêng tư',

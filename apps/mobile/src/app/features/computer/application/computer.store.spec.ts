@@ -25,6 +25,7 @@ describe('ComputerStore', () => {
     await store.load();
     expect(store.state()).toBe('ready');
     expect(store.status()).toEqual(status);
+    expect(store.lastSignalLabel(new Date('2026-09-04T01:00:00Z'))).toBe('2 ngày trước');
   });
 
   it('uses a recoverable unavailable state', async () => {

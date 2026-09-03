@@ -95,6 +95,10 @@ test.describe("production walking skeleton", () => {
       page.getByRole("heading", { name: "Chưa kết nối được với laptop" }),
     ).toBeVisible();
   });
+});
+
+test.describe("production data rendering", () => {
+  test.use({ serviceWorkers: "block" });
 
   test("shows current Codex work and privacy-safe recent activity", async ({
     page,
@@ -106,6 +110,8 @@ test.describe("production walking skeleton", () => {
           currentWork: {
             projectName: "vibeping-mobile-app",
             state: "running",
+            lastTestState: "unknown",
+            previewReady: false,
             startedAt: "2026-09-02T00:00:00Z",
             updatedAt: "2026-09-02T00:01:00Z",
           },
@@ -150,9 +156,11 @@ test.describe("production walking skeleton", () => {
     await expect(
       page.getByRole("heading", { name: "Codex đang làm việc" }),
     ).toBeVisible();
-    await expect(page.getByText("Cần xác nhận")).toBeVisible();
     await expect(
-      page.getByText("Mở laptop để xem và quyết định."),
+      page.getByText("Codex đang chờ bạn", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Cần xác nhận để tiếp tục", { exact: true }),
     ).toBeVisible();
   });
 

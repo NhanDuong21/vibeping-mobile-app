@@ -17,7 +17,7 @@ use crate::{
     infrastructure::web::error::ApiError,
 };
 
-use super::{ActivityEvent, ActivitySnapshot, ActivityStore, EventFeed, ReadStateResponse};
+use super::{ActivityEventDetail, ActivitySnapshot, ActivityStore, EventFeed, ReadStateResponse};
 
 #[derive(Debug, Deserialize, IntoParams)]
 #[into_params(parameter_in = Query)]
@@ -70,7 +70,7 @@ pub async fn events(
     path = "/api/v1/events/{id}",
     params(("id" = String, Path, description = "Activity event identifier")),
     responses(
-        (status = 200, description = "Activity event detail", body = ActivityEvent),
+        (status = 200, description = "Activity event detail", body = ActivityEventDetail),
         (status = 404, description = "Activity event not found")
     )
 )]
@@ -78,10 +78,10 @@ pub async fn event(
     State(state): State<Arc<ApplicationState>>,
     Path(id): Path<String>,
     headers: HeaderMap,
-) -> Result<Json<ActivityEvent>, ApiError> {
+) -> Result<Json<ActivityEventDetail>, ApiError> {
     authorize_if_claimed(&state, &headers).await?;
     ActivityStore::new(state.database.clone())
-        .event(&id)
+        .event_detail(&id)
         .await
         .map_err(|_| ApiError::unavailable("ACTIVITY_UNAVAILABLE"))?
         .map(Json)

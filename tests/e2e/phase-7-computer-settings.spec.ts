@@ -73,13 +73,13 @@ test("computer summarizes readiness and queues a delayed notification test", asy
     page.getByText("Đang dùng kết nối Tailscale riêng tư"),
   ).toBeVisible();
   const request = page.waitForRequest("**/api/v1/push/test");
-  await page.getByRole("button", { name: "Gửi thông báo thử" }).click();
+  await page.getByRole("button", { name: "Gửi thử sau 10 giây" }).click();
   expect((await request).headers()["x-vibeping-csrf"]).toBe("test-csrf");
   await expect(
-    page.getByText("Đã xếp gửi. Khóa màn hình và chờ thông báo."),
+    page.getByText("Đã gửi tín hiệu. Hãy kiểm tra Màn hình khóa."),
   ).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /Chạy chẩn đoán/ }),
+    page.getByRole("link", { name: /Kiểm tra VibePing/ }),
   ).toBeVisible();
 });
 
@@ -135,9 +135,13 @@ test("leave-laptop readiness stays blocked until Codex hooks are reviewed", asyn
 
   await page.getByRole("link", { name: "Xem cách thực hiện" }).click();
   await expect(
-    page.getByRole("heading", { name: "Cần hoàn tất kết nối Codex" }),
+    page.getByRole("heading", { name: "Cần hoàn tất theo dõi Codex" }),
   ).toBeVisible();
-  await page.getByText("Xem hướng dẫn").click();
+  await page
+    .getByRole("heading", { name: "Cần hoàn tất theo dõi Codex" })
+    .locator("..")
+    .getByText("Xem cách thực hiện")
+    .click();
   await expect(page.getByText("/hooks")).toBeVisible();
 });
 
@@ -151,13 +155,13 @@ test("settings persist all behavior controls including overnight quiet hours", a
     });
   });
   await routePairing(page);
-  let saved: unknown;
+  let saved = structuredClone(preferences);
   await page.route("**/api/v1/preferences", async (route) => {
     if (route.request().method() === "PUT") {
-      saved = route.request().postDataJSON();
+      saved = route.request().postDataJSON() as typeof preferences;
       await route.fulfill({ json: saved });
     } else {
-      await route.fulfill({ json: preferences });
+      await route.fulfill({ json: saved });
     }
   });
 
@@ -166,26 +170,21 @@ test("settings persist all behavior controls including overnight quiet hours", a
   await page
     .getByRole("switch", { name: "Thông báo công việc hoàn tất" })
     .click();
-  await page.locator("#allowance-threshold").fill("27");
+  await page.getByRole("button", { name: "30%" }).click();
   await page
-    .getByRole("switch", { name: "Thông báo hạn mức nguy cấp" })
+    .getByRole("switch", { name: "Thông báo khi hạn mức gần hết" })
     .click();
   await page.locator('input[type="time"]').nth(0).fill("23:00");
   await page.locator('input[type="time"]').nth(1).fill("06:30");
   await page.getByRole("switch", { name: "Cho phép thông báo gấp" }).click();
-  await page.getByRole("button", { name: "Chỉ báo có tín hiệu" }).click();
+  await page.getByRole("button", { name: "Chỉ báo" }).click();
   await page.getByRole("button", { name: "Tối", exact: true }).click();
-  await page.locator("#retention").selectOption("90");
-  const request = page.waitForRequest(
-    (value) =>
-      value.url().endsWith("/api/v1/preferences") && value.method() === "PUT",
-  );
-  await page.getByRole("button", { name: "Lưu cài đặt" }).click();
-  await request;
-  await expect(page.getByText("Đã áp dụng cài đặt.")).toBeVisible();
+  await page.getByRole("button", { name: /90\s*ngày/ }).click();
+  await expect(page.getByText("Đã lưu")).toBeVisible();
+  await expect.poll(() => saved.retentionDays).toBe(90);
   expect(saved).toMatchObject({
     notifications: { completion: false },
-    allowanceThresholdPercent: 27,
+    allowanceThresholdPercent: 30,
     criticalAllowanceNotifications: false,
     quietHours: {
       enabled: true,
@@ -198,8 +197,13 @@ test("settings persist all behavior controls including overnight quiet hours", a
     retentionDays: 90,
   });
 
-  await page.getByRole("button", { name: "Đăng ký lại thông báo" }).click();
-  await expect(page.getByText(/Quyền đang bị tắt/)).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole("button", { name: /90\s*ngày/ })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await page.getByRole("button", { name: "Xem cách bật lại" }).click();
+  await expect(page.getByText(/Mở Cài đặt iPhone/)).toBeVisible();
 });
 
 test("diagnostics gives recovery actions and copies only the sanitized report", async ({

@@ -341,10 +341,18 @@ export interface components {
             summary: string;
             title: string;
         };
+        ActivityEventDetail: components["schemas"]["ActivityEvent"] & {
+            timeline: components["schemas"]["ActivityTimelineStage"][];
+        };
         ActivitySnapshot: {
             currentWork?: null | components["schemas"]["CurrentWork"];
             cursor: string;
             events: components["schemas"]["ActivityEvent"][];
+        };
+        ActivityTimelineStage: {
+            eventType: string;
+            /** Format: date-time */
+            occurredAt: string;
         };
         BootstrapResponse: {
             connection: components["schemas"]["ConnectionSnapshot"];
@@ -377,6 +385,8 @@ export interface components {
             privateConnection: string;
         };
         CurrentWork: {
+            lastTestState: string;
+            previewReady: boolean;
             projectName: string;
             /** Format: date-time */
             startedAt: string;
@@ -681,7 +691,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ActivityEvent"];
+                    "application/json": components["schemas"]["ActivityEventDetail"];
                 };
             };
             /** @description Activity event not found */

@@ -1,10 +1,11 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { ApiClient, type ComputerStatusDto } from '../../../core/api/api-client';
+import { relativeSignalTime } from '../../../core/formatting/time';
 import { installationId } from '../../../core/notifications/registration';
 
 type ComputerState = 'loading' | 'ready' | 'unavailable';
-type TestState = 'idle' | 'sending' | 'accepted' | 'failed';
+type TestState = 'idle' | 'countdown' | 'sent' | 'queued' | 'failed';
 
 @Injectable({ providedIn: 'root' })
 export class ComputerStore {
@@ -28,25 +29,20 @@ export class ComputerStore {
   }
 
   async sendDelayedTest(): Promise<void> {
-    if (this.#testState() === 'sending') return;
-    this.#testState.set('sending');
+    if (this.#testState() === 'countdown') return;
+    this.#testState.set('countdown');
     try {
       const pairing = await firstValueFrom(this.#api.pairingStatus());
       const result = await firstValueFrom(this.#api.testPush(installationId(), pairing.csrfToken));
-      this.#testState.set(result.state === 'providerAccepted' ? 'accepted' : 'failed');
+      this.#testState.set(result.state === 'providerAccepted' ? 'sent' : 'queued');
     } catch {
       this.#testState.set('failed');
     }
   }
 
-  lastSignalLabel(): string {
+  lastSignalLabel(now = new Date()): string {
     const value = this.#status()?.lastSignalAt;
     if (!value) return 'Chưa có tín hiệu';
-    return new Intl.DateTimeFormat('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(new Date(value));
+    return relativeSignalTime(value, now);
   }
 }

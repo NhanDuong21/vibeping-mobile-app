@@ -3,7 +3,8 @@ import { of, throwError } from 'rxjs';
 import { ApiClient } from '../../../core/api/api-client';
 import { EVENT_SOURCE_FACTORY } from '../../../core/connectivity/event-source';
 import { ActivityCache, type CachedActivity } from '../data/activity-cache';
-import { ActivityStore, mergeEvents } from './activity.store';
+import { mergeEvents } from './activity-reconciliation';
+import { ActivityStore } from './activity.store';
 
 const event = {
   id: 'event-1',
@@ -135,17 +136,21 @@ describe('ActivityStore', () => {
     const currentWork = {
       projectName: 'vibeping-mobile-app',
       state: 'running',
+      lastTestState: 'unknown',
+      previewReady: false,
       startedAt: '2026-09-02T00:03:00Z',
       updatedAt: '2026-09-02T00:03:00Z',
     };
 
     listeners.get('work')?.(new MessageEvent('work', { data: JSON.stringify(currentWork) }));
     expect(store.readiness().title).toBe('Codex đang làm việc');
+    expect(store.motionActive()).toBe(true);
     expect(store.current()).toEqual(currentWork);
     expect(api.bootstrap).toHaveBeenCalledTimes(1);
 
     listeners.get('work')?.(new MessageEvent('work', { data: 'null' }));
-    expect(store.readiness().title).toBe('Bạn có thể rời laptop');
+    expect(store.readiness().title).toBe('VibePing đang lắng nghe');
+    expect(store.motionActive()).toBe(false);
     expect(store.current()).toBeNull();
     expect(api.bootstrap).toHaveBeenCalledTimes(1);
     store.stop();
@@ -218,12 +223,56 @@ describe('ActivityStore', () => {
     store.start();
     await vi.waitFor(() => expect(store.state()).toBe('ready'));
     stream.onopen?.(new Event('open'));
-    expect(store.readiness().title).toBe('Bạn có thể rời laptop');
+    expect(store.readiness().title).toBe('VibePing đang lắng nghe');
 
     stream.onerror?.(new Event('error'));
 
     expect(store.readiness().kind).toBe('offline');
     expect(store.readiness().title).toBe('Chưa kết nối được với laptop');
+    store.stop();
+  });
+
+  it('marks one detail and all remaining events read without reloading the feed', async () => {
+    const second = { ...event, id: 'event-2', occurredAt: '2026-09-02T00:02:00Z' };
+    const api = {
+      bootstrap: vi.fn().mockReturnValue(of({ ...bootstrap, unreadCount: 2 })),
+      events: vi
+        .fn()
+        .mockReturnValue(of({ events: [second, event], nextCursor: null, unreadCount: 2 })),
+      event: vi.fn().mockReturnValue(of({ ...event, timeline: [] })),
+      pairingStatus: vi.fn().mockReturnValue(of({ csrfToken: 'csrf' })),
+      markEventRead: vi.fn().mockReturnValue(of({ state: 'read', unreadCount: 1 })),
+      markAllEventsRead: vi.fn().mockReturnValue(of({ state: 'read', unreadCount: 0 })),
+    };
+    const stream = {
+      addEventListener: vi.fn(),
+      close: vi.fn(),
+    } as unknown as EventSource;
+    TestBed.configureTestingModule({
+      providers: [
+        ActivityStore,
+        { provide: ApiClient, useValue: api },
+        {
+          provide: ActivityCache,
+          useValue: { read: vi.fn().mockResolvedValue(null), write: vi.fn() },
+        },
+        { provide: EVENT_SOURCE_FACTORY, useValue: () => stream },
+      ],
+    });
+    const store = TestBed.inject(ActivityStore);
+    store.start();
+    await vi.waitFor(() => expect(store.events()).toHaveLength(2));
+
+    await store.loadDetail(event.id);
+    expect(store.selected()).toMatchObject({ id: event.id, isRead: true, timeline: [] });
+    expect(store.unreadCount()).toBe(1);
+    expect(api.markEventRead).toHaveBeenCalledTimes(1);
+
+    await store.markAllRead();
+    expect(store.events().every((item) => item.isRead)).toBe(true);
+    expect(store.unreadCount()).toBe(0);
+    expect(store.readAllState()).toBe('saved');
+    expect(api.events).toHaveBeenCalledTimes(1);
     store.stop();
   });
 

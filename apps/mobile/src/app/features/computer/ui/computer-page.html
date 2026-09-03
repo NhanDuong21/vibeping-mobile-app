@@ -1,14 +1,14 @@
 <app-pull-to-refresh
-  class="block h-dvh overflow-y-auto overscroll-y-contain bg-vibe-canvas px-5 pb-[calc(env(safe-area-inset-bottom)+6.5rem)] pt-[calc(env(safe-area-inset-top)+1.25rem)] text-vibe-ink dark:bg-vibe-night dark:text-vibe-paper"
+  class="block h-dvh overflow-y-auto overscroll-y-contain bg-vibe-canvas px-5 pb-[calc(env(safe-area-inset-bottom)+5.75rem)] pt-[calc(env(safe-area-inset-top)+1rem)] text-vibe-ink dark:bg-vibe-night dark:text-vibe-paper"
 >
   <header class="mx-auto w-full max-w-lg py-2">
-    <h1 class="text-3xl font-bold tracking-[-0.04em]">Máy tính</h1>
+    <h1 class="text-[1.75rem] font-bold tracking-[-0.035em]">Máy tính</h1>
     <p class="mt-2 max-w-md text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
       Những đường kết nối VibePing đang cần để báo bạn đúng lúc.
     </p>
   </header>
 
-  <main class="mx-auto w-full max-w-lg pt-7">
+  <main class="mx-auto w-full max-w-lg pt-5">
     @if (computer.state() === 'loading') {
       <div class="space-y-4" aria-label="Đang kiểm tra máy tính">
         @for (item of [1, 2, 3, 4, 5]; track item) {
@@ -35,7 +35,7 @@
       <ul
         class="divide-y divide-vibe-rule border-y border-vibe-rule dark:divide-vibe-rule-dark dark:border-vibe-rule-dark"
       >
-        <li class="flex min-h-20 items-center gap-4 py-4">
+        <li class="flex min-h-[4.5rem] items-center gap-4 py-3">
           <span
             class="size-2.5 shrink-0 rounded-full"
             [class.bg-vibe-mint]="ready(status.desktop)"
@@ -48,7 +48,7 @@
             </p>
           </div>
         </li>
-        <li class="flex min-h-20 items-center gap-4 py-4">
+        <li class="flex min-h-[4.5rem] items-center gap-4 py-3">
           <span
             class="size-2.5 shrink-0 rounded-full"
             [class.bg-vibe-mint]="ready(status.codex)"
@@ -61,7 +61,7 @@
             </p>
           </div>
         </li>
-        <li class="flex min-h-20 items-center gap-4 py-4">
+        <li class="flex min-h-[4.5rem] items-center gap-4 py-3">
           <span
             class="size-2.5 shrink-0 rounded-full"
             [class.bg-vibe-mint]="ready(status.allowanceReader)"
@@ -79,11 +79,11 @@
             >Chi tiết</a
           >
         </li>
-        <li class="flex min-h-20 items-center gap-4 py-4">
+        <li class="flex min-h-[4.5rem] items-center gap-4 py-3">
           <span
             class="size-2.5 shrink-0 rounded-full"
             [class.bg-vibe-mint]="ready(status.notifications)"
-            [class.bg-vibe-coral]="!ready(status.notifications)"
+            [class.bg-vibe-amber]="!ready(status.notifications)"
           ></span>
           <div>
             <p class="font-bold">Thông báo</p>
@@ -92,7 +92,7 @@
             </p>
           </div>
         </li>
-        <li class="flex min-h-20 items-center gap-4 py-4">
+        <li class="flex min-h-[4.5rem] items-center gap-4 py-3">
           <span
             class="size-2.5 shrink-0 rounded-full"
             [class.bg-vibe-mint]="ready(status.privateConnection)"
@@ -112,7 +112,7 @@
           class="mt-6 rounded-2xl border border-vibe-amber/40 bg-vibe-amber/10 p-5"
           aria-labelledby="codex-guide-heading"
         >
-          <h2 id="codex-guide-heading" class="text-lg font-bold">Cần hoàn tất kết nối Codex</h2>
+          <h2 id="codex-guide-heading" class="text-lg font-bold">Cần hoàn tất theo dõi Codex</h2>
           <p class="mt-2 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
             VibePing chưa nhận đủ tín hiệu khi Codex đang chờ bạn.
           </p>
@@ -120,7 +120,7 @@
             <summary
               class="min-h-11 cursor-pointer content-center text-sm font-bold text-vibe-green dark:text-vibe-mint"
             >
-              Xem hướng dẫn
+              Xem cách thực hiện
             </summary>
             <ol class="ml-5 list-decimal space-y-2 pb-1 pt-2 text-sm leading-6">
               <li>Mở Codex trên laptop.</li>
@@ -160,17 +160,17 @@
         </section>
       }
 
-      <section class="mt-8" aria-labelledby="last-signal-heading">
+      <section class="mt-7" aria-labelledby="last-signal-heading">
         <h2
           id="last-signal-heading"
-          class="text-sm font-bold uppercase tracking-[0.14em] text-vibe-muted dark:text-vibe-sage"
+          class="text-base font-bold text-vibe-muted dark:text-vibe-sage"
         >
           Tín hiệu gần nhất
         </h2>
-        <p class="mt-2 text-xl font-black">{{ computer.lastSignalLabel() }}</p>
+        <p class="mt-1 text-sm font-semibold">{{ computer.lastSignalLabel() }}</p>
       </section>
 
-      <section class="mt-8 border-t border-vibe-rule pt-6 dark:border-vibe-rule-dark">
+      <section class="mt-7 border-t border-vibe-rule pt-6 dark:border-vibe-rule-dark">
         <h2 class="text-lg font-bold">Kiểm tra thông báo</h2>
         <p class="mt-2 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
           Gửi một thông báo thử có độ trễ để kiểm tra đúng đường đi thật.
@@ -178,17 +178,28 @@
         <button
           type="button"
           class="mt-4 min-h-12 w-full rounded-full bg-vibe-ink px-5 text-sm font-black text-vibe-paper disabled:opacity-60 dark:bg-vibe-mint dark:text-vibe-ink"
-          [disabled]="computer.testState() === 'sending'"
+          [disabled]="computer.testState() === 'countdown'"
           (click)="computer.sendDelayedTest()"
         >
-          {{ computer.testState() === 'sending' ? 'Đang xếp thông báo' : 'Gửi thông báo thử' }}
+          {{ computer.testState() === 'countdown' ? 'Đang đếm ngược' : 'Gửi thử sau 10 giây' }}
         </button>
-        @if (computer.testState() === 'accepted') {
+        @if (computer.testState() === 'countdown') {
+          <p
+            class="mt-3 text-sm font-semibold text-vibe-muted dark:text-vibe-sage"
+            aria-live="polite"
+          >
+            VibePing đang chờ đúng thời điểm gửi.
+          </p>
+        } @else if (computer.testState() === 'sent') {
           <p
             class="mt-3 text-sm font-semibold text-vibe-green dark:text-vibe-mint"
             aria-live="polite"
           >
-            Đã xếp gửi. Khóa màn hình và chờ thông báo.
+            Đã gửi tín hiệu. Hãy kiểm tra Màn hình khóa.
+          </p>
+        } @else if (computer.testState() === 'queued') {
+          <p class="mt-3 text-sm font-semibold" aria-live="polite">
+            Đã xếp gửi. VibePing sẽ tiếp tục thử trong nền.
           </p>
         } @else if (computer.testState() === 'failed') {
           <p class="mt-3 text-sm font-semibold" aria-live="polite">
@@ -201,7 +212,7 @@
         routerLink="/diagnostics"
         class="mt-7 flex min-h-14 items-center justify-between border-y border-vibe-rule py-3 font-bold text-vibe-ink! dark:border-vibe-rule-dark dark:text-vibe-paper!"
       >
-        Chạy chẩn đoán
+        Kiểm tra VibePing
         <svg
           class="size-5"
           viewBox="0 0 24 24"

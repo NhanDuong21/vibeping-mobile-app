@@ -88,6 +88,8 @@ export async function routeProduct(page: Page): Promise<void> {
         currentWork: {
           projectName: event.projectName,
           state: "waiting",
+          lastTestState: "unknown",
+          previewReady: false,
           startedAt: "2026-09-02T00:50:00Z",
           updatedAt: "2026-09-02T01:00:00Z",
         },
@@ -101,7 +103,21 @@ export async function routeProduct(page: Page): Promise<void> {
     }),
   );
   await page.route("**/api/v1/events/phase-9-event", (route) =>
-    route.fulfill({ json: event }),
+    route.fulfill({
+      json: {
+        ...event,
+        timeline: [
+          {
+            eventType: "codex.turn.started",
+            occurredAt: "2026-09-02T00:50:00Z",
+          },
+          {
+            eventType: "codex.attention.permission_required",
+            occurredAt: event.occurredAt,
+          },
+        ],
+      },
+    }),
   );
   await page.route("**/api/v1/events/phase-9-event/read", (route) =>
     route.fulfill({
