@@ -24,9 +24,15 @@ test("product mastheads use the installed VibePing app icon", async ({
     const logo = page.locator('header img[src="/assets/logo-icon-192.png"]');
     await expect(logo).toBeVisible();
     await expect(logo).toHaveAttribute("alt", "");
+    await expect
+      .poll(() => logo.evaluate((element: HTMLImageElement) => element.naturalWidth))
+      .toBeGreaterThanOrEqual(40);
     const image = await logo.evaluate((element: HTMLImageElement) => ({
       complete: element.complete,
-      currentPath: new URL(element.currentSrc).pathname,
+      currentPath: new URL(
+        element.currentSrc,
+        element.ownerDocument.baseURI,
+      ).pathname,
       naturalWidth: element.naturalWidth,
     }));
     expect(image.complete).toBe(true);
