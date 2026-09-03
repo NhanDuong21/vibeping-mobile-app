@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BottomNavigation } from '../../../core/navigation/ui/bottom-navigation';
+import { PullToRefresh } from '../../../core/refresh/pull-to-refresh';
 import { ActivityStore } from '../application/activity.store';
 
 @Component({
   selector: 'app-event-detail-page',
-  imports: [RouterLink, BottomNavigation],
+  imports: [RouterLink, BottomNavigation, PullToRefresh],
   templateUrl: './event-detail-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

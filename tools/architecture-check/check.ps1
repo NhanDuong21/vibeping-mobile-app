@@ -7,7 +7,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $extensions = @('.rs', '.ts', '.js', '.mjs', '.html', '.css', '.scss', '.ps1')
 $forbiddenNames = @('utils.ts', 'utils.rs', 'helpers.ts', 'helpers.rs', 'common.service.ts')
-$excludedSegments = @('.git', '.agents', 'target', 'node_modules', 'generated', 'dist')
+$excludedSegments = @('.git', '.agents', '.angular', 'target', 'node_modules', 'generated', 'dist')
 $failures = [System.Collections.Generic.List[string]]::new()
 $warnings = [System.Collections.Generic.List[string]]::new()
 $scannedCount = 0

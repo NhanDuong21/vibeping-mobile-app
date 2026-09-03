@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { BottomNavigation } from '../../../core/navigation/ui/bottom-navigation';
 import { ToggleSwitch } from '../../../core/forms/ui/toggle-switch';
+import { PullToRefresh } from '../../../core/refresh/pull-to-refresh';
 import { PreferencesStore } from '../application/preferences.store';
 
 @Component({
   selector: 'app-settings-page',
-  imports: [BottomNavigation, ToggleSwitch],
+  imports: [BottomNavigation, ToggleSwitch, PullToRefresh],
   templateUrl: './settings-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

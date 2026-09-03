@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { PullToRefresh } from '../../../core/refresh/pull-to-refresh';
 import { DiagnosticsStore } from '../application/diagnostics.store';
 
 @Component({
   selector: 'app-diagnostics-page',
-  imports: [RouterLink],
+  imports: [RouterLink, PullToRefresh],
   templateUrl: './diagnostics-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

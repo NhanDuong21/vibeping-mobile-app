@@ -17,7 +17,18 @@ try {
     # VibePing uses only ES256 VAPID signing and performs no RSA private-key operation,
     # so RUSTSEC-2023-0071's network timing oracle is unreachable. There is no fixed
     # rsa release; keep this single exception visible and fail on any RSA source use.
-    $rsaUse = @(& rg -n --no-heading --color never -e 'RS256|RSAKey|rsa::' -- apps/desktop/src spikes/tailscale-web-push/src 2>$null)
+    $nativeErrorPreference = $PSNativeCommandUseErrorActionPreference
+    $PSNativeCommandUseErrorActionPreference = $false
+    try {
+        $rsaUse = @(& rg -n --no-heading --color never -e 'RS256|RSAKey|rsa::' -- apps/desktop/src spikes/tailscale-web-push/src 2>$null)
+        $rsaSearchExitCode = $LASTEXITCODE
+    }
+    finally {
+        $PSNativeCommandUseErrorActionPreference = $nativeErrorPreference
+    }
+    if ($rsaSearchExitCode -gt 1) {
+        throw "RSA source audit failed with exit code $rsaSearchExitCode."
+    }
     if ($rsaUse.Count -gt 0) {
         throw "Unexpected RSA use makes RUSTSEC-2023-0071 reachable: $($rsaUse -join '; ')"
     }

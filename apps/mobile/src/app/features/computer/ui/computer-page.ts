@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { BottomNavigation } from '../../../core/navigation/ui/bottom-navigation';
+import { PullToRefresh } from '../../../core/refresh/pull-to-refresh';
 import { ComputerStore } from '../application/computer.store';
 
 @Component({
   selector: 'app-computer-page',
-  imports: [RouterLink, BottomNavigation],
+  imports: [RouterLink, BottomNavigation, PullToRefresh],
   templateUrl: './computer-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

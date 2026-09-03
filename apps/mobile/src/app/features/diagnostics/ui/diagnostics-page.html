@@ -1,4 +1,4 @@
-<div class="h-dvh overflow-y-auto overscroll-y-contain bg-vibe-canvas px-5 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-[calc(env(safe-area-inset-top)+1.25rem)] text-vibe-ink dark:bg-vibe-night dark:text-vibe-paper">
+<app-pull-to-refresh class="block h-dvh overflow-y-auto overscroll-y-contain bg-vibe-canvas px-5 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-[calc(env(safe-area-inset-top)+1.25rem)] text-vibe-ink dark:bg-vibe-night dark:text-vibe-paper">
   <header class="mx-auto flex w-full max-w-lg items-center justify-between py-2">
     <a routerLink="/computer" class="grid min-h-11 min-w-11 place-items-center rounded-full border border-vibe-rule text-vibe-ink! dark:border-vibe-rule-dark dark:text-vibe-paper!" aria-label="Quay lại Máy tính">
       <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
@@ -56,4 +56,4 @@
       {{ diagnostics.running() ? 'Đang kiểm tra lại' : 'Chạy kiểm tra lại' }}
     </button>
   </main>
-</div>
+</app-pull-to-refresh>

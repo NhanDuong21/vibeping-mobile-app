@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { PullToRefresh } from '../../../core/refresh/pull-to-refresh';
 import { OnboardingStore } from '../application/onboarding.store';
 
 @Component({
   selector: 'app-onboarding-page',
-  imports: [FormsModule],
+  imports: [FormsModule, PullToRefresh],
   templateUrl: './onboarding-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

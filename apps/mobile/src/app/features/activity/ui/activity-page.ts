@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@
 import { RouterLink } from '@angular/router';
 import { BottomNavigation } from '../../../core/navigation/ui/bottom-navigation';
 import { ConnectivityStore } from '../../../core/connectivity/connectivity.store';
+import { PullToRefresh } from '../../../core/refresh/pull-to-refresh';
 import { UpdateStore } from '../../../core/updates/update.store';
 import { ActivityStore } from '../application/activity.store';
 
 @Component({
   selector: 'app-activity-page',
-  imports: [RouterLink, BottomNavigation],
+  imports: [RouterLink, BottomNavigation, PullToRefresh],
   templateUrl: './activity-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
