@@ -19,7 +19,7 @@ export function activityLabel(event: ActivityEventDto): string {
     'codex.turn.started': 'Codex bắt đầu làm việc',
     'codex.attention.permission_required': 'Codex đang chờ bạn',
     'codex.preview.ready': 'Bản xem trước đã sẵn sàng',
-    'codex.test.failed': 'Kiểm thử vẫn chưa qua',
+    'codex.test.failed': 'Kiểm thử mã nguồn chưa đạt',
     'codex.turn.completed': 'Công việc đã hoàn tất',
     'codex.allowance.low': 'Hạn mức Codex sắp thấp',
     'codex.allowance.critical': 'Hạn mức Codex gần hết',
@@ -42,7 +42,7 @@ export function activityTaskTitle(event: ActivityEventDto): string {
     'codex.turn.started': 'Công việc mới trong Codex',
     'codex.attention.permission_required': 'Cần xác nhận để tiếp tục',
     'codex.preview.ready': 'Bản xem trước của công việc hiện tại',
-    'codex.test.failed': 'Lần kiểm thử cuối vẫn còn lỗi',
+    'codex.test.failed': 'Lần kiểm thử Codex ghi nhận chưa đạt',
     'codex.turn.completed': 'Công việc trong Codex',
   };
   return fallbacks[event.eventType] ?? 'Tín hiệu mới từ Codex';
@@ -58,10 +58,13 @@ export function activityDescription(event: ActivityEventDto): string {
   const summary = cleanVisibleText(event.summary).slice(0, 240);
   const descriptions: Record<string, string> = {
     'codex.turn.started': 'VibePing đã bắt đầu theo dõi công việc này.',
-    'codex.attention.permission_required': 'Codex cần bạn quay lại để quyết định bước tiếp theo.',
-    'codex.preview.ready': 'Codex đã tạo một bản xem trước để bạn kiểm tra.',
-    'codex.test.failed': 'Codex đã dừng khi lần kiểm thử cuối vẫn còn lỗi.',
-    'codex.turn.completed': 'Codex đã hoàn tất thay đổi trên laptop.',
+    'codex.attention.permission_required':
+      'Codex cần bạn xác nhận trên laptop để tiếp tục công việc.',
+    'codex.preview.ready': 'Codex đã mở bản xem trước trên laptop. Quay lại laptop để kiểm tra.',
+    'codex.test.failed':
+      'Khi lượt làm việc này kết thúc, lần kiểm thử mã nguồn gần nhất VibePing ghi nhận báo chưa đạt. Đây là kết quả tại thời điểm thông báo; mở Codex trên laptop để xem chi tiết và các lần kiểm thử sau đó.',
+    'codex.turn.completed':
+      'Codex đã kết thúc lượt trả lời này. Mở Codex trên laptop để xem kết quả.',
   };
   const fallback = descriptions[event.eventType];
   if (fallback) return fallback;
@@ -90,7 +93,7 @@ export function timelineLabel(stage: ActivityEventDetailDto['timeline'][number])
     'codex.turn.started': 'Công việc bắt đầu',
     'codex.attention.permission_required': 'Codex chờ bạn',
     'codex.preview.ready': 'Bản xem trước sẵn sàng',
-    'codex.test.failed': 'Kiểm thử vẫn chưa qua',
+    'codex.test.failed': 'Kiểm thử mã nguồn chưa đạt',
     'codex.turn.completed': 'Công việc hoàn tất',
   };
   return labels[stage.eventType] ?? 'Trạng thái được cập nhật';

@@ -30,6 +30,26 @@ const unavailable = {
   windows: [],
 };
 
+async function unavailableBootstrap(page: Page): Promise<void> {
+  // The app session now reads this endpoint on every operational route too.
+  await page.route("**/api/v1/bootstrap", (route) =>
+    route.fulfill({
+      json: {
+        serverTime: new Date().toISOString(),
+        cursor: "unavailable",
+        unreadCount: 0,
+        connection: {
+          desktop: "running",
+          codex: "ready",
+          privateConnection: "local",
+        },
+        currentWork: null,
+        usageLimits: unavailable,
+      },
+    }),
+  );
+}
+
 async function savedLimits(page: Page) {
   return page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
@@ -144,6 +164,7 @@ test.describe("last known allowance", () => {
     await page.goto("/manifest.webmanifest");
     await seedActivityCache(page);
     await routeProduct(page);
+    await unavailableBootstrap(page);
     await page.route("**/api/v1/usage-limits", (route) =>
       route.fulfill({ json: unavailable }),
     );
@@ -194,6 +215,7 @@ test.describe("last known allowance", () => {
     page,
   }) => {
     await routeProduct(page);
+    await unavailableBootstrap(page);
     await page.route("**/api/v1/usage-limits", (route) =>
       route.fulfill({ json: unavailable }),
     );

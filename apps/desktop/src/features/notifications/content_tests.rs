@@ -2,11 +2,36 @@ use super::{NotificationContext, notification_copy, safe_label};
 use chrono::{Duration, Utc};
 
 #[test]
+fn private_notifications_identify_the_check_and_direct_actions_to_codex_on_the_laptop() {
+    let failed = notification_copy(
+        "codex.test.failed",
+        "private-project",
+        None,
+        "private",
+        Utc::now(),
+    );
+    assert_eq!(failed.title, "Kiểm thử mã nguồn chưa đạt");
+    assert!(failed.body.contains("mã nguồn"));
+    assert!(failed.body.contains("ghi nhận"));
+    assert!(failed.body.contains("Codex trên laptop"));
+    assert!(!failed.body.contains("private-project"));
+    for event in [
+        "codex.attention.permission_required",
+        "codex.turn.completed",
+        "codex.preview.ready",
+    ] {
+        let copy = notification_copy(event, "private-project", None, "private", Utc::now());
+        assert!(copy.body.contains("Codex trên laptop"));
+        assert!(!copy.body.contains("VibePing để"));
+    }
+}
+
+#[test]
 fn each_signal_has_a_useful_title_and_three_distinct_privacy_levels() {
     for (kind, title) in [
         ("codex.turn.completed", "Codex đã xong việc"),
         ("codex.attention.permission_required", "Codex đang chờ bạn"),
-        ("codex.test.failed", "Kiểm thử vẫn chưa qua"),
+        ("codex.test.failed", "Kiểm thử mã nguồn chưa đạt"),
         ("codex.preview.ready", "Bản xem trước đã sẵn sàng"),
     ] {
         let context = NotificationContext::Activity {
@@ -74,7 +99,7 @@ fn missing_or_unsafe_metadata_falls_back_without_fabricating_work() {
 }
 
 #[test]
-fn project_appears_only_once_and_no_generic_laptop_copy_is_used() {
+fn project_appears_only_once_and_fallback_names_where_to_view_results() {
     let context = NotificationContext::Activity {
         task_label: Some("Sửa VibePing".into()),
     };
@@ -93,7 +118,10 @@ fn project_appears_only_once_and_no_generic_laptop_copy_is_used() {
         "standard",
         Utc::now(),
     );
-    assert!(!fallback.body.contains("laptop"));
+    assert_eq!(
+        fallback.body,
+        "Mở Codex trên laptop để xem kết quả · project"
+    );
     assert!(!fallback.body.contains(&fallback.title));
 }
 

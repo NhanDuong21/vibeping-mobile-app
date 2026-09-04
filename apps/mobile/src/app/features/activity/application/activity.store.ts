@@ -1,5 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { firstValueFrom, timeout } from 'rxjs';
 import {
   ApiClient,
   type ActivityEventDetailDto,
@@ -7,7 +8,7 @@ import {
   type BootstrapDto,
   type CurrentWorkDto,
 } from '../../../core/api/api-client';
-import { EVENT_SOURCE_FACTORY } from '../../../core/connectivity/event-source';
+import { ActivityLiveConnection } from '../data/activity-live-connection';
 import { UsageLimitsStore } from '../../usage-limits';
 import { ActivityCache, type CachedActivity } from '../data/activity-cache';
 import { isCurrentWork, localUnread, mergeEvents } from './activity-reconciliation';
@@ -24,7 +25,7 @@ export class ActivityStore {
   readonly #api = inject(ApiClient);
   readonly #cache = inject(ActivityCache);
   readonly #usage = inject(UsageLimitsStore);
-  readonly #eventSourceFactory = inject(EVENT_SOURCE_FACTORY);
+  readonly #live = inject(ActivityLiveConnection);
   readonly #state = signal<ActivityState>('loading');
   readonly #bootstrap = signal<BootstrapDto | null>(null);
   readonly #events = signal<ActivityEventDto[]>([]);
@@ -34,15 +35,10 @@ export class ActivityStore {
   readonly #pendingReadIds = new Set<string>();
   readonly #detailState = signal<DetailState>('idle');
   readonly #selected = signal<ActivityEventDetailDto | null>(null);
-  readonly #streamConnected = signal(false);
   readonly #readAllState = signal<ReadAllState>('idle');
   readonly #newEventId = signal<string | null>(null);
-  readonly #clock = signal(new Date());
-  readonly #pageVisible = signal(globalThis.document?.visibilityState !== 'hidden');
   #pendingReadAll = false;
   #pendingWork: CurrentWorkDto | null | undefined;
-  #stream?: EventSource;
-  #clockTimer?: ReturnType<typeof setInterval>;
   #newEventTimer?: ReturnType<typeof setTimeout>;
   #started = false;
   #syncSequence = 0;
@@ -59,52 +55,63 @@ export class ActivityStore {
   readonly detailState = this.#detailState.asReadonly();
   readonly readAllState = this.#readAllState.asReadonly();
   readonly newEventId = this.#newEventId.asReadonly();
-  readonly now = this.#clock.asReadonly();
+  readonly now = this.#live.now;
   readonly isStale = computed(() => {
     const saved = this.#savedAt();
     return (
       this.#state() === 'cached' ||
-      Boolean(saved && this.#clock().getTime() - saved.getTime() > STALE_AFTER_MS)
+      Boolean(saved && this.now().getTime() - saved.getTime() > STALE_AFTER_MS)
     );
   });
   readonly readiness = computed<ReadinessView>(() =>
     readinessView(
       this.#state(),
-      this.#streamConnected(),
+      this.#live.connected(),
       this.#bootstrap()?.connection,
       this.current(),
       this.#events()[0] ?? null,
-      this.#clock(),
+      this.now(),
     ),
   );
   readonly motionActive = computed(
-    () => this.readiness().kind === 'working' && this.#pageVisible(),
+    () => this.readiness().kind === 'working' && this.#live.visible(),
   );
+
+  constructor() {
+    this.#live.events.pipe(takeUntilDestroyed()).subscribe((message) => {
+      switch (message.type) {
+        case 'activity':
+          this.#receiveActivity(message.event);
+          break;
+        case 'work':
+          this.#receiveWork(message.event);
+          break;
+        case 'allowance':
+          this.#usage.receiveEvent(message.event);
+          break;
+        case 'reconcile':
+          void this.#sync();
+          break;
+        case 'disconnected':
+          this.#usage.markDisconnected();
+          this.#state.set(this.#bootstrap() ? 'cached' : 'unavailable');
+      }
+    });
+  }
 
   start(): void {
     if (this.#started) return;
     this.#started = true;
     void this.#restoreThenSync();
-    this.#connectStream();
-    this.#clockTimer = setInterval(() => this.#clock.set(new Date()), 30_000);
-    globalThis.addEventListener?.('online', this.#online);
-    globalThis.addEventListener?.('offline', this.#offline);
-    globalThis.document?.addEventListener('visibilitychange', this.#visibilityChanged);
+    this.#live.start();
   }
 
   stop(): void {
     this.#syncSequence++;
-    this.#stream?.close();
-    this.#stream = undefined;
-    this.#streamConnected.set(false);
-    clearInterval(this.#clockTimer);
+    this.#live.stop();
     clearTimeout(this.#newEventTimer);
-    this.#clockTimer = undefined;
     this.#newEventTimer = undefined;
     this.#started = false;
-    globalThis.removeEventListener?.('online', this.#online);
-    globalThis.removeEventListener?.('offline', this.#offline);
-    globalThis.document?.removeEventListener('visibilitychange', this.#visibilityChanged);
   }
 
   async loadMore(): Promise<void> {
@@ -153,44 +160,32 @@ export class ActivityStore {
     }
   }
 
-  readonly #online = (): void => {
-    void this.#sync();
-  };
-
-  readonly #offline = (): void => {
-    this.#usage.markDisconnected();
-    if (this.#events().length || this.#bootstrap()) this.#state.set('cached');
-  };
-
-  readonly #visibilityChanged = (): void => {
-    this.#pageVisible.set(globalThis.document?.visibilityState !== 'hidden');
-    this.#clock.set(new Date());
-    if (this.#pageVisible()) void this.#sync();
-  };
-
   async #restoreThenSync(): Promise<void> {
     const [cached] = await Promise.all([this.#cache.read(), this.#usage.restoreCached()]);
-    if (cached && this.#state() === 'loading') this.#applyCache(cached);
+    if (!this.#started) return;
+    if (cached && !this.#bootstrap()) this.#applyCache(cached);
     await this.#sync();
   }
 
   async #sync(): Promise<void> {
+    if (!this.#started) return;
     const sequence = ++this.#syncSequence;
     const workRevision = this.#workRevision;
     try {
       const [bootstrap, feed] = await Promise.all([
-        firstValueFrom(this.#api.bootstrap()),
-        firstValueFrom(this.#api.events()),
+        firstValueFrom(this.#api.bootstrap().pipe(timeout(10_000))),
+        firstValueFrom(this.#api.events().pipe(timeout(10_000))),
       ]);
       if (sequence !== this.#syncSequence) return;
       this.#usage.acceptSnapshot(bootstrap.usageLimits);
-      this.#bootstrap.set(
-        workRevision !== this.#workRevision && this.#bootstrap()
-          ? { ...bootstrap, currentWork: this.current() }
-          : this.#pendingWork === undefined
-            ? bootstrap
-            : { ...bootstrap, currentWork: this.#takePendingWork() },
-      );
+      const currentWork =
+        workRevision !== this.#workRevision
+          ? this.#bootstrap()
+            ? this.current()
+            : (this.#pendingWork ?? null)
+          : bootstrap.currentWork;
+      this.#bootstrap.set({ ...bootstrap, currentWork });
+      this.#pendingWork = undefined;
       this.#events.set(mergeEvents(this.#events(), feed.events));
       this.#nextCursor.set(feed.nextCursor ?? null);
       this.#unreadCount.set(
@@ -209,27 +204,6 @@ export class ActivityStore {
     }
   }
 
-  #connectStream(): void {
-    const stream = this.#eventSourceFactory('/api/v1/stream');
-    stream.addEventListener('activity', (event) => this.#receiveActivity(event));
-    stream.addEventListener('work', (event) => this.#receiveWork(event));
-    stream.addEventListener('allowance', (event) => this.#usage.receiveEvent(event));
-    stream.addEventListener('connected', () => this.#streamOpened());
-    stream.onopen = () => this.#streamOpened();
-    stream.onerror = () => {
-      this.#usage.markDisconnected();
-      this.#streamConnected.set(false);
-      if (this.#events().length || this.#bootstrap()) this.#state.set('cached');
-      else if (this.#state() !== 'loading') this.#state.set('unavailable');
-    };
-    this.#stream = stream;
-  }
-
-  #streamOpened(): void {
-    this.#streamConnected.set(true);
-    if (['cached', 'partial', 'unavailable'].includes(this.#state())) void this.#sync();
-  }
-
   #receiveActivity(raw: Event): void {
     if (raw instanceof MessageEvent) {
       try {
@@ -239,7 +213,7 @@ export class ActivityStore {
           this.#events.set(mergeEvents(this.#events(), [event]));
           if (!event.isRead && this.#events().length > before) {
             this.#unreadCount.update((count) => count + 1);
-            if (isLiveMotionEvent(event, this.#pageVisible(), Date.now()))
+            if (isLiveMotionEvent(event, this.#live.visible(), Date.now()))
               this.#showNewEvent(event.id);
           }
           void this.#persist();
@@ -263,20 +237,15 @@ export class ActivityStore {
         void this.#sync();
         return;
       }
-      const shouldRefreshCodexStatus = bootstrap.connection.codex === 'needsReview';
+      const shouldReconcile =
+        bootstrap.connection.codex === 'needsReview' || this.#state() !== 'ready';
       this.#bootstrap.set({ ...bootstrap, currentWork: current });
       this.#savedAt.set(new Date());
       void this.#persist();
-      if (shouldRefreshCodexStatus) void this.#sync();
+      if (shouldReconcile) void this.#sync();
     } catch {
       void this.#sync();
     }
-  }
-
-  #takePendingWork(): CurrentWorkDto | null {
-    const current = this.#pendingWork ?? null;
-    this.#pendingWork = undefined;
-    return current;
   }
 
   async #markReadLocally(id: string): Promise<void> {

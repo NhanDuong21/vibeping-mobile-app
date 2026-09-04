@@ -54,7 +54,7 @@ test("quiet work expires honestly and foreground sync clears a missed ending", a
   ).toBeVisible();
   await page.clock.fastForward(120_000);
   await expect(
-    page.getByRole("heading", { name: "Chưa rõ trạng thái Codex" }),
+    page.getByRole("heading", { name: "Chưa nhận tín hiệu mới từ Codex" }),
   ).toBeVisible();
   await expect(
     page.locator(".vibe-active-pulse, .vibe-signal-sweep"),

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { of, Subject } from 'rxjs';
+import { NEVER, of, Subject } from 'rxjs';
 import { ApiClient, type BootstrapDto } from '../../../core/api/api-client';
 import { EVENT_SOURCE_FACTORY } from '../../../core/connectivity/event-source';
 import { ActivityCache } from '../data/activity-cache';
@@ -108,6 +108,44 @@ describe('live work freshness and reconciliation', () => {
     await vi.advanceTimersByTimeAsync(0);
     expect(store.current()).toBeNull();
     store.stop();
+  });
+
+  it('recovers a missed work update within 15 seconds without reload or a stream event', async () => {
+    const { store, api } = setup();
+    await vi.advanceTimersByTimeAsync(0);
+    api.bootstrap.mockReturnValue(of({ ...bootstrap, currentWork: { ...work, state: 'waiting' } }));
+    await vi.advanceTimersByTimeAsync(15_000);
+    expect(store.readiness().kind).toBe('waiting');
+    api.bootstrap.mockReturnValue(of({ ...bootstrap, currentWork: null }));
+    await vi.advanceTimersByTimeAsync(15_000);
+    expect(store.current()).toBeNull();
+    store.stop();
+  });
+
+  it('reconciles every server connection even if the old page still says ready', async () => {
+    const { store, api, listeners } = setup();
+    await vi.advanceTimersByTimeAsync(0);
+    api.bootstrap.mockReturnValue(of({ ...bootstrap, currentWork: null }));
+    listeners.get('connected')?.(new Event('connected'));
+    await vi.advanceTimersByTimeAsync(0);
+    expect(store.current()).toBeNull();
+    store.stop();
+  });
+
+  it('bounds a hanging snapshot and retries without trapping the current status', async () => {
+    const { store, api } = setup();
+    await vi.advanceTimersByTimeAsync(0);
+    api.bootstrap.mockReturnValue(NEVER);
+    await vi.advanceTimersByTimeAsync(25_000);
+    expect(store.state()).toBe('cached');
+    api.bootstrap.mockReturnValue(of({ ...bootstrap, currentWork: null }));
+    await vi.advanceTimersByTimeAsync(5_000);
+    expect(store.state()).toBe('ready');
+    expect(store.current()).toBeNull();
+    store.stop();
+    const requests = api.bootstrap.mock.calls.length;
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(api.bootstrap).toHaveBeenCalledTimes(requests);
   });
 
   it('does not let an in-flight REST snapshot resurrect work after SSE completion', async () => {

@@ -51,7 +51,13 @@ export function readinessView(
   if (current?.lastTestState === 'failed') return READINESS.failed;
   if (current?.previewReady) return READINESS.preview;
   if (current?.state === 'running') return READINESS.working;
-  if (state === 'loading' || state === 'partial' || !streamConnected) return READINESS.checking;
+  if (state === 'loading' || state === 'partial') return READINESS.checking;
+  if (!streamConnected)
+    return {
+      ...READINESS.checking,
+      title: 'Đang nối lại cập nhật trực tiếp',
+      detail: 'Laptop vẫn phản hồi. VibePing tự lấy trạng thái mới mỗi 15 giây khi bạn mở app.',
+    };
   if (isRecentCompletion(latest, now)) return READINESS.completed;
   if (connection?.codex === 'notInstalled') return READINESS.codexSetup;
   if (connection?.codex !== 'ready') return READINESS.codexReview;
@@ -82,13 +88,14 @@ const READINESS: Record<ReadinessKind, ReadinessView> = {
     kind: 'waiting',
     label: 'Cần bạn',
     title: 'Codex đang chờ bạn',
-    detail: 'Hãy mở lại ChatGPT hoặc Codex để tiếp tục.',
+    detail: 'Codex cần bạn xác nhận. Mở Codex trên laptop để quyết định bước tiếp theo.',
   },
   failed: {
     kind: 'failed',
     label: 'Cần kiểm tra',
-    title: 'Kiểm thử vẫn chưa qua',
-    detail: 'Lần kiểm thử cuối vẫn còn lỗi. Mở lại Codex để xem chi tiết.',
+    title: 'Kiểm thử mã nguồn chưa đạt',
+    detail:
+      'Lệnh kiểm thử mã nguồn do Codex chạy trên laptop báo chưa đạt. Codex có thể vẫn đang sửa; mở Codex để xem kết quả.',
   },
   preview: {
     kind: 'preview',
@@ -104,10 +111,10 @@ const READINESS: Record<ReadinessKind, ReadinessView> = {
   },
   unconfirmed: {
     kind: 'unconfirmed',
-    label: 'Chưa xác nhận',
-    title: 'Chưa rõ trạng thái Codex',
+    label: 'Chờ tín hiệu mới',
+    title: 'Chưa nhận tín hiệu mới từ Codex',
     detail:
-      'Chưa có tín hiệu mới. Mở Codex trên laptop để kiểm tra; VibePing chưa xác nhận công việc đã kết thúc.',
+      'Laptop vẫn kết nối, nhưng Codex chưa gửi tín hiệu mới trong 2 phút. Trạng thái sẽ tự cập nhật khi có tín hiệu; chưa thể kết luận công việc đã xong.',
   },
   checking: {
     kind: 'checking',
@@ -119,7 +126,7 @@ const READINESS: Record<ReadinessKind, ReadinessView> = {
     kind: 'completed',
     label: 'Vừa hoàn tất',
     title: 'Công việc vừa hoàn tất',
-    detail: 'Tín hiệu mới nhất đã được lưu vào Hoạt động.',
+    detail: 'Codex đã kết thúc lượt trả lời. Mở Codex trên laptop để xem kết quả.',
   },
   codexSetup: {
     kind: 'codexSetup',

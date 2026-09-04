@@ -5,6 +5,7 @@ import { MotionPreferenceStore } from './core/motion/motion-preference.store';
 import { signalRouteTransition } from './core/motion/route-transition';
 import { BottomNavigation } from './core/navigation/ui/bottom-navigation';
 import { UpdateNotice } from './core/updates/update-notice';
+import { ActivitySession } from './features/activity/application/activity-session';
 
 @Component({
   selector: 'app-root',
@@ -17,5 +18,6 @@ export class App {
   constructor() {
     inject(ThemeStore).start();
     inject(MotionPreferenceStore);
+    inject(ActivitySession);
   }
 }

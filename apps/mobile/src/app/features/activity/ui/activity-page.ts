@@ -1,6 +1,6 @@
 import { AnimatedPercent } from '../../../core/motion/animated-percent';
 import { SignalMotion } from '../../../core/motion/signal-motion';
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PullToRefresh } from '../../../core/refresh/pull-to-refresh';
 import { UsageLimitsStore } from '../../usage-limits';
@@ -14,15 +14,7 @@ import { LiveStatusCard } from './live-status-card';
   templateUrl: './activity-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ActivityPage implements OnInit, OnDestroy {
+export class ActivityPage {
   protected readonly activity = inject(ActivityStore);
   protected readonly usage = inject(UsageLimitsStore);
-
-  ngOnInit(): void {
-    this.activity.start();
-  }
-
-  ngOnDestroy(): void {
-    this.activity.stop();
-  }
 }

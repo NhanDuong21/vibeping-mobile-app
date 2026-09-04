@@ -168,6 +168,13 @@ test.describe("production data rendering", () => {
   test("shows dynamic allowance windows and supports an explicit refresh", async ({
     page,
   }) => {
+    // Keep this snapshot test independent of the host's live allowance reader.
+    await page.addInitScript(() => {
+      class FixtureStream extends EventTarget {
+        close(): void {}
+      }
+      Object.defineProperty(window, "EventSource", { value: FixtureStream });
+    });
     const snapshot = {
       state: "available",
       readAt: "2026-09-02T00:00:00Z",
@@ -193,6 +200,22 @@ test.describe("production data rendering", () => {
       ],
       cursor: "1",
     };
+    await page.route("**/api/v1/bootstrap", (route) =>
+      route.fulfill({
+        json: {
+          serverTime: new Date().toISOString(),
+          cursor: "1",
+          unreadCount: 0,
+          connection: {
+            desktop: "running",
+            codex: "ready",
+            privateConnection: "local",
+          },
+          currentWork: null,
+          usageLimits: snapshot,
+        },
+      }),
+    );
     await page.route(/\/api\/v1\/usage-limits$/, (route) =>
       route.fulfill({
         contentType: "application/json",

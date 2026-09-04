@@ -91,10 +91,15 @@
             />
           </div>
           <div class="flex min-h-14 items-center justify-between gap-4 py-2.5">
-            <span class="font-semibold">Kiểm thử vẫn chưa qua</span
+            <span
+              ><span class="block font-semibold">Kiểm thử mã nguồn chưa đạt</span
+              ><span class="mt-1 block text-sm leading-5 text-vibe-muted dark:text-vibe-sage"
+                >Báo khi Codex kết thúc lượt làm việc và kết quả kiểm thử gần nhất ghi nhận chưa
+                đạt.</span
+              ></span
             ><app-toggle-switch
               [checked]="draft.notifications.finalFailure"
-              label="Thông báo khi kiểm thử chưa qua"
+              label="Thông báo khi kiểm thử mã nguồn chưa đạt"
               (changed)="preferences.toggleNotification('finalFailure')"
             />
           </div>

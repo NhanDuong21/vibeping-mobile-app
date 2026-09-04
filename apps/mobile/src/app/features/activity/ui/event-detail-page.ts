@@ -1,5 +1,5 @@
 import { SignalMotion } from '../../../core/motion/signal-motion';
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import type { ActivityEventDetailDto } from '../../../core/api/api-client';
 import { clock, exactDateTime } from '../../../core/formatting/time';
@@ -19,7 +19,7 @@ import { ActivityStore } from '../application/activity.store';
   templateUrl: './event-detail-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EventDetailPage implements OnInit, OnDestroy {
+export class EventDetailPage implements OnInit {
   protected readonly activity = inject(ActivityStore);
   protected readonly label = activityLabel;
   protected readonly taskTitle = activityTaskTitle;
@@ -32,11 +32,6 @@ export class EventDetailPage implements OnInit, OnDestroy {
   readonly #route = inject(ActivatedRoute);
 
   ngOnInit(): void {
-    this.activity.start();
     void this.activity.loadDetail(this.#route.snapshot.paramMap.get('id') ?? '');
-  }
-
-  ngOnDestroy(): void {
-    this.activity.stop();
   }
 }

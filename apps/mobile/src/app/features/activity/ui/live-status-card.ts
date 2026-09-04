@@ -22,7 +22,7 @@ export class LiveStatusCard {
   protected workTitle(): string {
     const kind = this.activity.readiness().kind;
     if (kind === 'waiting') return 'Cần xác nhận để tiếp tục';
-    if (kind === 'failed') return 'Lần kiểm thử cuối vẫn còn lỗi';
+    if (kind === 'failed') return 'Lần kiểm thử Codex ghi nhận chưa đạt';
     if (kind === 'preview') return 'Bản xem trước của công việc hiện tại';
     if (kind === 'unconfirmed') return 'Công việc ghi nhận gần nhất';
     return 'Công việc hiện tại';

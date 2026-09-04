@@ -111,12 +111,15 @@ pub fn notification_copy(
 pub fn event_words(event_type: &str) -> (&'static str, &'static str) {
     match event_type {
         "codex.turn.started" => ("Codex đã bắt đầu", "Đang xử lý yêu cầu"),
-        "codex.turn.completed" => ("Codex đã xong việc", "Mở VibePing để xem kết quả"),
+        "codex.turn.completed" => ("Codex đã xong việc", "Mở Codex trên laptop để xem kết quả"),
         "codex.attention.permission_required" => ("Codex đang chờ bạn", "Cần xác nhận để tiếp tục"),
-        "codex.test.failed" => ("Kiểm thử vẫn chưa qua", "Cần xem lại kết quả kiểm thử"),
+        "codex.test.failed" => (
+            "Kiểm thử mã nguồn chưa đạt",
+            "Lần kiểm thử Codex ghi nhận chưa đạt; xem lại trên laptop",
+        ),
         "codex.preview.ready" => (
             "Bản xem trước đã sẵn sàng",
-            "Đã có bản xem trước để kiểm tra",
+            "Mở bản xem trước trong Codex trên laptop",
         ),
         "codex.allowance.low" => ("Hạn mức Codex sắp thấp", "Mở VibePing để xem hạn mức"),
         "codex.allowance.critical" => ("Hạn mức Codex gần hết", "Mở VibePing để xem hạn mức"),
@@ -128,10 +131,14 @@ pub fn event_words(event_type: &str) -> (&'static str, &'static str) {
 }
 
 fn private_body(event_type: &str) -> &'static str {
-    if event_type == "codex.attention.permission_required" {
-        "Mở VibePing để tiếp tục."
-    } else {
-        "Mở VibePing để xem chi tiết."
+    match event_type {
+        "codex.attention.permission_required" => "Mở Codex trên laptop để xác nhận.",
+        "codex.test.failed" => {
+            "Lần kiểm thử mã nguồn gần nhất Codex ghi nhận chưa đạt. Xem lại trong Codex trên laptop."
+        }
+        "codex.turn.completed" => "Mở Codex trên laptop để xem kết quả.",
+        "codex.preview.ready" => "Mở bản xem trước trong Codex trên laptop.",
+        _ => "Mở VibePing để xem chi tiết.",
     }
 }
 

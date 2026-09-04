@@ -129,7 +129,7 @@ async fn notification_toggles_and_private_mode_change_real_delivery() {
         .fetch_one(&pool)
         .await
         .unwrap();
-    assert_eq!(body, "Mở VibePing để xem chi tiết.");
+    assert_eq!(body, "Mở Codex trên laptop để xem kết quả.");
     assert!(!body.contains("Dự án riêng"));
 
     value.privacy_mode = "project".into();

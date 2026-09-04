@@ -51,7 +51,7 @@ async fn latest_real_activity_replaces_sample_and_task_survives_database_reopen(
     assert_eq!(preview.source, "activity");
     assert_eq!(preview.standard.body, "Sửa màn Cài đặt · project");
     assert_eq!(preview.project.body, "project");
-    assert_eq!(preview.private.body, "Mở VibePing để xem chi tiết.");
+    assert_eq!(preview.private.body, "Mở Codex trên laptop để xem kết quả.");
 }
 
 #[tokio::test]
@@ -131,10 +131,10 @@ async fn historical_and_damaged_context_does_not_leak_stored_output() {
             .bind(Utc::now()).bind(Utc::now()).bind(context).execute(&pool).await.unwrap();
         let preview = store.preview().await.unwrap();
         assert_eq!(preview.source, "activity");
-        assert_eq!(preview.standard.title, "Kiểm thử vẫn chưa qua");
+        assert_eq!(preview.standard.title, "Kiểm thử mã nguồn chưa đạt");
         assert_eq!(
             preview.standard.body,
-            "Cần xem lại kết quả kiểm thử · project"
+            "Lần kiểm thử Codex ghi nhận chưa đạt; xem lại trên laptop · project"
         );
     }
 }

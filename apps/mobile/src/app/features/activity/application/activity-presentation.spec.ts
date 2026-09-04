@@ -18,6 +18,17 @@ const event: ActivityEventDto = {
 };
 
 describe('activity presentation', () => {
+  it('explains legacy failed-test events as recorded project checks, with the right place to inspect them', () => {
+    const failed = {
+      ...event,
+      eventType: 'codex.test.failed',
+      summary: 'Codex đã dừng với một kiểm tra chưa đạt.',
+    };
+    expect(activityLabel(failed)).toBe('Kiểm thử mã nguồn chưa đạt');
+    expect(activityDescription(failed)).toContain('tại thời điểm thông báo');
+    expect(activityDescription(failed)).toContain('mở Codex trên laptop');
+    expect(activityTaskTitle(failed)).toBe('Lần kiểm thử Codex ghi nhận chưa đạt');
+  });
   it('uses a safe fallback when no task title was stored', () => {
     expect(activityLabel(event)).toBe('Công việc đã hoàn tất');
     expect(activityTaskTitle(event)).toBe('Công việc trong Codex');
@@ -26,7 +37,9 @@ describe('activity presentation', () => {
   it('uses a richer safe summary without duplicating the project name', () => {
     const richer = { ...event, summary: 'Hoàn thiện trải nghiệm Hoạt động' };
     expect(activityTaskTitle(richer)).toBe('Hoàn thiện trải nghiệm Hoạt động');
-    expect(activityDescription(richer)).toBe('Codex đã hoàn tất thay đổi trên laptop.');
+    expect(activityDescription(richer)).toBe(
+      'Codex đã kết thúc lượt trả lời này. Mở Codex trên laptop để xem kết quả.',
+    );
     expect(activityTaskTitle({ ...event, summary: event.projectName })).toBe(
       'Công việc trong Codex',
     );
@@ -40,7 +53,9 @@ describe('activity presentation', () => {
     };
     expect(activityTaskTitle(unsafe)).toBe('Công việc trong Codex');
     expect(activityProject(unsafe)).toBe('vibeping-mobile-app');
-    expect(activityDescription(unsafe)).toBe('Codex đã hoàn tất thay đổi trên laptop.');
+    expect(activityDescription(unsafe)).toBe(
+      'Codex đã kết thúc lượt trả lời này. Mở Codex trên laptop để xem kết quả.',
+    );
   });
 
   it('keeps a long Vietnamese work title useful and bounded', () => {
