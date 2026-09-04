@@ -174,6 +174,36 @@ async fn failures_keep_last_good_windows_and_mark_them_stale() {
 }
 
 #[tokio::test]
+async fn last_reading_survives_restart_without_codex_and_recovers_on_reconnect() {
+    let temp = tempdir().unwrap();
+    let path = temp.path().join("persisted-usage.sqlite3");
+    let pool = database::connect(&path).await.unwrap();
+    let store = UsageLimitStore::new(pool.clone());
+    let mut limits = normalize_response(response(window(63.0, 300, 1_700_000_000))).unwrap();
+    limits.read_at -= chrono::Duration::days(1);
+    store.save(&limits).await.unwrap();
+    drop(store);
+    pool.close().await;
+
+    let pool = database::connect(&path).await.unwrap();
+    let store = UsageLimitStore::new(pool);
+    store.mark_failure("CODEX_NOT_CONNECTED").await.unwrap();
+    let saved = store.snapshot().await.unwrap();
+    assert_eq!(saved.state, "stale");
+    assert_eq!(saved.read_at, Some(limits.read_at));
+    assert_eq!(saved.windows[0].remaining_percent, 37.0);
+    assert_eq!(saved.windows[0].resets_at, 1_700_000_000);
+
+    let fresh = normalize_response(response(window(100.0, 300, 2_000_000_000))).unwrap();
+    store.save(&fresh).await.unwrap();
+    let recovered = store.snapshot().await.unwrap();
+    assert_eq!(recovered.state, "available");
+    assert_eq!(recovered.read_at, Some(fresh.read_at));
+    assert_eq!(recovered.windows[0].remaining_percent, 0.0);
+    assert!(recovered.read_at > saved.read_at);
+}
+
+#[tokio::test]
 async fn protocol_handles_notifications_malformed_output_crash_and_timeout() {
     let (client_read, mut server_write) = duplex(4096);
     let (_server_read, client_write) = duplex(4096);

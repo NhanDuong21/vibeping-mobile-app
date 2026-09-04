@@ -98,6 +98,11 @@
       </div>
       @if (activity.allowance(); as allowance) {
         @if (allowance.windows.length) {
+          @if (allowance.state === 'stale') {
+            <p class="pt-3 text-sm leading-5 text-vibe-muted dark:text-vibe-sage">
+              Dữ liệu lần cuối · {{ usage.lastReadLabel() }}
+            </p>
+          }
           <div class="grid grid-cols-2 gap-x-5 gap-y-3 py-4">
             @for (window of allowance.windows.slice(0, 2); track window.windowKey) {
               <div class="min-w-0">
@@ -108,7 +113,7 @@
                   {{ window.remainingPercent.toFixed(0) }}%
                 </p>
                 <p class="mt-0.5 text-xs font-bold">
-                  {{ allowanceStatus(window.remainingPercent, window.reached) }}
+                  {{ usage.statusLabel(window) }}
                 </p>
               </div>
             }

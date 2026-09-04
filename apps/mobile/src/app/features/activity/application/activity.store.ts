@@ -8,6 +8,7 @@ import {
   type CurrentWorkDto,
 } from '../../../core/api/api-client';
 import { EVENT_SOURCE_FACTORY } from '../../../core/connectivity/event-source';
+import { UsageLimitsStore } from '../../usage-limits';
 import { ActivityCache, type CachedActivity } from '../data/activity-cache';
 import { isCurrentWork, localUnread, mergeEvents } from './activity-reconciliation';
 import { readinessView, type ReadinessSourceState, type ReadinessView } from './readiness';
@@ -21,6 +22,7 @@ const STALE_AFTER_MS = 10 * 60 * 1000;
 export class ActivityStore {
   readonly #api = inject(ApiClient);
   readonly #cache = inject(ActivityCache);
+  readonly #usage = inject(UsageLimitsStore);
   readonly #eventSourceFactory = inject(EVENT_SOURCE_FACTORY);
   readonly #state = signal<ActivityState>('loading');
   readonly #bootstrap = signal<BootstrapDto | null>(null);
@@ -47,7 +49,7 @@ export class ActivityStore {
 
   readonly state = this.#state.asReadonly();
   readonly current = computed(() => this.#bootstrap()?.currentWork ?? null);
-  readonly allowance = computed(() => this.#bootstrap()?.usageLimits ?? null);
+  readonly allowance = this.#usage.snapshot;
   readonly codexNeedsReview = computed(() => this.#bootstrap()?.connection.codex === 'needsReview');
   readonly events = this.#events.asReadonly();
   readonly unreadCount = this.#unreadCount.asReadonly();
@@ -155,6 +157,7 @@ export class ActivityStore {
   };
 
   readonly #offline = (): void => {
+    this.#usage.markDisconnected();
     if (this.#events().length || this.#bootstrap()) this.#state.set('cached');
   };
 
@@ -165,7 +168,7 @@ export class ActivityStore {
   };
 
   async #restoreThenSync(): Promise<void> {
-    const cached = await this.#cache.read();
+    const [cached] = await Promise.all([this.#cache.read(), this.#usage.restoreCached()]);
     if (cached && this.#state() === 'loading') this.#applyCache(cached);
     await this.#sync();
   }
@@ -179,6 +182,7 @@ export class ActivityStore {
         firstValueFrom(this.#api.events()),
       ]);
       if (sequence !== this.#syncSequence) return;
+      this.#usage.acceptSnapshot(bootstrap.usageLimits);
       this.#bootstrap.set(
         workRevision !== this.#workRevision && this.#bootstrap()
           ? { ...bootstrap, currentWork: this.current() }
@@ -199,6 +203,7 @@ export class ActivityStore {
       await this.#flushReads();
     } catch {
       if (sequence !== this.#syncSequence) return;
+      this.#usage.markDisconnected();
       this.#state.set(this.#events().length || this.#bootstrap() ? 'cached' : 'unavailable');
     }
   }
@@ -207,9 +212,11 @@ export class ActivityStore {
     const stream = this.#eventSourceFactory('/api/v1/stream');
     stream.addEventListener('activity', (event) => this.#receiveActivity(event));
     stream.addEventListener('work', (event) => this.#receiveWork(event));
+    stream.addEventListener('allowance', (event) => this.#usage.receiveEvent(event));
     stream.addEventListener('connected', () => this.#streamOpened());
     stream.onopen = () => this.#streamOpened();
     stream.onerror = () => {
+      this.#usage.markDisconnected();
       this.#streamConnected.set(false);
       if (this.#events().length || this.#bootstrap()) this.#state.set('cached');
       else if (this.#state() !== 'loading') this.#state.set('unavailable');
@@ -310,6 +317,7 @@ export class ActivityStore {
   }
 
   #applyCache(cached: CachedActivity): void {
+    this.#usage.acceptCached(cached.usageLimits);
     this.#bootstrap.set({
       serverTime: cached.savedAt,
       connection: { desktop: 'cached', codex: 'cached', privateConnection: 'cached' },
@@ -333,7 +341,7 @@ export class ActivityStore {
     await this.#cache.write({
       savedAt: this.#savedAt()?.toISOString() ?? new Date().toISOString(),
       currentWork: bootstrap.currentWork,
-      usageLimits: bootstrap.usageLimits,
+      usageLimits: this.#usage.snapshot() ?? bootstrap.usageLimits,
       unreadCount: this.#unreadCount(),
       events: this.#events().slice(0, 100),
       nextCursor: this.#nextCursor(),

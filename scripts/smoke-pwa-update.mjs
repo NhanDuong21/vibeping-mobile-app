@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { promisify } from "node:util";
@@ -15,6 +15,7 @@ assert(
 );
 const oldBinary = resolve(oldArgument);
 const newBinary = resolve(newArgument);
+const expectedVersion = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8")).version;
 const dataDirectory = await mkdtemp(join(tmpdir(), "vibeping-pwa-upgrade-"));
 const origin = "http://127.0.0.1:8796";
 const execute = promisify(execFile);
@@ -79,9 +80,9 @@ try {
   await stop();
   await start(newBinary);
   const health = await (await fetch(`${origin}/api/v1/health`)).json();
-  assert.equal(health.version, "1.0.0-rc.2");
+  assert.equal(health.version, expectedVersion);
   const manifest = await (await fetch(`${origin}/ngsw.json`)).json();
-  assert.equal(manifest.appData.version, "1.0.0-rc.2");
+  assert.equal(manifest.appData.version, expectedVersion);
   const newMain = Object.keys(manifest.hashTable).find((path) =>
     /^\/main-.*\.js$/.test(path),
   );
@@ -108,7 +109,7 @@ try {
     new RegExp(`^/?${newMain.slice(1)}$`),
   );
   console.log(
-    "PWA upgrade passed: real RC1 cache -> RC2 notice -> explicit update -> new offline shell; local data retained.",
+    `PWA upgrade passed: previous release cache -> ${expectedVersion} notice -> explicit update -> new offline shell; local data retained.`,
   );
 } finally {
   await browser?.close();

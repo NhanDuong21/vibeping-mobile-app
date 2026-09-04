@@ -1,9 +1,11 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import type { ActivityEventDto, BootstrapDto } from '../../../core/api/api-client';
+import {
+  MobileSnapshotStorage,
+  MOBILE_CACHE_VERSION,
+} from '../../../core/cache/mobile-snapshot-storage';
 
-export const ACTIVITY_CACHE_VERSION = 2;
-const DATABASE_NAME = 'vibeping-mobile';
-const STORE_NAME = 'activity-feed';
+export const ACTIVITY_CACHE_VERSION = MOBILE_CACHE_VERSION;
 const SNAPSHOT_KEY = 'snapshot';
 
 export interface CachedActivity {
@@ -19,23 +21,15 @@ export interface CachedActivity {
 
 @Injectable({ providedIn: 'root' })
 export class ActivityCache {
+  readonly #storage = inject(MobileSnapshotStorage);
+
   async read(): Promise<CachedActivity | null> {
     try {
-      const database = await openDatabase();
-      const value = await request<unknown>(
-        database.transaction(STORE_NAME).objectStore(STORE_NAME).get(SNAPSHOT_KEY),
-      );
+      const value = await this.#storage.read(SNAPSHOT_KEY);
       if (!isCachedActivity(value)) {
-        await request(
-          database
-            .transaction(STORE_NAME, 'readwrite')
-            .objectStore(STORE_NAME)
-            .delete(SNAPSHOT_KEY),
-        );
-        database.close();
+        await this.#storage.write(SNAPSHOT_KEY, undefined);
         return null;
       }
-      database.close();
       return value;
     } catch {
       return null;
@@ -44,14 +38,7 @@ export class ActivityCache {
 
   async write(snapshot: CachedActivity): Promise<void> {
     try {
-      const database = await openDatabase();
-      await request(
-        database
-          .transaction(STORE_NAME, 'readwrite')
-          .objectStore(STORE_NAME)
-          .put(snapshot, SNAPSHOT_KEY),
-      );
-      database.close();
+      await this.#storage.write(SNAPSHOT_KEY, snapshot);
     } catch {
       // The server remains authoritative when browser storage is unavailable.
     }
@@ -90,27 +77,4 @@ function isCachedEvent(value: unknown): boolean {
     !Number.isNaN(Date.parse(event.occurredAt)) &&
     typeof event.isRead === 'boolean'
   );
-}
-
-function openDatabase(): Promise<IDBDatabase> {
-  if (typeof indexedDB === 'undefined') return Promise.reject(new Error('CACHE_UNAVAILABLE'));
-  return new Promise((resolve, reject) => {
-    const opening = indexedDB.open(DATABASE_NAME, ACTIVITY_CACHE_VERSION);
-    opening.onupgradeneeded = () => {
-      const database = opening.result;
-      if (!database.objectStoreNames.contains(STORE_NAME)) {
-        database.createObjectStore(STORE_NAME);
-      }
-    };
-    opening.onsuccess = () => resolve(opening.result);
-    opening.onerror = () => reject(opening.error);
-    opening.onblocked = () => reject(new Error('CACHE_BLOCKED'));
-  });
-}
-
-function request<T = IDBValidKey>(value: IDBRequest<T>): Promise<T> {
-  return new Promise((resolve, reject) => {
-    value.onsuccess = () => resolve(value.result);
-    value.onerror = () => reject(value.error);
-  });
 }
