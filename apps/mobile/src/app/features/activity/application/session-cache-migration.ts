@@ -22,8 +22,34 @@ export function mergeSessionFeed(
     const answer = viewed.find((value) => value.result);
     return answer ? { ...answer, ...event } : event;
   });
-  const grouped = current.filter(
-    (event) => event.session || event.eventType.startsWith('codex.allowance.'),
+  const aliases = new Set(incoming.flatMap((event) => event.session?.eventIds ?? []));
+  const grouped = attachThreadIdentity(
+    current.filter((event) => event.session || !aliases.has(event.id)),
+    incoming,
   );
   return { events: mergeEvents(grouped, enriched), legacy: [...saved.values()].slice(0, 100) };
+}
+
+/** Upgrade per-turn caches using verified server membership, never a project-name guess. */
+function attachThreadIdentity(current: CachedEvent[], incoming: ActivityEventDto[]): CachedEvent[] {
+  const membership = new Map<
+    string,
+    NonNullable<NonNullable<ActivityEventDto['session']>['thread']>
+  >();
+  for (const event of incoming) {
+    const thread = event.session?.thread;
+    if (!thread?.turnIds) continue;
+    thread.turnIds.forEach((id, index, ids) => {
+      membership.set(id, {
+        ...thread,
+        turnNumber: index + 1,
+        previousTurnId: ids[index - 1] ?? null,
+        nextTurnId: ids[index + 1] ?? null,
+      });
+    });
+  }
+  return current.map((event) => {
+    const thread = membership.get(event.id);
+    return event.session && thread ? { ...event, session: { ...event.session, thread } } : event;
+  });
 }

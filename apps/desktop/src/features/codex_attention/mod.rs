@@ -16,7 +16,9 @@ mod session_feed;
 mod session_stages;
 mod store;
 mod task_metadata;
+mod thread_feed;
 mod turn_state;
+pub use thread_feed::ThreadContext;
 
 pub use classifier::normalize;
 pub(crate) use installer::runtime_executable;
@@ -38,3 +40,6 @@ mod result_tests;
 
 #[cfg(test)]
 mod session_tests;
+
+#[cfg(test)]
+mod thread_tests;

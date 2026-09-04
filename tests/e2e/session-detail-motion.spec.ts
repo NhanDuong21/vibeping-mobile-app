@@ -123,7 +123,7 @@ test("detail pauses for reduced motion, hidden content, navigation and expired e
   await page.clock.fastForward(135_000);
   await expect(signal).toHaveCount(0);
   await expect(
-    page.getByText("Chờ tín hiệu mới", { exact: true }),
+    page.getByText("Không còn tín hiệu mới", { exact: true }),
   ).toBeVisible();
 });
 

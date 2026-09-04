@@ -92,6 +92,9 @@ try {
   await expect(
     page.getByText("Có bản VibePing mới", { exact: true }),
   ).toBeVisible({ timeout: 60_000 });
+  await expect(
+    page.getByText(`Phiên bản ${expectedVersion}`, { exact: true }),
+  ).toBeVisible();
   await page.getByRole("button", { name: "Cập nhật", exact: true }).click();
   await expect(main).toHaveAttribute(
     "src",

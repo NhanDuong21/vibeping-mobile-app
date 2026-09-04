@@ -7,10 +7,10 @@ import {
   activityLabel,
   activityProject,
   activityTaskTitle,
-  groupActivityEvents,
 } from '../application/activity-presentation';
 import { ActivityStore } from '../application/activity.store';
 import { WorkSessionCard } from './work-session-card';
+import { threadIdentity, threadSections } from '../application/thread-presentation';
 
 @Component({
   selector: 'app-activity-list',
@@ -21,11 +21,14 @@ import { WorkSessionCard } from './work-session-card';
 export class ActivityList {
   protected readonly activity = inject(ActivityStore);
   protected readonly groups = computed(() =>
-    groupActivityEvents(
-      this.activity.events().filter((event) => event.id !== this.activity.focusedSession()?.id),
+    threadSections(
+      this.activity.threads(),
+      this.activity.focusedSession(),
       this.activity.now(),
+      this.activity.isStale(),
     ),
   );
+  protected readonly identity = threadIdentity;
   protected readonly label = activityLabel;
   protected readonly taskTitle = activityTaskTitle;
   protected readonly project = activityProject;

@@ -15,6 +15,7 @@ struct SessionRow {
 
 #[derive(FromRow)]
 struct TurnRow {
+    last_test_state: String,
     state: String,
     started_at: DateTime<Utc>,
     completed_at: Option<DateTime<Utc>>,
@@ -124,7 +125,7 @@ impl ActivityStore {
             return Ok(Some(detail));
         };
         let mut turn = sqlx::query_as::<_, TurnRow>(
-            "SELECT state, started_at, completed_at, updated_at, start_observed, task_label FROM codex_turns WHERE turn_key = ?",
+            "SELECT state, started_at, completed_at, updated_at, start_observed, task_label, last_test_state FROM codex_turns WHERE turn_key = ?",
         ).bind(&turn_key).fetch_one(&self.pool).await?;
         detail.timeline = self.session_timeline(&turn_key).await?;
         if turn.state == "completed"
@@ -138,7 +139,7 @@ impl ActivityStore {
         detail.event.id = row.id;
         detail.event.occurred_at = row.occurred_at;
         detail.event.is_read = row.is_read;
-        if let Some(task) = turn.task_label {
+        if let Some(task) = turn.task_label.clone() {
             detail.event.summary = task;
         }
         detail.event.event_type = match turn.state.as_str() {
@@ -154,6 +155,9 @@ impl ActivityStore {
             .into();
         self.attach_session_result(&mut detail, &turn_key).await?;
         detail.event.session = Some(WorkSession {
+            thread: self.thread_context(&turn_key).await?,
+            task_label: turn.task_label,
+            last_test_state: Some(turn.last_test_state),
             event_ids: sqlx::query_scalar(
                 "SELECT id FROM activity_events WHERE turn_key = ? ORDER BY occurred_at, rowid",
             )
@@ -219,7 +223,7 @@ impl ActivityStore {
     }
 }
 
-fn session_cursor(cursor: Option<&str>) -> Result<(Option<DateTime<Utc>>, String)> {
+pub(super) fn session_cursor(cursor: Option<&str>) -> Result<(Option<DateTime<Utc>>, String)> {
     let Some(cursor) = cursor else {
         return Ok((None, String::new()));
     };

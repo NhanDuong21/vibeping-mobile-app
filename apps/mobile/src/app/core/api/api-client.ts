@@ -38,12 +38,20 @@ export class ApiClient {
 
   events(cursor?: string): Observable<EventFeedDto> {
     return this.#http.get<EventFeedDto>('/api/v1/events', {
-      params: cursor ? { cursor, limit: 20, grouped: true } : { limit: 20, grouped: true },
+      params: cursor
+        ? { cursor, limit: 20, grouped: true, threads: true }
+        : { limit: 20, grouped: true, threads: true },
     });
   }
 
   event(id: string): Observable<ActivityEventDetailDto> {
     return this.#http.get<ActivityEventDetailDto>(`/api/v1/events/${encodeURIComponent(id)}`);
+  }
+
+  threadTurns(thread: string, cursor?: string): Observable<EventFeedDto> {
+    return this.#http.get<EventFeedDto>('/api/v1/events', {
+      params: cursor ? { thread, cursor, limit: 10 } : { thread, limit: 10 },
+    });
   }
 
   markEventRead(id: string, csrfToken: string, through?: string): Observable<ReadStateDto> {

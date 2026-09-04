@@ -26,6 +26,8 @@ pub struct EventListQuery {
     limit: Option<u8>,
     grouped: Option<bool>,
     project: Option<String>,
+    threads: Option<bool>,
+    thread: Option<String>,
 }
 
 #[derive(Debug, Deserialize, IntoParams)]
@@ -67,7 +69,15 @@ pub async fn events(
 ) -> Result<Json<EventFeed>, ApiError> {
     authorize_if_claimed(&state, &headers).await?;
     let store = ActivityStore::new(state.database.clone());
-    let result = if query.grouped.unwrap_or(false) {
+    let result = if let Some(thread) = query.thread.as_deref() {
+        store
+            .list_thread_turns(thread, query.cursor.as_deref(), query.limit.unwrap_or(10))
+            .await
+    } else if query.threads.unwrap_or(false) {
+        store
+            .list_threads(query.cursor.as_deref(), query.limit.unwrap_or(20))
+            .await
+    } else if query.grouped.unwrap_or(false) {
         store
             .list_sessions_for_project(
                 query.cursor.as_deref(),

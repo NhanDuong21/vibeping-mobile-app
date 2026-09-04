@@ -12,6 +12,10 @@ const GENERIC_SUMMARIES = new Set([
   'Mở laptop để xem và quyết định.',
   'Bạn có thể mở VibePing để kiểm tra.',
   'Codex đã dừng với một kiểm tra chưa đạt.',
+  'Mở Codex trên laptop để xem kết quả',
+  'Mở chi tiết để đọc câu trả lời của Codex',
+  'Chờ tín hiệu mới',
+  'Đang xử lý yêu cầu',
 ]);
 
 export function activityLabel(event: ActivityEventDto): string {
@@ -45,7 +49,9 @@ export function activityTaskTitle(event: ActivityEventDto): string {
     'codex.test.failed': 'Lần kiểm thử Codex ghi nhận chưa đạt',
     'codex.turn.completed': 'Công việc trong Codex',
   };
-  return fallbacks[event.eventType] ?? 'Tín hiệu mới từ Codex';
+  return event.session
+    ? 'Phiên làm việc VibePing'
+    : (fallbacks[event.eventType] ?? 'Tín hiệu mới từ Codex');
 }
 
 export function activityProject(event: ActivityEventDto): string {

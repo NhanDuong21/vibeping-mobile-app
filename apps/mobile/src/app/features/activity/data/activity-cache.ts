@@ -77,7 +77,7 @@ export function isCachedActivity(value: unknown): value is CachedActivity {
   );
 }
 
-function isCachedEvent(value: unknown): boolean {
+export function isCachedEvent(value: unknown): boolean {
   if (!value || typeof value !== 'object') return false;
   const event = value as Partial<ActivityEventDetailDto>;
   return (
@@ -112,6 +112,10 @@ function isCachedSession(value: NonNullable<ActivityEventDetailDto['session']>):
     typeof input === 'string' && Number.isFinite(Date.parse(input));
   return (
     typeof value === 'object' &&
+    (value.thread == null || isCachedThread(value.thread)) &&
+    (value.taskLabel == null || typeof value.taskLabel === 'string') &&
+    (value.lastTestState == null ||
+      ['unknown', 'passed', 'failed'].includes(value.lastTestState)) &&
     Array.isArray(value.eventIds) &&
     value.eventIds.every((id) => typeof id === 'string') &&
     ['running', 'waiting', 'completed', 'stopped', 'failed', 'unconfirmed'].includes(value.state) &&
@@ -125,5 +129,34 @@ function isCachedSession(value: NonNullable<ActivityEventDetailDto['session']>):
     value.timeline.every(
       (stage) => stage && typeof stage.eventType === 'string' && date(stage.occurredAt),
     )
+  );
+}
+
+function isCachedThread(
+  value: NonNullable<NonNullable<ActivityEventDetailDto['session']>['thread']>,
+): boolean {
+  const date = (input: unknown): boolean =>
+    typeof input === 'string' && Number.isFinite(Date.parse(input));
+  return (
+    typeof value === 'object' &&
+    typeof value.id === 'string' &&
+    value.id.length > 0 &&
+    (value.title === null || typeof value.title === 'string') &&
+    Number.isInteger(value.turnCount) &&
+    value.turnCount > 0 &&
+    Number.isInteger(value.turnNumber) &&
+    value.turnNumber > 0 &&
+    value.turnNumber <= value.turnCount &&
+    (value.turnIds === undefined ||
+      (Array.isArray(value.turnIds) && value.turnIds.every((id) => typeof id === 'string'))) &&
+    typeof value.latestTurnId === 'string' &&
+    (value.previousTurnId === null || typeof value.previousTurnId === 'string') &&
+    (value.nextTurnId === null || typeof value.nextTurnId === 'string') &&
+    date(value.firstSignalAt) &&
+    date(value.updatedAt) &&
+    (value.startedAt === null || date(value.startedAt)) &&
+    Number.isInteger(value.failedTestCount) &&
+    value.failedTestCount >= 0 &&
+    typeof value.isRead === 'boolean'
   );
 }

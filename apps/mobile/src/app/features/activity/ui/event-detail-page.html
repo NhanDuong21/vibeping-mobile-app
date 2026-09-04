@@ -3,9 +3,9 @@
 >
   <header class="mx-auto flex w-full max-w-lg items-center justify-between py-2">
     <a
-      routerLink="/activity"
+      [routerLink]="backLink()"
       class="grid min-h-11 min-w-11 place-items-center rounded-full border border-vibe-rule text-vibe-ink! transition-colors active:bg-vibe-mint-soft dark:border-vibe-rule-dark dark:text-vibe-paper! dark:active:bg-vibe-mint/10"
-      aria-label="Quay lại hoạt động"
+      [attr.aria-label]="activity.selected()?.session?.thread ? 'Quay lại phiên làm việc' : 'Quay lại hoạt động'"
     >
       <svg
         class="size-5"
@@ -20,15 +20,17 @@
         <path d="m15 18-6-6 6-6" />
       </svg>
     </a>
-    <p class="font-bold">Chi tiết hoạt động</p>
+    <p class="text-center text-sm font-bold">Chi tiết lượt làm việc</p>
     <span class="size-11" aria-hidden="true"></span>
   </header>
 
   <main class="mx-auto w-full max-w-lg pt-7" aria-live="polite">
     @if (activity.selected(); as event) {
+      @if (event.session?.thread; as thread) {
+        <p class="mb-3 text-sm text-vibe-muted dark:text-vibe-sage">Lượt {{ thread.turnNumber }} trong {{ thread.turnCount }}</p>
+      }
       <h1
-        appSignalMotion="arrive"
-        class="text-balance text-[1.75rem] font-bold leading-tight tracking-[-0.035em]"
+        class="break-words text-[1.75rem] font-bold leading-tight tracking-[-0.035em]"
       >
         {{ event.session ? taskTitle(event) : label(event) }}
       </h1>
@@ -38,7 +40,7 @@
           <p class="min-w-0 break-words text-lg font-bold leading-6">{{ event.session ? sessionStatus(event, activity.now(), activity.isStale()) : taskTitle(event) }}</p>
         </div>
         @if (event.session) {
-          <p class="mt-1.5 text-sm text-vibe-muted dark:text-vibe-sage">{{ sessionDuration(event, activity.now(), activity.isStale()) }}</p>
+          @if (event.session.startedAt) { <p class="mt-1.5 text-sm text-vibe-muted dark:text-vibe-sage">{{ sessionDuration(event, activity.now(), activity.isStale()) }}</p> }
           @if (event.session.failedTestCount) {
             <p class="mt-2 text-sm">{{ event.session.failedTestCount }} lần kiểm thử chưa đạt</p>
           }
@@ -46,7 +48,7 @@
         <p class="mt-1.5 break-words text-sm text-vibe-muted dark:text-vibe-sage">
           <a [routerLink]="['/settings/projects', event.projectName]" class="inline-flex min-h-11 items-center text-vibe-green! underline underline-offset-4 dark:text-vibe-mint!"><app-project-identity [name]="event.projectName" /></a>
         </p>
-        @if (description(event)) {
+        @if (!event.session && description(event)) {
           <p class="mt-4 text-[0.9375rem] leading-6 text-vibe-muted dark:text-vibe-sage">
             {{ description(event) }}
           </p>
@@ -59,7 +61,7 @@
             Diễn biến
           </h2>
           <ol
-            class="relative mt-4 space-y-1 before:absolute before:bottom-5 before:left-[4.25rem] before:top-5 before:w-px before:bg-vibe-mint/50"
+            class="relative mt-4 space-y-1 before:absolute before:bottom-5 before:left-[4.625rem] before:top-5 before:w-px before:bg-vibe-rule dark:before:bg-vibe-rule-dark"
           >
             @for (
               stage of event.timeline;
@@ -68,16 +70,14 @@
             ) {
               <li
                 appSignalMotion="arrive"
+                [motionKey]="activity.newEventId() === event.id && index === event.timeline.length - 1 ? stage.eventType + stage.occurredAt : null"
                 [motionDelay]="index * 60"
-                class="relative grid grid-cols-[3.25rem_0.5rem_minmax(0,1fr)] items-center gap-3 py-3.5 text-sm"
+                class="relative grid grid-cols-[3.25rem_1.25rem_minmax(0,1fr)] items-center gap-3 py-3.5 text-sm"
               >
                 <time class="font-semibold tabular-nums text-vibe-muted dark:text-vibe-sage">{{
                   stageTime(stage.occurredAt)
                 }}</time>
-                <span
-                  class="size-2 rounded-full bg-vibe-mint ring-4 ring-vibe-canvas dark:ring-vibe-night"
-                  aria-hidden="true"
-                ></span>
+                <app-timeline-marker [type]="stage.eventType" />
                 <span class="font-semibold">{{ stageLabel(stage) }}</span>
               </li>
             }
@@ -100,15 +100,32 @@
             </p>
           }
         </section>
+      } @else if (event.session && !event.session.completedAt) {
+        <section class="mt-7" aria-labelledby="processing-heading">
+          <h2 id="processing-heading" class="text-[1.375rem] font-bold tracking-[-0.025em]">{{ activity.detailWorking() ? 'Đang xử lý' : 'Chưa có kết quả cuối' }}</h2>
+          <p class="mt-2 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">Codex chưa gửi kết quả cuối cho lượt này. Diễn biến sẽ tiếp tục cập nhật khi có tín hiệu mới.</p>
+          <p class="mt-3 text-xs text-vibe-muted dark:text-vibe-sage">Tín hiệu gần nhất lúc {{ stageTime(event.session.updatedAt) }}</p>
+        </section>
+      } @else if (event.session) {
+        <section class="mt-7"><h2 class="text-[1.375rem] font-bold">Kết quả Codex</h2><p class="mt-2 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">Lượt này chưa có nội dung kết quả được lưu. Mở Codex trên laptop để xem.</p></section>
       }
 
       <dl
         class="mt-7 grid grid-cols-[auto_minmax(0,1fr)] gap-x-5 gap-y-3 border-b border-vibe-rule pb-6 text-sm dark:border-vibe-rule-dark"
       >
-        <dt class="text-vibe-muted dark:text-vibe-sage">Thời gian</dt>
-        <dd class="text-right font-semibold">{{ exactTime(event.occurredAt) }}</dd>
-        <dt class="text-vibe-muted dark:text-vibe-sage">Trạng thái</dt>
-        <dd class="text-right font-semibold">{{ event.isRead ? 'Đã đọc' : 'Chưa đọc' }}</dd>
+        <dt class="text-vibe-muted dark:text-vibe-sage">Bắt đầu</dt>
+        <dd class="text-right font-semibold">{{ event.session?.startedAt ? exactTime(event.session!.startedAt!) : 'Không ghi nhận' }}</dd>
+        @if (event.session?.completedAt; as finish) {
+          <dt class="text-vibe-muted dark:text-vibe-sage">{{ event.session?.state === 'stopped' ? 'Đã dừng' : 'Hoàn tất' }}</dt>
+          <dd class="text-right font-semibold">{{ exactTime(finish) }}</dd>
+        } @else {
+          <dt class="text-vibe-muted dark:text-vibe-sage">Tín hiệu cuối</dt><dd class="text-right font-semibold">{{ exactTime(event.occurredAt) }}</dd>
+        }
+        @if (event.session?.startedAt) {
+          <dt class="text-vibe-muted dark:text-vibe-sage">Thời lượng</dt><dd class="text-right font-semibold">{{ sessionDuration(event, activity.now(), activity.isStale()) }}</dd>
+        }
+        <dt class="text-vibe-muted dark:text-vibe-sage">Thông báo</dt>
+        <dd class="text-right font-semibold">{{ event.isRead ? 'Đã đọc trên iPhone' : 'Chưa đọc' }}</dd>
       </dl>
 
       <details class="mt-6">
@@ -118,6 +135,12 @@
           chạy công cụ không được lưu. Bạn có thể ẩn đoạn trích trên Màn hình khóa trong Cài đặt.
         </p>
       </details>
+      @if (event.session?.thread; as thread) {
+        <nav class="mt-6 flex items-center justify-between gap-4 border-t border-vibe-rule pt-4 text-sm font-bold dark:border-vibe-rule-dark" aria-label="Các lượt trong phiên">
+          @if (thread.previousTurnId) { <a [routerLink]="['/activity/events', thread.previousTurnId]" [replaceUrl]="true" class="min-h-11 content-center text-vibe-green! dark:text-vibe-mint!">← Lượt trước</a> } @else { <span></span> }
+          @if (thread.nextTurnId) { <a [routerLink]="['/activity/events', thread.nextTurnId]" [replaceUrl]="true" class="min-h-11 content-center text-vibe-green! dark:text-vibe-mint!">Lượt sau →</a> }
+        </nav>
+      }
     } @else if (activity.detailState() === 'missing') {
       <section class="py-8">
         <h1 class="text-balance text-[1.75rem] font-bold leading-tight tracking-[-0.035em]">

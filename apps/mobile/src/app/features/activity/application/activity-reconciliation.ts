@@ -7,6 +7,12 @@ export function mergeEvents(
   const merged = new Map(current.map((event) => [event.id, event]));
   for (const event of incoming) {
     const previous = merged.get(event.id);
+    if (
+      previous?.session &&
+      event.session &&
+      Date.parse(previous.session.updatedAt) > Date.parse(event.session.updatedAt)
+    )
+      continue;
     const updated = { ...previous, ...event };
     const sameRevision = !event.session || previous?.session?.updatedAt === event.session.updatedAt;
     merged.set(event.id, previous?.isRead && sameRevision ? { ...updated, isRead: true } : updated);

@@ -9,12 +9,15 @@ import { ProjectIcon } from './project-icon';
     @if (profile(); as p) {
       <app-project-icon [icon]="p.icon" [accent]="p.accent" />
     }
-    <span class="min-w-0 break-words">{{ profile()?.displayName || name() }}</span>
+    <span class="min-w-0" [class.truncate]="compact()" [class.break-words]="!compact()">{{
+      profile()?.displayName || name()
+    }}</span>
   </span>`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectIdentity {
   readonly name = input.required<string>();
+  readonly compact = input(false);
   readonly #personal = inject(PersonalStore);
   readonly profile = computed(() => this.#personal.profile(this.name()));
   constructor() {

@@ -33,7 +33,7 @@ VibePing is a local-first attention bridge, not another Codex client. The Window
 - In 1.1.1 Personal, project names, icons and subtle accents, project notification filters, completion-duration thresholds, one durable waiting reminder, a small daily summary, and state-aware whole-image mascot motion. Keep the existing tabs and final Codex results.
 - In 1.1.1 Always ready, explicitly enabled per-user Windows sign-in startup, a local tray and silent health checks with bounded recovery. Stop prevents recovery for the current sign-in session; the phone only reports status.
 - Activity signals for completed work, return-needed states, failed final tests, ready previews, and low Codex allowance.
-- In 1.1, group signals from the same Codex request into one work session. The card retains its identity from live work to completion, with a real timeline, observed duration, and failed-test count. Separate requests stay separate even within the same Codex task or project; historical data never gains invented stages or start times.
+- In 1.2, one Codex thread is one work session in Activity. Prompts remain separate turns within the session, with their own real timelines, observed durations, read states and retained results. Distinct threads never merge by project. Historical data never gains invented stages, titles or start times.
 - Read the completed turn's assistant answer in activity detail, with a short excerpt in the feed and in the optional standard Lock Screen mode. This is a read-only result, not a conversation or command surface.
 - REST and SSE while the PWA is open; Web Push in the background.
 - Codex rate-limit data through `codex app-server` only.

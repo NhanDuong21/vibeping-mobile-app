@@ -1,4 +1,5 @@
 import { mergeSessionFeed, type CachedEvent } from './session-cache-migration';
+import { groupThreads } from './thread-presentation';
 
 const old: CachedEvent = {
   id: 'completed-event',
@@ -31,6 +32,49 @@ function session(id: string, eventIds: string[]): CachedEvent {
 }
 
 describe('RC8 session cache migration', () => {
+  it('upgrades per-turn caches into exact threads without losing viewed results or joining by project', () => {
+    const saved = ['one', 'two', 'three', 'unrelated'].map((id) => ({
+      ...session(id, [id]),
+      result: { text: `Kết quả nguyên bản ${id}`, truncated: false },
+      timeline: old.timeline,
+    }));
+    const latest = session('three', ['three']);
+    latest.session!.thread = {
+      id: 'verified-thread',
+      title: null,
+      turnCount: 3,
+      turnNumber: 3,
+      turnIds: ['one', 'two', 'three'],
+      latestTurnId: 'three',
+      previousTurnId: 'two',
+      nextTurnId: null,
+      firstSignalAt: old.occurredAt,
+      startedAt: null,
+      updatedAt: old.occurredAt,
+      failedTestCount: 0,
+      isRead: true,
+    };
+    const migrated = mergeSessionFeed(saved, [latest], []);
+    expect(groupThreads(migrated.events)).toHaveLength(2);
+    for (const original of saved) {
+      const retained = migrated.events.find((event) => event.id === original.id)!;
+      expect(retained.result).toEqual(original.result);
+      expect(retained.timeline).toEqual(original.timeline);
+      expect(retained.isRead).toBe(true);
+    }
+    expect(migrated.events.find((event) => event.id === 'two')?.session?.thread).toMatchObject({
+      id: 'verified-thread',
+      turnNumber: 2,
+      previousTurnId: 'one',
+      nextTurnId: 'three',
+    });
+    expect(
+      migrated.events.find((event) => event.id === 'unrelated')?.session?.thread,
+    ).toBeUndefined();
+    const reloaded = JSON.parse(JSON.stringify(migrated.events)) as CachedEvent[];
+    expect(groupThreads(mergeSessionFeed(reloaded, [latest], []).events)).toHaveLength(2);
+  });
+
   it.each(['new-session', old.id])(
     'retains a viewed answer and timeline when the session id is %s',
     (id) => {
@@ -46,7 +90,7 @@ describe('RC8 session cache migration', () => {
   it('keeps older viewed answers outside the feed until their page arrives without joining different turns', () => {
     const first = mergeSessionFeed([old], [session('recent', ['another-event'])], []);
     expect(first.legacy).toEqual([old]);
-    expect(first.events).toHaveLength(1);
+    expect(first.events).toHaveLength(2);
     expect(first.events[0].result).toBeUndefined();
     const reloaded = JSON.parse(JSON.stringify(first)) as typeof first;
     const next = mergeSessionFeed(reloaded.events, [session('older', [old.id])], reloaded.legacy);

@@ -8,8 +8,8 @@ export const signalRouteTransition: AnimationBuilder = (_base, options) => {
   const entering = options.enteringEl as HTMLElement;
   const leaving = options.leavingEl as HTMLElement | undefined;
   const detail =
-    entering.matches('app-event-detail-page, app-usage-limits-page') ||
-    leaving?.matches('app-event-detail-page, app-usage-limits-page');
+    entering.matches('app-event-detail-page, app-thread-detail-page, app-usage-limits-page') ||
+    leaving?.matches('app-event-detail-page, app-thread-detail-page, app-usage-limits-page');
   const tabs = ['APP-ACTIVITY-PAGE', 'APP-COMPUTER-PAGE', 'APP-SETTINGS-PAGE'];
   const direction = detail
     ? options.direction === 'back'

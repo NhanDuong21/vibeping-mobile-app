@@ -181,7 +181,7 @@ test("one card follows a session through completion, keeps its answer and opens 
   ).toBe(0);
   await page.route("**/api/v1/**", (route) => route.abort());
   await page.reload();
-  await expect(card).toContainText(session.resultExcerpt!);
+  await expect(card).toContainText("Đã tinh chỉnh chuyển động.");
   await card.click();
   await expect(page.locator("app-result-body")).toContainText(
     "Thẻ phiên giữ nguyên khi hoàn tất.",

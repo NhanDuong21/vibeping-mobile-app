@@ -49,11 +49,12 @@
     @for (group of groups(); track group.label) {
       <h3 class="pt-5 text-xs font-bold text-vibe-muted dark:text-vibe-sage">{{ group.label }}</h3>
       <ol class="divide-y divide-vibe-rule dark:divide-vibe-rule-dark">
-        @for (event of group.events; track event.id) {
+        @for (event of group.events; track identity(event)) {
           @if (event.session) {
             <li>
               <app-work-session-card [event]="event" [now]="activity.now()" [stale]="activity.isStale()"
-                [reaction]="activity.newEventId() === event.id ? event.id : null" />
+                [entrance]="activity.newThreadId() === identity(event) ? identity(event) : null"
+                [reaction]="activity.newEventId() === event.id ? event.session?.updatedAt || event.occurredAt : null" />
             </li>
           } @else {
           <li

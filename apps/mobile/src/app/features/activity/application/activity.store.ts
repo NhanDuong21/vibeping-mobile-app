@@ -16,6 +16,7 @@ import { readinessView, type ReadinessSourceState, type ReadinessView } from './
 import { isLiveMotionEvent } from './event-motion';
 import { sessionIsWorking, sessionRevision } from './work-session-presentation';
 import { mergeSessionFeed, type CachedEvent } from './session-cache-migration';
+import { groupThreads, threadIdentity } from './thread-presentation';
 
 type ActivityState = ReadinessSourceState;
 type DetailState = 'idle' | 'loading' | 'ready' | 'missing';
@@ -41,6 +42,7 @@ export class ActivityStore {
   readonly #selected = signal<ActivityEventDetailDto | null>(null);
   readonly #readAllState = signal<ReadAllState>('idle');
   readonly #newEventId = signal<string | null>(null);
+  readonly #newThreadId = signal<string | null>(null);
   #pendingReadAll = false;
   #pendingWork: CurrentWorkDto | null | undefined;
   #newEventTimer?: ReturnType<typeof setTimeout>;
@@ -54,18 +56,31 @@ export class ActivityStore {
   readonly allowance = this.#usage.snapshot;
   readonly codexNeedsReview = computed(() => this.#bootstrap()?.connection.codex === 'needsReview');
   readonly events = this.#events.asReadonly();
+  readonly threads = computed(() => groupThreads(this.#events()));
   readonly focusedSession = computed(() => {
-    const id = this.current()?.sessionId;
-    return id
-      ? (this.#events().find((event) => event.id === id && event.session) ?? null)
-      : (this.#events().find((event) => event.session) ?? null);
+    const threads = this.threads();
+    return (
+      threads.find((event) => sessionIsWorking(event, this.now(), this.isStale())) ??
+      threads.find((event) => event.session) ??
+      null
+    );
   });
+  readonly otherWorking = computed(
+    () =>
+      this.threads().filter(
+        (event) =>
+          threadIdentity(event) !==
+            (this.focusedSession() && threadIdentity(this.focusedSession()!)) &&
+          sessionIsWorking(event, this.now(), this.isStale()),
+      ).length,
+  );
   readonly unreadCount = this.#unreadCount.asReadonly();
   readonly hasMore = computed(() => Boolean(this.#nextCursor()));
   readonly selected = this.#selected.asReadonly();
   readonly detailState = this.#detailState.asReadonly();
   readonly readAllState = this.#readAllState.asReadonly();
   readonly newEventId = this.#newEventId.asReadonly();
+  readonly newThreadId = this.#newThreadId.asReadonly();
   readonly now = this.#live.now;
   readonly isStale = computed(() => {
     const saved = this.#savedAt();
@@ -144,7 +159,15 @@ export class ActivityStore {
 
   async markAllRead(): Promise<void> {
     if (this.#readAllState() === 'saving') return;
-    this.#events.update((events) => events.map((event) => ({ ...event, isRead: true })));
+    this.#events.update((events) =>
+      events.map((event) => ({
+        ...event,
+        isRead: true,
+        ...(event.session?.thread
+          ? { session: { ...event.session, thread: { ...event.session.thread, isRead: true } } }
+          : {}),
+      })),
+    );
     this.#unreadCount.set(0);
     this.#pendingReadAll = true;
     this.#pendingReadIds.clear();
@@ -242,6 +265,9 @@ export class ActivityStore {
         const event = JSON.parse(String(raw.data)) as ActivityEventDto;
         if (event.id && event.occurredAt) {
           const previous = this.#events().find((value) => value.id === event.id);
+          const knownThread = this.threads().some(
+            (value) => threadIdentity(value) === threadIdentity(event),
+          );
           this.#mergeFeed([event]);
           if (this.#selected()?.id === event.id) void this.loadDetail(event.id);
           const updated = this.#events().find((value) => value.id === event.id);
@@ -251,7 +277,7 @@ export class ActivityStore {
             (!previous || sessionRevision(previous) !== sessionRevision(event)) &&
             isLiveMotionEvent(event, this.#live.visible(), Date.now())
           ) {
-            this.#showNewEvent(event.id);
+            this.#showNewEvent(event.id, knownThread ? null : threadIdentity(event));
           }
           void this.#persist();
         }
@@ -325,10 +351,14 @@ export class ActivityStore {
     }
   }
 
-  #showNewEvent(id: string): void {
+  #showNewEvent(id: string, thread: string | null): void {
     clearTimeout(this.#newEventTimer);
     this.#newEventId.set(id);
-    this.#newEventTimer = setTimeout(() => this.#newEventId.set(null), 900);
+    this.#newThreadId.set(thread);
+    this.#newEventTimer = setTimeout(() => {
+      this.#newEventId.set(null);
+      this.#newThreadId.set(null);
+    }, 900);
   }
 
   #mergeFeed(incoming: ActivityEventDto[]): void {

@@ -49,6 +49,12 @@ pub struct ActivityEvent {
 #[derive(Clone, Debug, Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct WorkSession {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub thread: Option<super::ThreadContext>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub task_label: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_test_state: Option<String>,
     pub event_ids: Vec<String>,
     pub state: String,
     pub started_at: Option<DateTime<Utc>>,

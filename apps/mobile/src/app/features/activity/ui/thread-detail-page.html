@@ -1,0 +1,63 @@
+<app-pull-to-refresh class="block h-dvh overflow-y-auto overscroll-y-contain bg-vibe-canvas px-5 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] text-vibe-ink dark:bg-vibe-night dark:text-vibe-paper">
+  <header class="mx-auto flex w-full max-w-lg items-center justify-between gap-2 py-2">
+    <a routerLink="/activity" class="grid min-h-11 min-w-11 place-items-center rounded-full border border-vibe-rule text-vibe-ink! active:bg-vibe-mint-soft dark:border-vibe-rule-dark dark:text-vibe-paper!" aria-label="Quay lại hoạt động"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg></a>
+    <p class="text-center text-sm font-bold">Chi tiết phiên làm việc</p>
+    <span class="size-11 shrink-0" aria-hidden="true"></span>
+  </header>
+  <main class="mx-auto w-full max-w-lg pt-7">
+    @if (thread.latest(); as event) {
+      <h1 class="break-words text-[1.75rem] font-bold leading-tight tracking-[-0.035em]">{{ title(event) }}</h1>
+      <p class="mt-3 break-words text-sm text-vibe-muted dark:text-vibe-sage"><app-project-identity [name]="event.projectName" /></p>
+      <div class="mt-6 border-y border-vibe-rule py-5 dark:border-vibe-rule-dark">
+        <p class="text-lg font-bold">{{ status(event, activity.now(), activity.isStale()) }}</p>
+        <p class="mt-2 text-sm">{{ event.session?.thread?.turnCount }} lượt làm việc</p>
+        @if (span(event)) { <p class="mt-1 text-sm text-vibe-muted dark:text-vibe-sage">{{ span(event) }} từ tín hiệu đầu đến gần nhất</p> }
+        @if (failures(event, true)) { <p class="mt-2 text-sm text-vibe-muted dark:text-vibe-sage">{{ failures(event, true) }}</p> }
+        <p class="mt-3 text-xs text-vibe-muted dark:text-vibe-sage">Tín hiệu gần nhất lúc {{ clock(event.session?.thread?.updatedAt || event.occurredAt) }}</p>
+        @if (event.session?.thread?.startedAt; as start) { <p class="mt-1 text-xs text-vibe-muted dark:text-vibe-sage">Phiên bắt đầu {{ exactTime(start) }}</p> }
+      </div>
+      @if (thread.state() === 'cached') {
+        <p class="mt-4 text-sm text-vibe-muted dark:text-vibe-sage">Đang hiển thị các lượt đã lưu. <button type="button" (click)="thread.refresh()" class="min-h-11 font-bold text-vibe-green underline dark:text-vibe-mint">Thử lại</button></p>
+      }
+      @if (attention(event, activity.now(), activity.isStale())) {
+        <section class="mt-5 border-b border-vibe-rule pb-5 dark:border-vibe-rule-dark" aria-label="Cần chú ý">
+          <h2 class="text-sm font-bold">Cần chú ý</h2>
+          <p class="mt-1 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">Lượt {{ event.session?.thread?.turnNumber }} · {{ attentionNote(event, activity.now()) }}. Mở Codex trên laptop để kiểm tra.</p>
+        </section>
+      }
+      @if (thread.current(); as current) {
+        <section class="mt-6" aria-labelledby="current-turn-heading">
+          <h2 id="current-turn-heading" class="mb-3 text-sm font-bold">Lượt hiện tại</h2>
+          <a [routerLink]="['/activity/events', current.id]" class="block rounded-2xl border border-vibe-rule bg-vibe-surface p-4 text-vibe-ink! dark:border-vibe-rule-dark dark:bg-vibe-surface-dark dark:text-vibe-paper!"
+            appSignalMotion="ping" [motionKey]="activity.newEventId() === current.id ? current.session?.updatedAt : null">
+            <p class="text-xs font-bold text-vibe-muted dark:text-vibe-sage">Lượt {{ current.session?.thread?.turnNumber }}</p>
+            <p class="mt-2 line-clamp-2 break-words text-lg font-bold">{{ turnTitle(current) }}</p>
+            <p class="mt-3 text-sm font-bold">Đang làm việc@if (current.session?.startedAt) { · {{ duration(current, activity.now(), activity.isStale()) }} }</p>
+            @if (current.session?.startedAt; as start) { <p class="mt-3 text-sm">{{ clock(start) }} · Công việc bắt đầu</p> }
+            <p class="mt-1 text-xs text-vibe-muted dark:text-vibe-sage">Tín hiệu mới nhất lúc {{ clock(current.occurredAt) }}</p>
+            <p class="mt-4 text-sm font-bold text-vibe-green dark:text-vibe-mint">Xem diễn biến trực tiếp <span aria-hidden="true">→</span></p>
+          </a>
+        </section>
+      }
+      @if (thread.previous().length) {
+        <section class="mt-7" aria-labelledby="turns-heading">
+          <h2 id="turns-heading" class="text-[1.375rem] font-bold tracking-[-0.025em]">Các lượt trong phiên</h2>
+          <ol class="mt-2 divide-y divide-vibe-rule dark:divide-vibe-rule-dark">
+            @for (turn of thread.previous(); track turn.id) {
+              <li><app-turn-row [event]="turn" [now]="activity.now()" [stale]="activity.isStale()" [reaction]="activity.newEventId() === turn.id ? turn.id : null" /></li>
+            }
+          </ol>
+        </section>
+      }
+      @if (thread.hasMore()) {
+        <button type="button" (click)="thread.loadMore()" [disabled]="thread.loadingMore()" class="mt-4 min-h-11 w-full rounded-full border border-vibe-rule text-sm font-bold disabled:opacity-60 dark:border-vibe-rule-dark">{{ thread.loadingMore() ? 'Đang tải các lượt' : 'Xem các lượt cũ hơn' }}</button>
+      }
+    } @else if (thread.state() === 'loading') {
+      <p class="py-7 text-sm text-vibe-muted dark:text-vibe-sage" role="status">Đang tải phiên làm việc…</p>
+    } @else {
+      <h1 class="text-2xl font-bold">Chưa đọc được phiên làm việc</h1>
+      <p class="mt-3 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">Kiểm tra kết nối với laptop rồi thử lại. Phiên cũng có thể đã được dọn theo thời gian lưu.</p>
+      <button type="button" class="mt-4 min-h-11 text-sm font-bold text-vibe-green dark:text-vibe-mint" (click)="thread.refresh()">Thử lại</button>
+    }
+  </main>
+</app-pull-to-refresh>

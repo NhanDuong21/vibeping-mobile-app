@@ -635,6 +635,29 @@ export interface components {
             sendAfter: string;
             state: string;
         };
+        /** @description Safe, retained thread metadata and the selected turn's position. No prompt or raw identity. */
+        ThreadContext: {
+            /** Format: int64 */
+            failedTestCount: number;
+            /** Format: date-time */
+            firstSignalAt: string;
+            id: string;
+            isRead: boolean;
+            latestTurnId: string;
+            nextTurnId?: string | null;
+            previousTurnId?: string | null;
+            /** Format: date-time */
+            startedAt?: string | null;
+            title?: string | null;
+            /** Format: int64 */
+            turnCount: number;
+            /** @description Retained public turn IDs in order, used to reconcile older phone caches exactly. */
+            turnIds?: string[];
+            /** Format: int64 */
+            turnNumber: number;
+            /** Format: date-time */
+            updatedAt: string;
+        };
         UsageLimitWindow: {
             /** Format: int64 */
             durationMinutes: number;
@@ -660,9 +683,12 @@ export interface components {
             eventIds: string[];
             /** Format: int64 */
             failedTestCount: number;
+            lastTestState?: string | null;
             /** Format: date-time */
             startedAt?: string | null;
             state: string;
+            taskLabel?: string | null;
+            thread?: null | components["schemas"]["ThreadContext"];
             timeline: components["schemas"]["ActivityTimelineStage"][];
             /** Format: date-time */
             updatedAt: string;
@@ -802,6 +828,8 @@ export interface operations {
                 limit?: number;
                 grouped?: boolean;
                 project?: string;
+                threads?: boolean;
+                thread?: string;
             };
             header?: never;
             path?: never;

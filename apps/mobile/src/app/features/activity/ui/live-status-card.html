@@ -27,7 +27,10 @@
   }
   @if (activity.focusedSession(); as session) {
     <app-work-session-card [event]="session" [now]="activity.now()" [stale]="activity.isStale() || activity.readiness().kind === 'offline'"
-      [prominent]="true" [reaction]="activity.newEventId() === session.id ? session.id : null" />
+      [prominent]="true" [reaction]="activity.newEventId() === session.id ? session.session?.updatedAt || session.occurredAt : null" />
+    @if (activity.otherWorking()) {
+      <p class="px-4 pb-4 text-xs text-vibe-muted dark:text-vibe-sage">Còn {{ activity.otherWorking() }} phiên khác đang làm việc</p>
+    }
   } @else {
   <div class="relative p-4">
     <div class="flex items-start gap-3">

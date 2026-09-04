@@ -19,9 +19,9 @@ THESIS: A trustworthy private signal line, not a miniature developer dashboard.
 
 OWN-WORLD: Tinted off-white or green-black field, mint signal, green-gray metadata, sparse rules, 12–16 px corners only where a container is necessary.
 
-STORY: Follow one Codex request from start to completion, scan its real stages, then read the retained final answer. Each new request is a separate session. In 1.1.1, give its project a familiar identity and notification rules through Settings, then glance at a small daily recap.
+STORY: In 1.2, glance at one session per Codex thread, open its recent turns, then read one turn's original timeline and final answer. New prompts update that session. Distinct threads never merge by project. Personal project identities, notification rules and the daily recap retain their existing scope.
 
-FIRST VIEWPORT: Compact masthead with the existing cat reacting as one image, one persistent session card with task, project, state, duration and three latest stages; allowance rows and earlier sessions below. Completion changes that same card into a summary. Detail puts the full timeline before the final answer. Project profiles inherit the Settings form: back link, editable name, icon/accent choices, bounded notification controls and filtered session history. The daily recap is four quiet rows, not a dashboard.
+FIRST VIEWPORT: Compact masthead with the existing cat, one session hero with name, project, latest-turn state, real duration, turn count and latest signal; allowance rows and compact session lists below. Session detail progressively reveals turns; turn detail preserves the full timeline and final answer. Project profiles, Settings and daily recap retain the incumbent form.
 
 FORM: Established Quiet signal world; precise supplied composition, so no concept tournament. Seed key: brief-pinned-operate.
 

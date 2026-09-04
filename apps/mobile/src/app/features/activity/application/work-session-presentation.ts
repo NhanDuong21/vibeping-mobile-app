@@ -15,14 +15,14 @@ export function sessionStatus(event: ActivityEventDto, now: Date, stale = false)
   const session = event.session;
   if (!session) return '';
   if (!session.completedAt && (stale || now.getTime() - Date.parse(session.updatedAt) >= 120_000))
-    return stale ? 'Dữ liệu đã lưu' : 'Chờ tín hiệu mới';
+    return stale ? 'Dữ liệu đã lưu' : 'Không còn tín hiệu mới';
   const labels: Record<string, string> = {
     running: 'Đang làm việc',
-    waiting: 'Đang chờ bạn',
+    waiting: 'Cần chú ý',
     completed: 'Đã hoàn tất',
     stopped: 'Đã dừng',
-    failed: 'Kết thúc · Kiểm thử chưa đạt',
-    unconfirmed: 'Chờ tín hiệu mới',
+    failed: 'Cần chú ý',
+    unconfirmed: 'Không còn tín hiệu mới',
   };
   return labels[session.state] ?? 'Đã ghi nhận';
 }

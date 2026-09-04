@@ -7,7 +7,7 @@
       "name": "MIT OR Apache-2.0",
       "identifier": "MIT OR Apache-2.0"
     },
-    "version": "1.1.2"
+    "version": "1.2.0"
   },
   "paths": {
     "/api/v1/activity": {
@@ -165,6 +165,22 @@
           },
           {
             "name": "project",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "threads",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "thread",
             "in": "query",
             "required": false,
             "schema": {
@@ -1624,6 +1640,83 @@
           }
         }
       },
+      "ThreadContext": {
+        "type": "object",
+        "description": "Safe, retained thread metadata and the selected turn's position. No prompt or raw identity.",
+        "required": [
+          "id",
+          "turnCount",
+          "turnNumber",
+          "latestTurnId",
+          "firstSignalAt",
+          "updatedAt",
+          "failedTestCount",
+          "isRead"
+        ],
+        "properties": {
+          "failedTestCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "firstSignalAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "isRead": {
+            "type": "boolean"
+          },
+          "latestTurnId": {
+            "type": "string"
+          },
+          "nextTurnId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "previousTurnId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "startedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "turnCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "turnIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Retained public turn IDs in order, used to reconcile older phone caches exactly."
+          },
+          "turnNumber": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "UsageLimitWindow": {
         "type": "object",
         "required": [
@@ -1718,6 +1811,12 @@
             "type": "integer",
             "format": "int64"
           },
+          "lastTestState": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "startedAt": {
             "type": [
               "string",
@@ -1727,6 +1826,22 @@
           },
           "state": {
             "type": "string"
+          },
+          "taskLabel": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "thread": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ThreadContext"
+              }
+            ]
           },
           "timeline": {
             "type": "array",

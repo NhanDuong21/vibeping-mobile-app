@@ -29,7 +29,7 @@ use crate::features::{
 
 #[derive(OpenApi)]
 #[openapi(
-    info(title = "VibePing API", version = "1.1.2"),
+    info(title = "VibePing API", version = "1.2.0"),
     paths(
         http::health,
         crate::features::always_ready::http::status,
