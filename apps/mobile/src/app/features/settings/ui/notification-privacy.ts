@@ -1,3 +1,6 @@
+import { SegmentedControl } from '../../../core/forms/ui/segmented-control';
+import { MotionPreferenceStore } from '../../../core/motion/motion-preference.store';
+import { inject } from '@angular/core';
 import {
   afterRenderEffect,
   ChangeDetectionStrategy,
@@ -16,10 +19,12 @@ const privacyRank = { private: 0, project: 1, standard: 2 };
 
 @Component({
   selector: 'app-notification-privacy',
+  imports: [SegmentedControl],
   templateUrl: './notification-privacy.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationPrivacy implements OnChanges {
+  readonly #motion = inject(MotionPreferenceStore);
   readonly mode = input.required<string>();
   readonly preview = input<NotificationPreviewDto | null>(null);
   readonly state = input<'loading' | 'ready' | 'unavailable'>('loading');
@@ -41,7 +46,10 @@ export class NotificationPrivacy implements OnChanges {
       const current = this.currentText()?.nativeElement;
       const previous = this.previousText()?.nativeElement;
       this.current();
-      if (!current || globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+      if (!current || !this.#motion.enabled()) {
+        this.previous.set(null);
+        return;
+      }
       const options = { duration: 160, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' };
       const incoming = current.animate?.([{ opacity: 0.35 }, { opacity: 1 }], options);
       const outgoing = previous?.animate?.([{ opacity: 1 }, { opacity: 0 }], {
@@ -56,6 +64,10 @@ export class NotificationPrivacy implements OnChanges {
     });
   }
 
+  protected select(value: string | number): void {
+    this.changed.emit(value as PrivacyMode);
+  }
+
   ngOnChanges(): void {
     const mode =
       this.mode() === 'standard' || this.mode() === 'project'
@@ -63,7 +75,7 @@ export class NotificationPrivacy implements OnChanges {
         : 'private';
     const next = this.preview()?.[mode] ?? null;
     if (next === this.current()) return;
-    const reducedMotion = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const reducedMotion = !this.#motion.enabled();
     // Restricting privacy removes the old details immediately, even during rapid changes.
     this.previous.set(
       !reducedMotion && privacyRank[mode] > privacyRank[this.#lastMode] ? this.current() : null,

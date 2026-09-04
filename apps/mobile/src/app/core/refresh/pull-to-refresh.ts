@@ -37,23 +37,16 @@ export const PAGE_RELOAD = new InjectionToken<() => void>('PAGE_RELOAD', {
         <div
           class="flex min-h-11 items-center gap-2 rounded-full border border-vibe-rule bg-vibe-surface px-5 text-sm font-bold text-vibe-ink dark:border-vibe-rule-dark dark:bg-vibe-surface-dark dark:text-vibe-paper"
         >
-          <svg
-            class="size-4"
-            [style.rotate]="armed() ? '180deg' : '0deg'"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.25"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            @if (refreshing()) {
-              <path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v6h-6" />
-            } @else {
-              <path d="M12 4v14m0 0 5-5m-5 5-5-5" />
-            }
-          </svg>
+          <img
+            src="/assets/logo-icon-192.png"
+            alt=""
+            width="32"
+            height="32"
+            class="size-8 object-contain transition-transform duration-300 ease-out"
+            [class.animate-signal-pop]="refreshing()"
+            [class.scale-110]="armed()"
+            [class.-rotate-12]="!armed() && !refreshing()"
+          />
           <span>{{ label() }}</span>
         </div>
       </div>

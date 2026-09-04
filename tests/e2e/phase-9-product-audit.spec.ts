@@ -317,12 +317,12 @@ test("system theme, reduced motion, and keyboard focus retain usable feedback", 
   ).toBeVisible();
   expect(
     await page
-      .locator(".vibe-active-pulse")
+      .locator("app-live-status-card rect")
       .evaluateAll((elements) =>
         elements.map((element) => getComputedStyle(element).animationName),
       ),
-  ).toEqual(["none", "none"]);
-  await expect(page.locator(".vibe-signal-sweep")).toHaveCSS(
+  ).toEqual(["none"]);
+  await expect(page.locator("app-live-status-card .h-0\\.5 span")).toHaveCSS(
     "animation-name",
     "none",
   );

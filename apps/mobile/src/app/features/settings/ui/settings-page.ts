@@ -1,5 +1,7 @@
+import { MotionSettings } from './motion-settings';
+import { SegmentedControl } from '../../../core/forms/ui/segmented-control';
+import { SignalMotion } from '../../../core/motion/signal-motion';
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import { BottomNavigation } from '../../../core/navigation/ui/bottom-navigation';
 import { ToggleSwitch } from '../../../core/forms/ui/toggle-switch';
 import { PullToRefresh } from '../../../core/refresh/pull-to-refresh';
 import { PreferencesStore } from '../application/preferences.store';
@@ -8,7 +10,14 @@ import { NotificationPrivacy } from './notification-privacy';
 
 @Component({
   selector: 'app-settings-page',
-  imports: [BottomNavigation, ToggleSwitch, PullToRefresh, NotificationPrivacy],
+  imports: [
+    MotionSettings,
+    SegmentedControl,
+    SignalMotion,
+    ToggleSwitch,
+    PullToRefresh,
+    NotificationPrivacy,
+  ],
   templateUrl: './settings-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -20,6 +29,20 @@ export class SettingsPage implements OnInit {
     { value: 'light' as const, label: 'Sáng' },
     { value: 'dark' as const, label: 'Tối' },
   ];
+
+  protected readonly thresholds = [10, 15, 20, 25, 30].map((value) => ({
+    value,
+    label: value + '%',
+  }));
+  protected readonly retentionOptions = [7, 14, 30, 60, 90].map((value) => ({
+    value,
+    label: value + ' ngày',
+  }));
+  protected readonly numeric = Number;
+  protected selectTheme(value: string | number): void {
+    if (value === 'system' || value === 'light' || value === 'dark')
+      this.preferences.setTheme(value);
+  }
 
   ngOnInit(): void {
     void this.preferences.load();

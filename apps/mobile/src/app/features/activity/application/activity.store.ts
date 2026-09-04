@@ -12,6 +12,7 @@ import { UsageLimitsStore } from '../../usage-limits';
 import { ActivityCache, type CachedActivity } from '../data/activity-cache';
 import { isCurrentWork, localUnread, mergeEvents } from './activity-reconciliation';
 import { readinessView, type ReadinessSourceState, type ReadinessView } from './readiness';
+import { isLiveMotionEvent } from './event-motion';
 
 type ActivityState = ReadinessSourceState;
 type DetailState = 'idle' | 'loading' | 'ready' | 'missing';
@@ -238,7 +239,8 @@ export class ActivityStore {
           this.#events.set(mergeEvents(this.#events(), [event]));
           if (!event.isRead && this.#events().length > before) {
             this.#unreadCount.update((count) => count + 1);
-            this.#showNewEvent(event.id);
+            if (isLiveMotionEvent(event, this.#pageVisible(), Date.now()))
+              this.#showNewEvent(event.id);
           }
           void this.#persist();
         }
@@ -313,7 +315,7 @@ export class ActivityStore {
   #showNewEvent(id: string): void {
     clearTimeout(this.#newEventTimer);
     this.#newEventId.set(id);
-    this.#newEventTimer = setTimeout(() => this.#newEventId.set(null), 240);
+    this.#newEventTimer = setTimeout(() => this.#newEventId.set(null), 900);
   }
 
   #applyCache(cached: CachedActivity): void {

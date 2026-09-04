@@ -32,6 +32,7 @@
         </button>
       </section>
     } @else if (computer.status(); as status) {
+      <app-signal-pipeline [status]="status" />
       <ul
         class="divide-y divide-vibe-rule border-y border-vibe-rule dark:divide-vibe-rule-dark dark:border-vibe-rule-dark"
       >
@@ -229,5 +230,3 @@
     }
   </main>
 </app-pull-to-refresh>
-
-<app-bottom-navigation />

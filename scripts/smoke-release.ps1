@@ -8,7 +8,7 @@ param(
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Net.Http
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$packageName = 'VibePing-Windows-x64-v1.0.0-rc.4'
+$packageName = 'VibePing-Windows-x64-v1.0.0-rc.5'
 if ([string]::IsNullOrWhiteSpace($PackageZip)) {
     $PackageZip = Join-Path $repoRoot "artifacts\$packageName.zip"
 }
@@ -40,7 +40,7 @@ function Wait-Health {
     while ([DateTime]::UtcNow -lt $deadline) {
         try {
             $health = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/v1/health" -TimeoutSec 2
-            if ($health.status -eq 'ok' -and $health.version -eq '1.0.0-rc.4') { return $health }
+            if ($health.status -eq 'ok' -and $health.version -eq '1.0.0-rc.5') { return $health }
         }
         catch { Start-Sleep -Milliseconds 300 }
     }
@@ -189,7 +189,7 @@ try {
         }
     }
     $version = Invoke-Executable @('--version')
-    if ($version -ne 'vibeping 1.0.0-rc.4') { throw "Sai phiên bản package: $version" }
+    if ($version -ne 'vibeping 1.0.0-rc.5') { throw "Sai phiên bản package: $version" }
 
     $start = Invoke-Executable @('start', '--port', [string]$Port, '--data-dir', $dataDirectory)
     $started = $true

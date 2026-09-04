@@ -7,7 +7,18 @@
       class="grid min-h-11 min-w-11 place-items-center rounded-full border border-vibe-rule text-xl font-bold text-vibe-ink! dark:border-vibe-rule-dark dark:text-vibe-paper!"
       aria-label="Quay lại hoạt động"
     >
-      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+      <svg
+        class="size-5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="m15 18-6-6 6-6" />
+      </svg>
     </a>
     <p class="font-bold">Hạn mức Codex</p>
     <span class="size-11" aria-hidden="true"></span>
@@ -29,12 +40,18 @@
     </div>
 
     @if (usage.readerState() === 'loading' && !usage.windows().length) {
-      <p class="mt-8 leading-6 text-vibe-muted dark:text-vibe-sage" role="status">Đang đọc hạn mức đã lưu…</p>
+      <p class="mt-8 leading-6 text-vibe-muted dark:text-vibe-sage" role="status">
+        Đang đọc hạn mức đã lưu…
+      </p>
     } @else if (!usage.windows().length && usage.state() !== 'noWindows') {
-      <section class="mt-8 border-y border-vibe-rule py-6 dark:border-vibe-rule-dark" aria-live="polite">
+      <section
+        class="mt-8 border-y border-vibe-rule py-6 dark:border-vibe-rule-dark"
+        aria-live="polite"
+      >
         <h2 class="text-lg font-bold">Chưa đọc được hạn mức Codex</h2>
         <p class="mt-2 leading-6 text-vibe-muted dark:text-vibe-sage">
-          VibePing vẫn tiếp tục báo công việc bình thường. Hãy kiểm tra Codex đang đăng nhập rồi thử lại.
+          VibePing vẫn tiếp tục báo công việc bình thường. Hãy kiểm tra Codex đang đăng nhập rồi thử
+          lại.
         </p>
       </section>
     } @else if (usage.state() === 'noWindows') {
@@ -43,14 +60,19 @@
       </p>
     } @else {
       @if (usage.state() === 'stale' || usage.refreshFailed()) {
-        <p class="mt-6 rounded-xl bg-vibe-mint-soft px-4 py-3 text-sm font-semibold text-vibe-green dark:bg-vibe-mint/15 dark:text-vibe-mint">
-          Đang hiển thị hạn mức lần cuối. Số liệu có thể đã thay đổi; VibePing sẽ cập nhật khi kết nối lại.
+        <p
+          class="mt-6 rounded-xl bg-vibe-mint-soft px-4 py-3 text-sm font-semibold text-vibe-green dark:bg-vibe-mint/15 dark:text-vibe-mint"
+        >
+          Đang hiển thị hạn mức lần cuối. Số liệu có thể đã thay đổi; VibePing sẽ cập nhật khi kết
+          nối lại.
         </p>
       }
       <p class="mt-4 text-sm leading-5 text-vibe-muted dark:text-vibe-sage">
         Đọc lần cuối: {{ usage.lastReadLabel() }}
       </p>
-      <ol class="mt-7 divide-y divide-vibe-rule border-y border-vibe-rule dark:divide-vibe-rule-dark dark:border-vibe-rule-dark">
+      <ol
+        class="mt-7 divide-y divide-vibe-rule border-y border-vibe-rule dark:divide-vibe-rule-dark dark:border-vibe-rule-dark"
+      >
         @for (window of usage.windows(); track window.windowKey) {
           <li class="py-6">
             <div class="flex items-baseline justify-between gap-4">
@@ -58,7 +80,7 @@
               <span class="text-sm font-bold">{{ usage.statusLabel(window) }}</span>
             </div>
             <div
-              class="mt-4 h-2 overflow-hidden rounded-full bg-vibe-rule dark:bg-vibe-rule-dark"
+              class="relative mt-4 h-2 overflow-hidden rounded-full bg-vibe-rule dark:bg-vibe-rule-dark"
               role="progressbar"
               [attr.aria-label]="window.label"
               aria-valuemin="0"
@@ -66,14 +88,23 @@
               [attr.aria-valuenow]="window.remainingPercent"
             >
               <span
-                class="block h-full rounded-full bg-vibe-mint"
+                class="block h-full w-full origin-left rounded-full bg-vibe-mint transition-[transform,background-color] duration-500 ease-out"
                 [class.bg-vibe-amber]="window.remainingPercent <= 20 && window.remainingPercent > 5"
                 [class.bg-vibe-coral]="window.remainingPercent <= 5"
-                [style.width.%]="window.remainingPercent"
+                [style.transform]="'scaleX(' + window.remainingPercent / 100 + ')'"
+              ></span>
+              <span
+                class="absolute inset-y-0 left-[20%] w-px bg-vibe-ink/40 dark:bg-vibe-paper/40"
+                aria-hidden="true"
               ></span>
             </div>
             <div class="mt-3 flex items-baseline justify-between gap-4">
-              <p class="text-2xl font-black tabular-nums">{{ usage.percentLabel(window) }}</p>
+              <p class="text-2xl font-black tabular-nums">
+                <app-animated-percent
+                  [value]="window.remainingPercent"
+                  [fresh]="usage.state() !== 'stale'"
+                />
+              </p>
               <p class="text-right text-sm text-vibe-muted dark:text-vibe-sage">
                 {{ usage.resetLabel(window) }}
               </p>
@@ -87,5 +118,3 @@
     }
   </main>
 </app-pull-to-refresh>
-
-<app-bottom-navigation />

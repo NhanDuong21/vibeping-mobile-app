@@ -6,6 +6,8 @@
       <h2 id="recent-heading" class="text-[1.375rem] font-bold tracking-[-0.025em]">Hoạt động</h2>
       @if (activity.unreadCount() > 0) {
         <span
+          appSignalMotion="ping"
+          [motionKey]="activity.unreadCount()"
           class="shrink-0 rounded-full bg-vibe-coral px-2 py-0.5 text-[0.6875rem] font-black text-white"
         >
           {{ activity.unreadCount() }} mới
@@ -48,14 +50,18 @@
       <h3 class="pt-5 text-xs font-bold text-vibe-muted dark:text-vibe-sage">{{ group.label }}</h3>
       <ol class="divide-y divide-vibe-rule dark:divide-vibe-rule-dark">
         @for (event of group.events; track event.id) {
-          <li>
+          <li
+            class="relative before:absolute before:bottom-0 before:left-[1.125rem] before:top-0 before:w-px before:bg-vibe-rule dark:before:bg-vibe-rule-dark"
+          >
             <a
               [routerLink]="['/activity/events', event.id]"
-              class="grid min-h-[5.5rem] grid-cols-[2rem_minmax(0,1fr)] gap-3 rounded-lg px-1 py-3.5 text-vibe-ink! transition-colors active:bg-vibe-mint-soft/60 motion-reduce:transition-none dark:text-vibe-paper! dark:active:bg-vibe-mint/10"
-              [class.vibe-row-enter]="activity.newEventId() === event.id"
+              class="grid min-h-[5.5rem] grid-cols-[2rem_minmax(0,1fr)] gap-3 rounded-lg px-1 py-3.5 text-vibe-ink! transition-[background-color,transform] active:scale-[0.985] active:bg-vibe-mint-soft/60 motion-reduce:transition-none dark:text-vibe-paper! dark:active:bg-vibe-mint/10"
+              appSignalMotion="arrive"
+              [motionKey]="activity.newEventId() === event.id ? event.id : null"
+              [motionDelay]="100"
             >
               <span
-                class="mt-0.5 grid size-7 place-items-center rounded-full"
+                class="relative z-10 mt-0.5 grid size-7 ring-4 ring-vibe-canvas dark:ring-vibe-night place-items-center rounded-full"
                 [class.bg-vibe-mint-soft]="
                   event.eventType === 'codex.turn.completed' ||
                   event.eventType === 'codex.turn.started'
@@ -158,6 +164,7 @@
                     <span
                       class="mt-1.5 size-2 shrink-0 rounded-full bg-vibe-coral"
                       aria-label="Chưa đọc"
+                      animate.leave="animate-signal-pop"
                     ></span>
                   }
                 </div>

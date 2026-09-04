@@ -5,23 +5,13 @@
   <h2 id="privacy-heading" class="text-[1.375rem] font-bold tracking-[-0.025em]">
     Nội dung trên Màn hình khóa
   </h2>
-  <div class="mt-3 grid grid-cols-3 gap-2" role="group" aria-label="Mức riêng tư">
-    @for (option of options; track option.value) {
-      <button
-        type="button"
-        class="min-h-12 rounded-lg border border-vibe-rule px-2 text-xs font-bold dark:border-vibe-rule-dark"
-        [class]="
-          mode() === option.value
-            ? 'bg-vibe-mint-soft text-vibe-green! dark:bg-vibe-mint dark:text-vibe-ink!'
-            : ''
-        "
-        [attr.aria-pressed]="mode() === option.value"
-        (click)="changed.emit(option.value)"
-      >
-        {{ option.label }}
-      </button>
-    }
-  </div>
+  <app-segmented-control
+    class="mt-3 block"
+    label="Mức riêng tư"
+    [options]="options"
+    [value]="mode()"
+    (selected)="select($event)"
+  />
   @if (current(); as copy) {
     <div
       class="mt-4 rounded-2xl bg-vibe-surface p-4 shadow-[0_3px_14px_0_rgb(0_0_0/0.07)] dark:bg-vibe-surface-dark"

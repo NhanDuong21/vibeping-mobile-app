@@ -1,4 +1,4 @@
-VibePing 1.0.0-rc.4 — hướng dẫn cá nhân
+VibePing 1.0.0-rc.5 — hướng dẫn cá nhân
 ========================================
 
 Yêu cầu
@@ -11,7 +11,7 @@ Bắt đầu
 2. Ghi lại mã ghép nối nếu cửa sổ hiển thị mã.
 3. Kết nối Tailscale trên iPhone rồi mở biểu tượng VibePing hiện có.
 4. Nhập mã một lần nếu ứng dụng yêu cầu.
-5. Nếu giao diện cũ còn mở, đóng VibePing, mở lại biểu tượng một lần, rồi tải lại một lần. Không xóa biểu tượng.
+5. Nếu đang dùng bản cũ, mở Hoạt động, chờ "Có bản VibePing mới" phiên bản 1.0.0-rc.5 rồi bấm "Cập nhật". Nếu chưa thấy, đưa app về nền rồi mở lại. Không xóa biểu tượng.
 
 Điều khiển
 - "Start VibePing.bat": khởi động nền, hiện trạng thái và địa chỉ riêng.

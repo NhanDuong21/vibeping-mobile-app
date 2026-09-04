@@ -28,7 +28,11 @@
     }
   </header>
 
-  <main class="mx-auto w-full max-w-lg pt-5">
+  <main
+    appSignalMotion="failure"
+    [motionKey]="preferences.saveFailed()"
+    class="mx-auto w-full max-w-lg pt-5"
+  >
     @if (preferences.state() === 'loading') {
       <div class="space-y-4" aria-label="Đang tải cài đặt">
         @for (item of [1, 2, 3, 4]; track item) {
@@ -115,27 +119,13 @@
         <p class="mt-1.5 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
           Báo khi mức còn lại chạm ngưỡng bạn chọn.
         </p>
-        <div
-          class="mt-3 grid grid-cols-5 gap-1.5"
-          role="group"
-          aria-label="Cảnh báo khi hạn mức còn lại"
-        >
-          @for (threshold of [10, 15, 20, 25, 30]; track threshold) {
-            <button
-              type="button"
-              class="min-h-11 rounded-lg border border-vibe-rule px-1 text-xs font-bold transition-colors active:bg-vibe-mint-soft dark:border-vibe-rule-dark dark:active:bg-vibe-mint/10"
-              [class]="
-                draft.allowanceThresholdPercent === threshold
-                  ? 'bg-vibe-mint-soft text-vibe-green! dark:bg-vibe-mint dark:text-vibe-ink!'
-                  : ''
-              "
-              [attr.aria-pressed]="draft.allowanceThresholdPercent === threshold"
-              (click)="preferences.setAllowanceThreshold(threshold)"
-            >
-              {{ threshold }}%
-            </button>
-          }
-        </div>
+        <app-segmented-control
+          class="mt-3 block"
+          label="Cảnh báo khi hạn mức còn lại"
+          [options]="thresholds"
+          [value]="draft.allowanceThresholdPercent"
+          (selected)="preferences.setAllowanceThreshold(numeric($event))"
+        />
         <div
           class="mt-3 flex min-h-14 items-center justify-between gap-4 border-y border-vibe-rule py-2.5 dark:border-vibe-rule-dark"
         >
@@ -173,7 +163,7 @@
           />
         </div>
         @if (draft.quietHours.enabled) {
-          <div class="mt-4 grid grid-cols-2 gap-3">
+          <div class="mt-4 grid grid-cols-2 gap-3" animate.enter="animate-signal-enter">
             <label class="text-sm font-bold"
               >Bắt đầu<input
                 type="time"
@@ -223,24 +213,16 @@
         aria-labelledby="theme-heading"
       >
         <h2 id="theme-heading" class="text-[1.375rem] font-bold tracking-[-0.025em]">Giao diện</h2>
-        <div class="mt-3 grid grid-cols-3 gap-2" role="group" aria-label="Giao diện sáng tối">
-          @for (option of themeOptions; track option.value) {
-            <button
-              type="button"
-              class="min-h-12 rounded-lg border border-vibe-rule text-sm font-bold dark:border-vibe-rule-dark"
-              [class]="
-                draft.theme === option.value
-                  ? 'bg-vibe-mint-soft text-vibe-green! dark:bg-vibe-mint dark:text-vibe-ink!'
-                  : ''
-              "
-              [attr.aria-pressed]="draft.theme === option.value"
-              (click)="preferences.setTheme(option.value)"
-            >
-              {{ option.label }}
-            </button>
-          }
-        </div>
+        <app-segmented-control
+          class="mt-3 block"
+          label="Giao diện sáng tối"
+          [options]="themeOptions"
+          [value]="draft.theme"
+          (selected)="selectTheme($event)"
+        />
       </section>
+
+      <app-motion-settings />
 
       <section
         class="mt-8 border-t border-vibe-rule pt-6 dark:border-vibe-rule-dark"
@@ -252,24 +234,13 @@
         <p class="mt-1.5 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
           Chọn thời gian giữ lịch sử trên laptop.
         </p>
-        <div class="mt-3 grid grid-cols-5 gap-1.5" role="group" aria-label="Thời gian giữ lịch sử">
-          @for (days of [7, 14, 30, 60, 90]; track days) {
-            <button
-              type="button"
-              class="min-h-12 rounded-lg border border-vibe-rule px-1 text-xs font-bold leading-4 dark:border-vibe-rule-dark"
-              [class]="
-                draft.retentionDays === days
-                  ? 'bg-vibe-mint-soft text-vibe-green! dark:bg-vibe-mint dark:text-vibe-ink!'
-                  : ''
-              "
-              [attr.aria-pressed]="draft.retentionDays === days"
-              (click)="preferences.setRetentionDays(days)"
-            >
-              <span class="block text-sm">{{ days }}</span
-              >ngày
-            </button>
-          }
-        </div>
+        <app-segmented-control
+          class="mt-3 block"
+          label="Thời gian giữ lịch sử"
+          [options]="retentionOptions"
+          [value]="draft.retentionDays"
+          (selected)="preferences.setRetentionDays(numeric($event))"
+        />
       </section>
 
       <section
@@ -342,5 +313,3 @@
     }
   </main>
 </app-pull-to-refresh>
-
-<app-bottom-navigation />

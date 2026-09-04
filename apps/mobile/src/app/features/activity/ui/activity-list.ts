@@ -1,3 +1,4 @@
+import { SignalMotion } from '../../../core/motion/signal-motion';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { relativeTime } from '../../../core/formatting/time';
@@ -11,7 +12,7 @@ import { ActivityStore } from '../application/activity.store';
 
 @Component({
   selector: 'app-activity-list',
-  imports: [RouterLink],
+  imports: [SignalMotion, RouterLink],
   templateUrl: './activity-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

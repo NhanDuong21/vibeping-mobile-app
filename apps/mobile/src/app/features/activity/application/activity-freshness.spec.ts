@@ -58,6 +58,32 @@ describe('live work freshness and reconciliation', () => {
   });
   afterEach(() => vi.useRealTimers());
 
+  it('acknowledges a live event once and does not celebrate duplicates or old catch-up', async () => {
+    const { store, listeners } = setup();
+    await vi.advanceTimersByTimeAsync(0);
+    const event = {
+      id: 'new-live-event',
+      eventType: 'codex.turn.completed',
+      title: 'Đã xong',
+      summary: '',
+      projectName: 'VibePing',
+      isRead: false,
+      occurredAt: now.toISOString(),
+    };
+    const receive = (value: typeof event): void => {
+      listeners.get('activity')?.(new MessageEvent('activity', { data: JSON.stringify(value) }));
+    };
+    receive(event);
+    expect(store.newEventId()).toBe(event.id);
+    await vi.advanceTimersByTimeAsync(901);
+    receive(event);
+    expect(store.newEventId()).toBeNull();
+    receive({ ...event, id: 'old-catch-up', occurredAt: '2026-09-03T00:00:00Z' });
+    expect(store.newEventId()).toBeNull();
+    expect(store.events()).toHaveLength(2);
+    store.stop();
+  });
+
   it('stops the working animation when evidence expires without needing SSE', async () => {
     const { store } = setup();
     await vi.advanceTimersByTimeAsync(0);

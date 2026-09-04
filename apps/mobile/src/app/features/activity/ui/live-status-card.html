@@ -1,34 +1,88 @@
 <section
-  class="overflow-hidden rounded-2xl border border-vibe-rule bg-vibe-surface transition-colors duration-200 ease-out motion-reduce:transition-none dark:border-vibe-rule-dark dark:bg-vibe-surface-dark"
+  appMotionInView
+  [appSignalMotion]="cue()"
+  [motionKey]="activity.newEventId()"
+  class="relative overflow-hidden rounded-2xl border border-vibe-rule bg-vibe-surface transition-colors duration-500 ease-out motion-reduce:transition-none dark:border-vibe-rule-dark dark:bg-vibe-surface-dark"
+  [class.border-vibe-amber/60]="activity.readiness().kind === 'waiting'"
+  [class.border-vibe-coral/60]="activity.readiness().kind === 'failed'"
   aria-labelledby="live-status-heading"
   aria-live="polite"
 >
-  <div class="p-4">
+  @if (activity.motionActive()) {
+    <svg class="pointer-events-none absolute inset-0 size-full text-vibe-mint" aria-hidden="true">
+      <rect
+        x="1"
+        y="1"
+        width="calc(100% - 2px)"
+        height="calc(100% - 2px)"
+        rx="15"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        pathLength="100"
+        stroke-dasharray="12 88"
+        class="vibe-full:animate-signal-orbit"
+      />
+    </svg>
+  }
+  <div class="relative p-4">
     <div class="flex items-start gap-3">
       <span
-        class="mt-1.5 size-3 shrink-0 rounded-full"
-        [class.bg-vibe-mint]="
-          activity.readiness().kind === 'ready' ||
-          activity.readiness().kind === 'working' ||
-          activity.readiness().kind === 'completed'
-        "
-        [class.vibe-active-pulse]="activity.motionActive()"
-        [class.bg-vibe-amber]="
-          activity.readiness().kind === 'checking' ||
-          activity.readiness().kind === 'unconfirmed' ||
-          activity.readiness().kind === 'preview' ||
-          activity.readiness().kind === 'codexSetup' ||
-          activity.readiness().kind === 'codexReview'
-        "
-        [class.bg-vibe-coral]="
-          activity.readiness().kind === 'stopped' ||
-          activity.readiness().kind === 'offline' ||
-          activity.readiness().kind === 'waiting' ||
-          activity.readiness().kind === 'failed'
-        "
+        class="relative grid size-10 shrink-0 place-items-center rounded-full bg-vibe-mint-soft text-vibe-green dark:bg-vibe-mint/10 dark:text-vibe-mint"
         aria-hidden="true"
-      ></span>
-      <div class="min-w-0 flex-1">
+        [class]="
+          activity.readiness().kind === 'waiting'
+            ? 'bg-vibe-amber/10! text-vibe-amber!'
+            : activity.readiness().kind === 'failed'
+              ? 'bg-vibe-coral/10! text-vibe-coral!'
+              : activity.readiness().kind === 'offline' ||
+                  activity.readiness().kind === 'unconfirmed'
+                ? 'bg-vibe-rule/50! text-vibe-muted! dark:text-vibe-sage!'
+                : ''
+        "
+      >
+        @if (activity.readiness().kind === 'waiting') {
+          <span
+            class="absolute inset-0 rounded-full border border-vibe-amber vibe-full:animate-signal-wait"
+          ></span>
+        }
+        <svg
+          class="size-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          @switch (activity.readiness().kind) {
+            @case ('completed') {
+              <path
+                d="m5 12 4 4L19 6"
+                pathLength="1"
+                appSignalMotion="draw"
+                [motionKey]="activity.newEventId()"
+              />
+            }
+            @case ('failed') {
+              <path d="m7 7 10 10M17 7 7 17" />
+            }
+            @case ('waiting') {
+              <path d="M12 6v7m0 4h.01" />
+            }
+            @case ('offline') {
+              <path d="m4 4 16 16M4 12h3m10 0h3M9 8l1-3 4 14 1-3" />
+            }
+            @case ('unconfirmed') {
+              <path d="M9 9a3 3 0 1 1 5 2c-1 1-2 1-2 3m0 3h.01" />
+            }
+            @default {
+              <path d="M3 12h4l3-7 4 14 3-7h4" />
+            }
+          }
+        </svg>
+      </span>
+      <div class="min-w-0 flex-1" appSignalMotion="arrive" [motionKey]="activity.readiness().kind">
         <h1
           id="live-status-heading"
           class="text-balance text-[1.625rem] font-bold leading-[1.14] tracking-[-0.035em]"
@@ -98,8 +152,15 @@
   </div>
 
   @if (activity.motionActive()) {
-    <div class="h-0.5 overflow-hidden bg-vibe-mint/15" aria-label="Codex vẫn đang làm việc">
-      <span class="vibe-signal-sweep block h-full w-1/3 bg-vibe-mint"></span>
+    <div class="h-0.5 overflow-hidden bg-vibe-mint/15" aria-hidden="true">
+      <span class="vibe-full:vibe-signal-sweep block h-full w-1/3 bg-vibe-mint"></span>
     </div>
+  } @else if (
+    activity.readiness().kind === 'unconfirmed' || activity.readiness().kind === 'offline'
+  ) {
+    <div
+      class="mx-4 mb-4 border-t border-dashed border-vibe-rule dark:border-vibe-rule-dark"
+      aria-hidden="true"
+    ></div>
   }
 </section>

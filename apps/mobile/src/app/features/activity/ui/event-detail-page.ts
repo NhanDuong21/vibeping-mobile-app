@@ -1,3 +1,4 @@
+import { SignalMotion } from '../../../core/motion/signal-motion';
 import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import type { ActivityEventDetailDto } from '../../../core/api/api-client';
@@ -14,7 +15,7 @@ import { ActivityStore } from '../application/activity.store';
 
 @Component({
   selector: 'app-event-detail-page',
-  imports: [RouterLink, PullToRefresh],
+  imports: [SignalMotion, RouterLink, PullToRefresh],
   templateUrl: './event-detail-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

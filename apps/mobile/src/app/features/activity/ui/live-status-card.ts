@@ -3,16 +3,21 @@ import { RouterLink } from '@angular/router';
 import { elapsedTime, relativeSignalTime, relativeTime } from '../../../core/formatting/time';
 import { activityProject, activityTaskTitle } from '../application/activity-presentation';
 import { ActivityStore } from '../application/activity.store';
+import { MotionInView, SignalMotion } from '../../../core/motion/signal-motion';
+import { eventMotionCue } from '../application/event-motion';
 
 @Component({
   selector: 'app-live-status-card',
-  imports: [RouterLink],
+  imports: [RouterLink, SignalMotion, MotionInView],
   templateUrl: './live-status-card.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LiveStatusCard {
   protected readonly activity = inject(ActivityStore);
   protected readonly recent = computed(() => this.activity.events()[0] ?? null);
+  protected readonly cue = computed(() =>
+    eventMotionCue(this.activity.events().find((event) => event.id === this.activity.newEventId())),
+  );
 
   protected workTitle(): string {
     const kind = this.activity.readiness().kind;

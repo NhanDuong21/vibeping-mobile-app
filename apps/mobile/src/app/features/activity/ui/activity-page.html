@@ -4,6 +4,7 @@
   <header class="mx-auto flex w-full max-w-lg items-center justify-between py-2">
     <div class="flex items-center gap-2.5">
       <img
+        appSignalMotion="mascot"
         src="/assets/logo-icon-192.png"
         srcset="/assets/logo-icon-192.png 192w, /assets/logo-icon-512.png 512w"
         sizes="40px"
@@ -26,18 +27,17 @@
           activity.readiness().kind === 'working' ||
           activity.readiness().kind === 'completed'
         "
-        [class.vibe-active-pulse]="activity.motionActive()"
         [class.bg-vibe-amber]="
           activity.readiness().kind === 'checking' ||
           activity.readiness().kind === 'unconfirmed' ||
           activity.readiness().kind === 'preview' ||
+          activity.readiness().kind === 'waiting' ||
           activity.readiness().kind === 'codexSetup' ||
           activity.readiness().kind === 'codexReview'
         "
         [class.bg-vibe-coral]="
           activity.readiness().kind === 'stopped' ||
           activity.readiness().kind === 'offline' ||
-          activity.readiness().kind === 'waiting' ||
           activity.readiness().kind === 'failed'
         "
         aria-hidden="true"
@@ -47,31 +47,6 @@
   </header>
 
   <main class="mx-auto w-full max-w-lg pb-3 pt-6">
-    @if (updates.available()) {
-      <section
-        class="mb-5 flex items-center justify-between gap-3 rounded-2xl border border-vibe-rule bg-vibe-surface px-4 py-3 text-vibe-ink dark:border-vibe-rule-dark dark:bg-vibe-surface-dark dark:text-vibe-paper"
-        aria-live="polite"
-      >
-        <div>
-          <p class="text-sm font-bold">Có bản VibePing mới</p>
-          @if (updates.version(); as version) {
-            <p class="mt-0.5 break-words text-xs font-semibold">Phiên bản {{ version }}</p>
-          }
-          <p class="mt-0.5 text-xs text-vibe-muted dark:text-vibe-sage">
-            Cập nhật nhanh, dữ liệu gần đây vẫn được giữ lại.
-          </p>
-        </div>
-        <button
-          type="button"
-          class="min-h-11 shrink-0 rounded-full bg-vibe-mint px-4 text-sm font-black text-vibe-ink transition-opacity active:opacity-75 disabled:opacity-60"
-          [disabled]="updates.installing()"
-          (click)="updates.install()"
-        >
-          {{ updates.installing() ? 'Đang cập nhật' : 'Cập nhật' }}
-        </button>
-      </section>
-    }
-
     @if (activity.isStale()) {
       <p
         class="mb-5 rounded-xl border border-vibe-amber/35 bg-vibe-amber/10 px-4 py-3 text-sm font-semibold"
@@ -110,7 +85,10 @@
                   {{ window.label }}
                 </p>
                 <p class="mt-1 text-2xl font-black tabular-nums">
-                  {{ window.remainingPercent.toFixed(0) }}%
+                  <app-animated-percent
+                    [value]="window.remainingPercent"
+                    [fresh]="allowance.state !== 'stale'"
+                  />
                 </p>
                 <p class="mt-0.5 text-xs font-bold">
                   {{ usage.statusLabel(window) }}
@@ -133,5 +111,3 @@
     </div>
   </main>
 </app-pull-to-refresh>
-
-<app-bottom-navigation />

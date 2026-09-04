@@ -6,7 +6,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
     <button
       type="button"
       role="switch"
-      class="grid min-h-11 min-w-14 shrink-0 place-items-center"
+      class="grid min-h-11 min-w-14 shrink-0 place-items-center transition-transform active:scale-95"
       [attr.aria-checked]="checked"
       [attr.aria-label]="label"
       (click)="changed.emit()"
@@ -17,7 +17,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
         aria-hidden="true"
       >
         <span
-          class="absolute left-1 top-1 size-5 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none"
+          class="absolute left-1 top-1 size-5 rounded-full bg-white shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.22,1.5,0.36,1)] motion-reduce:transition-none"
           [class.translate-x-5]="checked"
         ></span>
       </span>

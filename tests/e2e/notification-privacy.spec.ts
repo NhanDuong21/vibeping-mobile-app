@@ -105,7 +105,11 @@ test("privacy preview is accessible at phone widths in all modes", async ({
     await page.setViewportSize({ width, height: 844 });
     for (const label of ["Chỉ báo", "Tên dự án", "Hiện tóm tắt"]) {
       await page.getByRole("button", { name: label, exact: true }).click();
-      await expect(section.locator('[aria-hidden="true"]')).toHaveCount(0);
+      await expect(
+        section
+          .getByRole("region", { name: "Xem trước thông báo" })
+          .locator('[aria-hidden="true"]'),
+      ).toHaveCount(0);
       await section.evaluate((element) =>
         element.scrollIntoView({ block: "start" }),
       );
