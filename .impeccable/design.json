@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-04T15:45:11.295Z",
+  "generatedAt": "2026-09-04T16:43:13.499Z",
   "title": "Design System: VibePing",
   "extensions": {
     "colorMeta": {
@@ -351,7 +351,7 @@
       },
       {
         "name": "The Observed Time Rule",
-        "body": "Show recorded stages and timestamps only. The prominent active card shows the current request's real duration and latest stage. Missing starts are explained inside detail. Stale or disconnected work freezes duration at its last signal and stops live motion. Work detail can show recorded start and update times, but never presents their span as total work duration.",
+        "body": "Show recorded stages and timestamps only. The prominent active card shows the current request's real duration and latest stage. Fresh running work on the home screen shows Vietnamese seconds, minutes and hours, such as 1 giờ 12 phút 34 giây, with tabular numerals in the existing position. Both home timer spans use `role=\"timer\"` and `aria-live=\"off\"` so each tick does not request a live announcement; the surrounding state region remains polite. A foreground clock updates once a second independently of the 15-second network reconciliation, pauses while hidden or offline, and reads current wall time on return. Missing starts are explained inside detail. Stale, unconfirmed or disconnected work stays bounded by its last signal and stops live motion; completed durations remain fixed. Detail and history retain minute precision. Work detail can show recorded start and update times, but never presents their span as total work duration.",
         "section": "components"
       },
       {

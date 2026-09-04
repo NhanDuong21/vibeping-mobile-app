@@ -1,4 +1,5 @@
 import type { ActivityEventDto } from '../../../core/api/api-client';
+import { durationWithSeconds } from '../../../core/formatting/time';
 
 export function sessionIsWorking(
   event: ActivityEventDto | null,
@@ -25,6 +26,12 @@ export function sessionStatus(event: ActivityEventDto, now: Date, stale = false)
     unconfirmed: 'Không còn tín hiệu mới',
   };
   return labels[session.state] ?? 'Đã ghi nhận';
+}
+
+export function liveSessionDuration(event: ActivityEventDto, now: Date, stale = false): string {
+  if (event.session?.startedAt && sessionIsWorking(event, now, stale))
+    return durationWithSeconds(now.getTime() - Date.parse(event.session.startedAt));
+  return sessionDuration(event, now, stale);
 }
 
 export function sessionDuration(event: ActivityEventDto, now: Date, stale = false): string {

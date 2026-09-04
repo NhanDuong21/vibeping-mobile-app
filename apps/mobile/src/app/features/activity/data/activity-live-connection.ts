@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { Subject } from 'rxjs';
+import { interval, Subject, type Subscription } from 'rxjs';
 import { EVENT_SOURCE_FACTORY } from '../../../core/connectivity/event-source';
 
 type LiveEvent =
@@ -19,6 +19,7 @@ export class ActivityLiveConnection {
   readonly #now = signal(new Date());
   #stream?: EventSource;
   #timer?: ReturnType<typeof setInterval>;
+  #clock?: Subscription;
   #lastMessageAt = 0;
 
   readonly events = this.#events.asObservable();
@@ -34,12 +35,16 @@ export class ActivityLiveConnection {
     document.addEventListener('visibilitychange', this.#visibilityChanged);
     this.#visible.set(document.visibilityState !== 'hidden');
     this.#now.set(new Date());
-    if (this.#visible() && navigator.onLine !== false) this.#connect();
+    if (this.#visible() && navigator.onLine !== false) {
+      this.#startClock();
+      this.#connect();
+    }
   }
 
   stop(): void {
     clearInterval(this.#timer);
     this.#timer = undefined;
+    this.#stopClock();
     this.#close();
     globalThis.removeEventListener('online', this.#resume);
     globalThis.removeEventListener('offline', this.#offline);
@@ -50,11 +55,13 @@ export class ActivityLiveConnection {
     this.#now.set(new Date());
     this.#visible.set(document.visibilityState !== 'hidden');
     if (!this.#visible() || navigator.onLine === false) return;
+    this.#startClock();
     this.#connect();
     this.#events.next({ type: 'reconcile' });
   };
 
   readonly #offline = (): void => {
+    this.#stopClock();
     this.#close();
     this.#events.next({ type: 'disconnected' });
   };
@@ -62,11 +69,22 @@ export class ActivityLiveConnection {
   readonly #visibilityChanged = (): void => {
     this.#visible.set(document.visibilityState !== 'hidden');
     if (this.#visible()) this.#resume();
-    else this.#close();
+    else {
+      this.#stopClock();
+      this.#close();
+    }
   };
 
+  #startClock(): void {
+    this.#clock ??= interval(1000).subscribe(() => this.#now.set(new Date()));
+  }
+
+  #stopClock(): void {
+    this.#clock?.unsubscribe();
+    this.#clock = undefined;
+  }
+
   #tick(): void {
-    this.#now.set(new Date());
     if (!this.#visible() || navigator.onLine === false) return;
     if (
       !this.#stream ||

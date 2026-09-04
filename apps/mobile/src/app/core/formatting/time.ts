@@ -29,12 +29,19 @@ export function relativeSignalTime(value: string, now = new Date()): string {
 }
 
 export function elapsedTime(value: string, now = new Date()): string {
-  const elapsed = Math.max(0, now.getTime() - new Date(value).getTime());
-  if (elapsed < MINUTE_MS) return 'Đang bắt đầu';
-  if (elapsed < HOUR_MS) return `Đã theo dõi ${Math.floor(elapsed / MINUTE_MS)} phút`;
-  const hours = Math.floor(elapsed / HOUR_MS);
-  const minutes = Math.floor((elapsed % HOUR_MS) / MINUTE_MS);
-  return minutes ? `Đã theo dõi ${hours} giờ ${minutes} phút` : `Đã theo dõi ${hours} giờ`;
+  const elapsed = now.getTime() - Date.parse(value);
+  return Number.isFinite(elapsed)
+    ? `Đã theo dõi ${durationWithSeconds(elapsed)}`
+    : 'Chưa ghi nhận thời gian';
+}
+
+export function durationWithSeconds(elapsed: number): string {
+  if (!Number.isFinite(elapsed)) return 'Chưa ghi nhận thời gian';
+  const seconds = Math.floor(Math.max(0, elapsed) / 1000);
+  if (seconds < 60) return `${seconds} giây`;
+  const minutes = Math.floor(seconds / 60);
+  const remainder = `${minutes % 60} phút ${seconds % 60} giây`;
+  return minutes < 60 ? remainder : `${Math.floor(minutes / 60)} giờ ${remainder}`;
 }
 
 export function dateGroup(value: string, now = new Date()): string {

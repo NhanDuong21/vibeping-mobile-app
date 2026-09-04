@@ -1,6 +1,11 @@
 import type { ActivityEventDto } from '../../../core/api/api-client';
 import { mergeEvents } from './activity-reconciliation';
-import { sessionDuration, sessionIsWorking, sessionStatus } from './work-session-presentation';
+import {
+  liveSessionDuration,
+  sessionDuration,
+  sessionIsWorking,
+  sessionStatus,
+} from './work-session-presentation';
 
 const event: ActivityEventDto = {
   id: 'session',
@@ -49,6 +54,12 @@ describe('Work session presentation', () => {
     const now = new Date('2026-09-04T06:11:00Z');
     expect(sessionStatus(event, now)).toBe('Đang làm việc');
     expect(sessionDuration(event, now)).toBe('11 phút');
+    expect(liveSessionDuration(event, now)).toBe('11 phút 0 giây');
+    expect(liveSessionDuration(event, new Date('2026-09-04T06:11:01Z'))).toBe('11 phút 1 giây');
+    expect(liveSessionDuration(event, now, true)).toBe('10 phút đến tín hiệu cuối');
+    expect(liveSessionDuration(event, new Date('2026-09-04T07:11:00Z'))).toBe(
+      '10 phút đến tín hiệu cuối',
+    );
     expect(sessionStatus(event, now, true)).toBe('Dữ liệu đã lưu');
     expect(sessionDuration(event, new Date('2026-09-04T07:11:00Z'))).toBe(
       '10 phút đến tín hiệu cuối',
@@ -61,6 +72,7 @@ describe('Work session presentation', () => {
       session: { ...event.session!, state: 'completed', completedAt: '2026-09-04T06:18:00Z' },
     };
     expect(sessionDuration(completed, new Date('2026-09-05'))).toBe('18 phút');
+    expect(liveSessionDuration(completed, new Date('2026-09-05'))).toBe('18 phút');
     expect(
       sessionDuration(
         { ...completed, session: { ...completed.session, startedAt: null } },

@@ -60,11 +60,14 @@ describe('foreground activity transport', () => {
     document.dispatchEvent(new Event('visibilitychange'));
     expect(streams[0].close).toHaveBeenCalledOnce();
     receive.mockClear();
+    const pausedAt = live.now();
     vi.advanceTimersByTime(120_000);
+    expect(live.now()).toEqual(pausedAt);
     expect(receive).not.toHaveBeenCalled();
     visibility.mockReturnValue('visible');
     document.dispatchEvent(new Event('visibilitychange'));
     expect(factory).toHaveBeenCalledTimes(2);
+    expect(live.now().getTime()).toBe(Date.now());
     expect(receive).toHaveBeenCalledWith({ type: 'reconcile' });
     live.stop();
   });
@@ -74,7 +77,9 @@ describe('foreground activity transport', () => {
     const online = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
     window.dispatchEvent(new Event('offline'));
     receive.mockClear();
+    const pausedAt = live.now();
     vi.advanceTimersByTime(60_000);
+    expect(live.now()).toEqual(pausedAt);
     expect(factory).toHaveBeenCalledOnce();
     expect(receive).not.toHaveBeenCalled();
     online.mockReturnValue(true);
@@ -82,5 +87,24 @@ describe('foreground activity transport', () => {
     expect(factory).toHaveBeenCalledTimes(2);
     expect(receive).toHaveBeenCalledWith({ type: 'reconcile' });
     live.stop();
+  });
+
+  it('ticks each second without increasing network reconciliation and stops on teardown', () => {
+    const { live, factory, receive } = setup();
+    live.start();
+    const start = live.now().getTime();
+    vi.advanceTimersByTime(1000);
+    expect(live.now().getTime()).toBe(start + 1000);
+    vi.advanceTimersByTime(13_000);
+    expect(live.now().getTime()).toBe(start + 14_000);
+    expect(receive).not.toHaveBeenCalled();
+    expect(factory).toHaveBeenCalledOnce();
+    vi.advanceTimersByTime(1000);
+    expect(receive).toHaveBeenCalledExactlyOnceWith({ type: 'reconcile' });
+    live.stop();
+    const stoppedAt = live.now();
+    vi.advanceTimersByTime(30_000);
+    expect(live.now()).toEqual(stoppedAt);
+    expect(vi.getTimerCount()).toBe(0);
   });
 });

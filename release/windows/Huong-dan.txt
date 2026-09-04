@@ -1,4 +1,4 @@
-VibePing 1.3.2 — Nhịp tín hiệu
+VibePing 1.3.3 — Nhịp tín hiệu
 ========================================
 
 Yêu cầu
@@ -10,14 +10,14 @@ Bắt đầu
 1. Mở "Start VibePing.bat" để chạy thủ công.
 2. Ghi lại mã ghép nối nếu được hiển thị; nhập trên iPhone khi được yêu cầu.
 3. Mở biểu tượng VibePing đã thêm vào Màn hình chính.
-4. Khi thấy "Có bản VibePing mới" phiên bản 1.3.2, bấm "Cập nhật". Không xóa biểu tượng hoặc đăng ký thông báo lại.
+4. Khi thấy "Có bản VibePing mới" phiên bản 1.3.3, bấm "Cập nhật". Không xóa biểu tượng hoặc đăng ký thông báo lại.
 
 Cập nhật từ bản cũ
 1. Mở "Tat San sang.bat", rồi "Stop VibePing.bat". Đợi khay biến mất.
 2. Tạo bản sao lưu bằng "vibeping.exe backup".
 3. Thay toàn bộ tệp trong đúng thư mục đang cài bằng gói mới; giữ nguyên đường dẫn và dữ liệu.
 4. Mở lại "Bat San sang.bat" nếu dùng Sẵn sàng, hoặc "Start VibePing.bat" để chạy thủ công.
-5. Trên iPhone bấm "Cập nhật" khi thấy phiên bản 1.3.2.
+5. Trên iPhone bấm "Cập nhật" khi thấy phiên bản 1.3.3.
 
 Sẵn sàng trên Windows
 - "Bat San sang.bat" (Bật Sẵn sàng): bật khay mèo, chạy khi đăng nhập và tự khôi phục máy chủ.

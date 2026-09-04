@@ -1,6 +1,8 @@
-# VibePing — Thông báo đúng công việc chính 1.3.2
+# VibePing — Theo dõi đến từng giây 1.3.3
 
 VibePing is a personal-production tool that notifies one user's iPhone when Codex finishes, needs attention, leaves final tests failing, has a preview ready, or approaches a usage allowance. Version 1.1.1 adds project profiles, personal notification rules, a living mascot, a small daily summary and an opted-in Windows companion. The persistent sessions, live cards, timelines and final Codex answers from 1.1 remain intact.
+
+Version 1.3.3 shows seconds on the home screen while Codex is working. The foreground display ticks once per second without extra network requests; background and offline clocks pause.
 
 Version 1.3.2 sends completion notifications only for a verified main conversation. Delegated-agent answers stay in the activity history without interrupting the phone. Unknown ancestry waits for reconciliation, and queued retries are checked again before delivery.
 
@@ -59,7 +61,7 @@ pnpm run package:windows
 pnpm run e2e:release
 ```
 
-The ignored output is `artifacts/VibePing-Windows-x64-v1.3.2/`, its ZIP, and its SHA-256 file. The nine-file package needs no Node.js, pnpm, Rust, or Cargo installation on the user machine. See [1.3.2 release notes](docs/release-1.3.2.md) for completion notification repairs and update instructions; Personal, Always ready and Codex results remain available. The phase ledger below records the original V1 foundation; physical iPhone acceptance remains separate from automated release checks.
+The ignored output is `artifacts/VibePing-Windows-x64-v1.3.3/`, its ZIP, and its SHA-256 file. The nine-file package needs no Node.js, pnpm, Rust, or Cargo installation on the user machine. See [1.3.3 release notes](docs/release-1.3.3.md) for the live seconds display and update instructions; Personal, Always ready and Codex results remain available. The phase ledger below records the original V1 foundation; physical iPhone acceptance remains separate from automated release checks.
 
 Control the production process explicitly, or opt into Windows sign-in startup with `Bat San sang.bat` in the packaged release:
 

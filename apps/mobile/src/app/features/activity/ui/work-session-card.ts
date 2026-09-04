@@ -5,7 +5,7 @@ import type { ActivityEventDto } from '../../../core/api/api-client';
 import { clock } from '../../../core/formatting/time';
 import { SignalMotion } from '../../../core/motion/signal-motion';
 import { timelineLabel } from '../application/activity-presentation';
-import { sessionDuration, sessionStatus } from '../application/work-session-presentation';
+import { liveSessionDuration, sessionStatus } from '../application/work-session-presentation';
 import {
   resultPreview,
   threadIdentity,
@@ -33,7 +33,9 @@ export class WorkSessionCard {
       : sessionStatus(this.event(), this.now(), this.stale()),
   );
   protected readonly duration = computed(() =>
-    this.event().session?.startedAt ? sessionDuration(this.event(), this.now(), this.stale()) : '',
+    this.event().session?.startedAt
+      ? liveSessionDuration(this.event(), this.now(), this.stale())
+      : '',
   );
   protected readonly identity = computed(() => threadIdentity(this.event()));
   protected readonly preview = computed(() => resultPreview(this.event()));
