@@ -1,10 +1,10 @@
-# Vietnamese copy guide
+# Quy ước viết nội dung tiếng Việt
 
-## Voice
+## Giọng điệu
 
-Use short, calm Vietnamese that says what is true now and what happens next. Prefer familiar nouns (“điện thoại”, “laptop”, “thông báo”) and active recovery (“Mở lại…”, “Bật…”, “Thử lại”). Do not blame the user or claim delivery before it is observed.
+Viết ngắn, bình tĩnh, nói đúng trạng thái hiện tại và bước tiếp theo. Dùng danh từ quen thuộc như “điện thoại”, “laptop”, “thông báo”; hướng dẫn bằng động từ như “Mở lại…”, “Bật…”, “Thử lại”. Không đổ lỗi cho người dùng hoặc nói thông báo đã hiện khi chưa có bằng chứng.
 
-Examples:
+Các câu mẫu:
 
 - “VibePing trên laptop đang tắt”
 - “Chưa kết nối được với laptop”
@@ -16,14 +16,30 @@ Examples:
 - “Thông báo đang bị tắt trên iPhone”
 - “Chưa đọc được thông tin từ Codex”
 
-## Forbidden primary UI language
+## Không đưa thuật ngữ nội bộ lên thông báo chính
 
-Never show these as primary user copy: Agent, Daemon, Backend, Endpoint, Subscription, Push token, Rate-limit bucket, SSE, VAPID, Outbox, Migration, JSON-RPC, HTTP 500, SQL error, or Rust panic. Do not expose provider codes, stack traces, key names, or internal identifiers.
+Không dùng các từ sau làm nội dung chính trên giao diện: Agent, Daemon, Backend, Endpoint, Subscription, Push token, Rate-limit bucket, SSE, VAPID, Outbox, Migration, JSON-RPC, HTTP 500, SQL error hoặc Rust panic.
 
-## Error mapping policy
+Không hiển thị mã của nhà cung cấp, dấu vết ngăn xếp lỗi, tên khóa hoặc mã định danh nội bộ. Trong tài liệu kỹ thuật, giữ thuật ngữ cần đối chiếu và giải thích bằng tiếng Việt; xem [bảng thuật ngữ](README.md).
 
-Infrastructure returns stable machine codes. The client owns a complete map from code to Vietnamese state, action, and retry behavior. Unknown codes use a safe fallback: “Đã có lỗi khi kiểm tra. VibePing sẽ tự thử lại.” Raw details may be copied only from an explicitly expanded sanitized diagnostic report; they never replace the human message.
+## Chuyển lỗi kỹ thuật thành hướng dẫn
 
-## Allowance labels
+Hạ tầng trả về mã lỗi ổn định. Ứng dụng ánh xạ từng mã thành trạng thái tiếng Việt, hành động và cách thử lại. Mã chưa biết dùng câu an toàn:
 
-Use a returned human name only when it is genuinely readable. Otherwise derive a neutral duration label: “Chu kỳ 15 phút”, “Chu kỳ 2 giờ”, or “Chu kỳ 3 ngày”. Known product-friendly phrases such as “Lượt dùng 5 giờ” and “Hạn mức tuần” are allowed when the duration supports them. Never show an identifier such as `codex_other` as the main label.
+> Đã có lỗi khi kiểm tra. VibePing sẽ tự thử lại.
+
+Chi tiết kỹ thuật chỉ được sao chép từ báo cáo chẩn đoán đã lọc thông tin nhạy cảm, sau khi người dùng chủ động mở rộng. Báo cáo không thay thế thông báo dễ hiểu.
+
+## Tên khung hạn mức
+
+Chỉ dùng tên trả về từ Codex khi tên đó dễ đọc. Nếu không, đặt tên theo thời lượng: “Chu kỳ 15 phút”, “Chu kỳ 2 giờ” hoặc “Chu kỳ 3 ngày”.
+
+Có thể dùng “Lượt dùng 5 giờ” hoặc “Hạn mức tuần” khi đúng với thời lượng thực tế. Không lấy mã như `codex_other` làm nhãn chính.
+
+## Tên gọi nhất quán
+
+- **Công việc:** cuộc hội thoại chính cùng các tác nhân phụ đã xác minh.
+- **Yêu cầu:** từng lượt được lưu bên trong công việc.
+- **Thời gian ghi nhận:** khoảng thời gian có bằng chứng; không gọi là tổng thời gian làm việc.
+- **Dữ liệu đã lưu:** bản đệm hoặc kết quả đọc trước đó; không diễn đạt như dữ liệu đang trực tiếp cập nhật.
+- **Sẵn sàng trên Windows:** trạng thái và lựa chọn chạy ở laptop; không ngụ ý điện thoại có thể khởi động hoặc dừng máy chủ.

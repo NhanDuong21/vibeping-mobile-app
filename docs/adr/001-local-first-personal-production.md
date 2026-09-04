@@ -1,8 +1,8 @@
-# ADR 001: Local-first personal-production scope
+# ADR 001 — Phạm vi cá nhân, ưu tiên dữ liệu cục bộ
 
-- **Status:** Accepted
-- **Decision:** Build for one user, Windows laptop, iPhone, Codex account, and personal tailnet. Windows owns durable state; no hosted service is introduced.
-- **Context:** The product is an attention bridge for one person's Codex workflow under a 0 VND constraint.
-- **Alternatives:** Multi-user cloud service; phone-owned state; native iOS app.
-- **Consequences:** Simple trust model and offline durability, but no team sync or access outside the tailnet.
-- **Validation needed:** Gate 0 private delivery and later SQLite recovery tests.
+- **Trạng thái:** Đã chấp nhận.
+- **Quyết định:** Phục vụ một người, một laptop Windows, một iPhone, một tài khoản Codex và một mạng Tailscale riêng. Windows giữ dữ liệu bền vững; không thêm dịch vụ thuê ngoài.
+- **Bối cảnh:** Cần cầu nối thông báo cho quy trình Codex cá nhân với giới hạn chi phí hạ tầng 0 đồng.
+- **Phương án đã cân nhắc:** Dịch vụ đám mây nhiều người dùng; lấy điện thoại làm nơi giữ dữ liệu chính; ứng dụng iOS native.
+- **Hệ quả:** Ranh giới tin cậy đơn giản, dữ liệu giữ được khi mất mạng; không có đồng bộ nhóm hoặc truy cập ngoài tailnet.
+- **Kiểm chứng theo kế hoạch ban đầu:** Gate 0 kiểm tra gửi riêng tư; các giai đoạn sau kiểm tra khôi phục SQLite.

@@ -1,41 +1,41 @@
-# Gate 0: Tailscale Web Push
+# Gate 0 — Web Push qua Tailscale
 
-- **Objective:** Prove a Home Screen PWA from one stable private `.ts.net` HTTPS origin receives encrypted Web Push on a physical iPhone and survives a local Rust restart without reinstalling or resubscribing.
-- **Current status:** PASS
-- **Date:** 2026-09-02
+- **Mục tiêu:** chứng minh PWA trên Màn hình chính nhận Web Push mã hóa từ một địa chỉ HTTPS riêng `.ts.net` ổn định trên iPhone thật; khởi động lại Rust không cần cài hoặc đăng ký lại.
+- **Kết quả ghi nhận:** đạt (PASS), ngày 02/09/2026.
 
-## Environment
+## Môi trường tại lần kiểm chứng
 
-- Windows x64, Rust 1.98.0, Node.js 24.15.0, pnpm 10.15.1, Tailwind CSS 4.3.3
-- Tailscale 1.102.3, Serve only, Funnel disabled
-- Rust backend target: `127.0.0.1:8787`
-- Stable origin: `https://<device>.<tailnet>.ts.net` (the working private hostname is intentionally redacted from tracked evidence)
+Windows x64; Rust 1.98.0; Node.js 24.15.0; pnpm 10.15.1; Tailwind CSS 4.3.3; Tailscale 1.102.3. Chỉ dùng Serve, Funnel tắt. Máy chủ Rust ở `127.0.0.1:8787`; địa chỉ riêng có dạng `https://<device>.<tailnet>.ts.net`. Tên máy thật được lược khỏi tài liệu đưa vào Git.
 
-## Desktop validation
+## Kiểm tra trên máy tính
 
-Both `http://127.0.0.1:8787` and the private HTTPS origin returned the correct Gate 0 service identity. The private origin passed health/status/public-key checks, manifest identity and icons, secure-context detection, service-worker registration at `/` with `updateViaCache: none`, and explicit cache versioning. The public browser key is the required uncompressed P-256 form.
+Cả localhost và HTTPS riêng trả đúng danh tính Gate 0. Địa chỉ riêng qua kiểm tra sức khỏe/trạng thái/khóa công khai, manifest/biểu tượng, ngữ cảnh an toàn, đăng ký service worker tại `/` với `updateViaCache: none` và phiên bản bộ đệm rõ ràng. Khóa trình duyệt dùng đúng dạng P-256 không nén.
 
-The final private build rendered in light and dark modes at 320/375/390/430 px without horizontal overflow. Primary and disclosure controls measured 44–48 px; focus was visible; row/details padding measured 12/16 px; the technical report contained no subscription endpoint or key names. Browser inspection found no application console warnings, runtime exceptions, or failed network requests. One rejected inline-style message came from the browser inspection overlay itself and had no page URL; the page CSP correctly blocked it.
+Bản cuối hiển thị sáng/tối ở 320/375/390/430 px, không tràn ngang. Điều khiển chính/mở rộng có vùng chạm 44–48 px; focus rõ; đệm hàng/chi tiết 12/16 px. Báo cáo kỹ thuật không có địa chỉ đăng ký hoặc tên khóa. Không thấy cảnh báo ứng dụng, lỗi chạy hay yêu cầu mạng thất bại. Một thông báo chặn kiểu dáng nội tuyến xuất phát từ lớp phủ công cụ kiểm tra, không có URL trang; CSP đã chặn đúng.
 
-Tailscale CLI reported `(tailnet only)`, the Serve root proxies only to `127.0.0.1:8787`, and no `(Funnel on)` or public-internet state was present. A real Stop/Start restart produced a new Rust PID while preserving the exact `.ts.net` origin and VAPID public key. Unit tests cover safe copy, unsupported/denied capability handling, push payload fallback, sender identity persistence, uncompressed browser-key encoding, and subscription file persistence.
+Tailscale báo `(tailnet only)`; Serve chỉ chuyển gốc đến `127.0.0.1:8787`; không có `(Funnel on)` hoặc trạng thái Internet công khai. Dừng/khởi động thật tạo PID Rust mới nhưng giữ đúng origin và khóa công khai VAPID.
 
-The source completed Impeccable shape, two independent critique assessments, harden, and adapt. Full-parser detector warnings about zero padding and mixed light/dark hover colors were checked against computed browser styles and treated as false positives: actual bordered-row padding was 12 px, details padding was 16 px, and both rendered themes retained their intended colors.
+Kiểm thử đơn vị bao phủ câu chữ an toàn, không hỗ trợ/từ chối quyền, dữ liệu thông báo dự phòng, lưu danh tính gửi, mã hóa khóa trình duyệt không nén và lưu đăng ký vào tệp.
 
-## Manual iPhone matrix
+Đã áp dụng Impeccable shape, hai đánh giá critique độc lập, harden và adapt. Cảnh báo đệm bằng không và màu hover sáng/tối trộn được đối chiếu kiểu dáng thực: hàng có viền đệm 12 px, chi tiết 16 px, cả hai giao diện đúng màu. Các cảnh báo này là phát hiện nhầm.
 
-| Case | Result |
-| --- | --- |
-| Foreground | Not rerun; covered by the prior Quick Tunnel PoC and not part of the permanent-origin revalidation |
-| Background | PASS — the Home Screen app was not foregrounded during Lock Screen delivery |
-| Locked | PASS — the human observed the first notification on the physical iPhone Lock Screen |
-| Removed from app switcher | Not rerun; covered by the prior Quick Tunnel PoC |
-| Phone cellular / laptop Wi-Fi | Not rerun; covered by the prior Quick Tunnel PoC |
-| Offline then online | Not rerun; covered by the prior Quick Tunnel PoC |
-| Notification tap opens/focuses | Not rerun; covered by the prior Quick Tunnel PoC |
-| Rust restart, same origin/subscription | PASS — the phone registration remained ready and the human observed a second Lock Screen notification after restart |
+## Ma trận iPhone thủ công
 
-## Evidence and uncertainty
+| Trường hợp                                | Kết quả tại lần kiểm chứng                                                              |
+| ----------------------------------------- | --------------------------------------------------------------------------------------- |
+| Ứng dụng đang mở                          | Không chạy lại; đã có ở PoC Quick Tunnel trước, ngoài lần kiểm lại địa chỉ lâu dài này. |
+| Chạy nền                                  | Đạt — ứng dụng không ở phía trước khi nhận trên màn hình khóa.                          |
+| Điện thoại khóa                           | Đạt — người dùng thấy thông báo đầu tiên trên iPhone thật.                              |
+| Vuốt khỏi trình chuyển ứng dụng           | Không chạy lại; có bằng chứng PoC trước.                                                |
+| iPhone dùng dữ liệu di động, laptop Wi-Fi | Không chạy lại; có bằng chứng PoC trước.                                                |
+| Mất mạng rồi có lại                       | Không chạy lại; có bằng chứng PoC trước.                                                |
+| Chạm thông báo mở/đưa ứng dụng lên trước  | Không chạy lại; có bằng chứng PoC trước.                                                |
+| Khởi động lại Rust, cùng origin/đăng ký   | Đạt — đăng ký vẫn sẵn sàng, người dùng thấy thông báo thứ hai trên màn hình khóa.       |
 
-The sibling Quick Tunnel PoC is prior evidence for the basic Web Push matrix only. Its tracked server and Quick Tunnel were stopped to release port 8787; its source and durable push data were not changed.
+## Bằng chứng và giới hạn
 
-On 2026-09-02, the physical iPhone registered from the private Home Screen PWA and received the first Lock Screen notification. The Rust Gate 0 process was then restarted. The private origin, sender identity, and stored phone registration remained ready without reinstalling or resubscribing, and the human observed the second Lock Screen notification. Provider acceptance was treated only as intermediate evidence; both deliveries were declared by the human. This satisfies the permanent-origin and restart-survival acceptance condition, so Gate 0 is PASS.
+PoC Quick Tunnel bên cạnh chỉ là bằng chứng trước đó cho ma trận Web Push cơ bản. Máy chủ và Quick Tunnel của PoC đã dừng để nhường cổng 8787; mã nguồn và dữ liệu thông báo bền vững không thay đổi.
+
+Ngày 02/09/2026, iPhone thật đăng ký từ PWA riêng và nhận thông báo màn hình khóa đầu tiên. Sau khi Rust Gate 0 khởi động lại, địa chỉ, danh tính gửi và đăng ký vẫn sẵn sàng mà không cài/đăng ký lại; người dùng thấy thông báo thứ hai.
+
+Việc dịch vụ gửi chấp nhận chỉ là bằng chứng trung gian; cả hai lần hiển thị do người dùng xác nhận. Vì vậy Gate 0 đạt điều kiện địa chỉ lâu dài và giữ đăng ký qua khởi động lại.

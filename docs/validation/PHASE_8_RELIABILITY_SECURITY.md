@@ -1,27 +1,29 @@
-# Phase 8 reliability, recovery, and security validation
+# Giai đoạn 8 — Độ tin cậy, khôi phục và bảo mật
 
-Date: 2026-09-02
+Ngày ghi nhận: 02/09/2026.
 
-## Scope
+## Phạm vi
 
-- verified SQLite WAL, foreign keys, busy timeout, empty and prior-schema migrations, automatic pre-migration backup, exact rollback after a failed migration, startup retention, and operational database failure copy;
-- explicit `doctor`, `backup`, confirmed `restore`, and confirmed notification reset commands, with rollback validation and no normal forced termination;
-- bounded recovery for stale lifecycle state, abrupt termination, active SSE shutdown, spool and outbox replay, expired leases, App Server failure, temporary network loss, push provider outcomes, expired jobs, and stale subscriptions;
-- loopback and private-host enforcement, Funnel fail-closed detection, origin/CSRF/owner boundaries, security headers, literal rendering, redacted logs/diagnostics, dependency and secret scans, and Windows owner/SYSTEM ACLs;
-- Codex integration merge, repair, removal, executable selection, missing/unsupported executable handling, and a source gate forbidding credential-file access.
+- SQLite: WAL, khóa ngoại, thời gian chờ khóa, tạo mới/nâng từ cấu trúc cũ, sao lưu trước nâng cấp, hoàn nguyên đúng dữ liệu khi lỗi, dọn lịch sử lúc khởi động và thông báo lỗi dễ hiểu.
+- Lệnh `doctor`, `backup`, `restore` và đặt lại thông báo; hai thao tác sau cần xác nhận, có kiểm tra hoàn nguyên; dừng bình thường không cưỡng bức.
+- Khôi phục có giới hạn cho dữ liệu tiến trình cũ, dừng đột ngột, đóng SSE, phát lại spool/outbox, hết hạn quyền xử lý, App Server lỗi, mất mạng tạm, kết quả dịch vụ gửi, việc hết hạn và đăng ký cũ.
+- Ràng buộc loopback/Host riêng, phát hiện Funnel và chặn an toàn, origin/CSRF/chủ sở hữu, header bảo mật, hiển thị nội dung như văn bản, lọc log/chẩn đoán, quét thư viện/bí mật và ACL người dùng/SYSTEM.
+- Ghép/sửa/gỡ tích hợp Codex, chọn tệp thực thi, xử lý thiếu/không tương thích và kiểm tra cấm đọc tệp đăng nhập.
 
-## Automated evidence
+## Bằng chứng tự động
 
-- 57 production Rust unit tests plus CLI and HTTP integration tests cover database snapshots and rollback, lifecycle faults, recovery commands, ACLs, headers, Tailscale loss, push classification, lease deduplication, TTL, stale subscription recovery, Codex boundaries, and redaction;
-- 15 Angular tests include corrupted IndexedDB projection rejection while preserving SQLite as authority;
-- 40 light/dark Playwright checks include corrupted-cache replacement and executable-markup rejection in addition to the prior product flows;
-- generated contract freshness, Angular lint/typecheck/build, Rust format/Clippy/tests/release, architecture and hygiene checks pass;
-- `pnpm audit --prod --audit-level high` reports no known production JavaScript vulnerabilities. `cargo audit --deny warnings` passes with one explicit reviewed exception: `RUSTSEC-2023-0071` is a no-fix RSA timing advisory in the pure-Rust backend selected transitively by `web-push-native`; both VibePing paths use ES256 VAPID only and a source gate fails on any RSA operation.
+57 kiểm thử đơn vị Rust sản phẩm cùng tích hợp CLI/HTTP bao phủ bản sao dữ liệu/hoàn nguyên, lỗi tiến trình, lệnh khôi phục, ACL, header, mất Tailscale, phân loại gửi, chống trùng quyền xử lý, TTL, đăng ký cũ, ranh giới Codex và lọc dữ liệu.
 
-## Windows protection decision
+15 kiểm thử Angular gồm từ chối bộ đệm IndexedDB hỏng, giữ SQLite là nguồn chính. 40 Playwright sáng/tối gồm thay bộ đệm hỏng và không thực thi mã đánh dấu trong nội dung. Hợp đồng mới, lint/kiểu/build Angular, format/Clippy/test/release Rust, kiến trúc và vệ sinh repo đạt.
 
-The local data root has inheritance removed once and grants full control only to the current Windows SID and Local System, recursively. This protects SQLite, VAPID material, control metadata, logs, and locally retained backups without changing the established VAPID bytes. Manual backup bundles contain the sender identity and are therefore sensitive; VibePing creates them only inside the protected data root and never prints their contents. Same-user malware and copied backup files remain residual risks.
+Tại lần ghi nhận, `pnpm audit --prod --audit-level high` không báo lỗ hổng JavaScript sản phẩm đã biết. `cargo audit --deny warnings` đạt với một ngoại lệ đã xem xét: `RUSTSEC-2023-0071`, cảnh báo thời gian RSA chưa có bản sửa của phụ thuộc gián tiếp từ `web-push-native`. Cả hai đường VibePing chỉ dùng ES256 VAPID; kiểm tra mã sẽ lỗi nếu có thao tác RSA. Đây là kết quả lịch sử, không thay cho lần kiểm toán phụ thuộc mới.
 
-## Manual boundary
+## Bảo vệ trên Windows
 
-No physical iPhone result is claimed. Phase 10 must still exercise the final package, stable private origin, existing browser subscription recovery where automation permits, delayed Lock Screen delivery, and rollback path. The seven-day soak remains after release-candidate cutover.
+Thư mục dữ liệu bỏ quyền kế thừa và cấp toàn quyền đệ quy chỉ cho SID người dùng hiện tại và Local System. Cách này bảo vệ SQLite, VAPID, thông tin điều khiển, log và bản sao tại chỗ mà không đổi danh tính VAPID đã có.
+
+Gói sao lưu chứa danh tính gửi nên nhạy cảm; chỉ tạo trong thư mục được bảo vệ, không in nội dung. Mã độc cùng quyền và bản sao chuyển ra ngoài vẫn là rủi ro còn lại.
+
+## Cần người dùng xác nhận
+
+Không tuyên bố kết quả iPhone thật. Giai đoạn 10 còn kiểm tra gói cuối, địa chỉ riêng, khôi phục đăng ký trong phạm vi tự động làm được, thông báo trễ màn hình khóa và quay lại bản cũ. Thử dùng bảy ngày bắt đầu sau chuyển sang bản ứng viên.

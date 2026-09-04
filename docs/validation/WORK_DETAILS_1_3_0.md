@@ -1,26 +1,29 @@
-# Work details 1.3.0 validation
+# Kiểm chứng chi tiết công việc 1.3.0
 
-## Delivered slice
+Biên bản lịch sử của bản 1.3.0.
 
-Activity opens work detail directly. Each exact Codex thread retains its identity; the latest request opens its original timeline and answer, and older requests expand independently in place. A single request omits hierarchy labels. Idle status and recent work rows are compact. Safe previews apply to current and legacy history; full technical results remain in detail.
+## Phần đã bàn giao
 
-Request reads wait for cache restoration, persist the complete answer before returning, reject obsolete selection responses, and catch signals arriving during a read without continuously polling a stale response. Exact notification targets are included even outside the latest history page. No database migration was added.
+Hoạt động mở thẳng chi tiết công việc. Mỗi hội thoại Codex giữ định danh; yêu cầu mới nhất mở diễn biến/câu trả lời gốc, yêu cầu cũ mở độc lập tại chỗ. Một yêu cầu thì bỏ nhãn phân cấp. Trạng thái rảnh và danh sách gần đây gọn; trích đoạn an toàn áp dụng cả lịch sử mới/cũ, kết quả kỹ thuật đầy đủ nằm trong chi tiết.
 
-## Validation
+Đọc yêu cầu đợi phục hồi bộ đệm, lưu câu trả lời đầy đủ trước khi trả về, bỏ phản hồi của lựa chọn đã đổi và bắt tín hiệu đến trong lúc đọc mà không đọc lặp mãi phản hồi cũ. Đích thông báo chính xác được đưa vào cả khi ngoài trang mới nhất. Không thêm nâng cấp cơ sở dữ liệu.
 
-- Formatting, Angular lint/type checking, generated-contract freshness, Tailwind/production builds, Rust formatting/clippy and release builds passed.
-- 125 mobile unit tests, 145 Rust workspace tests and six Gate 0 tests passed. All 120 browser scenarios passed across the full run and focused confirmation; the new legacy test's heading selector was corrected to target its established subtitle. Both themes, 320–430 px and wide layouts, reduced motion, live completion, same-project identities, inline disclosure, exact notification links, retained scroll and offline recovery were covered.
-- The finish reviewer scored legacy preview filtering and request terminology resolved. A real-data validation sentence reopened the preview finding; targeted phrase exclusions and regression checks resolved it. Final disposition: `ship`, at the reviewed-fix scope. DESIGN.md and its local design record were reconciled with the built source.
-- All four shipping PNG sources carry provenance. Only the existing favicon's origin metadata changed; its image-data and color chunks were verified identical.
-- Final ZIP smoke passed extraction, lifecycle, private health, PWA, REST, SSE, real Codex allowance, synthetic attention, delayed queue and restart persistence without a developer runtime.
-- A real service-worker upgrade from 1.2.0 to the final 1.3.0 executable showed the versioned notice, required explicit activation and retained local data in the new offline shell.
+## Kiểm chứng
 
-## Installed host
+- Format, lint/kiểu Angular, hợp đồng mới, build Tailwind/sản phẩm, format/Clippy Rust và build phát hành đạt.
+- 125 kiểm thử mobile, 145 Rust và sáu Gate 0 đạt. Đủ 120 kịch bản trình duyệt đạt qua lần toàn bộ và xác nhận trọng tâm; bộ chọn tiêu đề của kiểm thử lịch sử mới được sửa cho đúng phụ đề hiện có.
+- Bao phủ sáng/tối, 320–430 px và màn hình rộng, giảm chuyển động, hoàn tất trực tiếp, định danh cùng dự án, mở tại chỗ, đúng liên kết thông báo, giữ vị trí cuộn và ngoại tuyến.
+- Đánh giá cuối xác nhận lọc trích đoạn cũ và thuật ngữ yêu cầu đã sửa. Một câu kiểm chứng dữ liệu thật khiến mở lại lỗi trích đoạn; loại cụm có mục tiêu và kiểm thử hồi quy đã xử lý. Kết luận `ship` trong phạm vi đã xem. DESIGN.md/bản ghi cục bộ khớp mã đã build.
+- Bốn PNG phát hành có nguồn gốc. Chỉ metadata nguồn favicon đổi; dữ liệu ảnh/màu được xác minh giống hệt.
+- ZIP cuối đạt giải nén, vòng đời, sức khỏe riêng, PWA, REST/SSE, hạn mức thật, sự kiện giả, hàng đợi trễ và lưu qua khởi động lại khi không có công cụ phát triển.
+- Service worker thật 1.2.0 → 1.3.0 hiện đúng phiên bản, yêu cầu kích hoạt, giữ dữ liệu trong giao diện ngoại tuyến mới.
 
-The final package replaced files at the existing installation path after protected backups and a graceful stop. Local/private health and the PWA manifest report 1.3.0; installed files and manifest hashes match the final build. The companion reports healthy, with tray and opted-in sign-in startup enabled. Serve configuration and VAPID identity are unchanged; Funnel remains off.
+## Máy cài tại thời điểm ghi nhận
 
-Before/after integrity checks retained all 28 stored final results, 107 activity records, 139 timeline stages, one owner, two subscriptions and one phone identity. Evidence stores hashes and counts only and remains outside Git. Real app QA confirmed the update notice, direct work detail and inline expansion of an older retained result without a third route.
+Thay gói ở đường cũ sau sao lưu bảo vệ và dừng an toàn. Sức khỏe localhost/riêng và manifest báo 1.3.0; tệp cài/mã băm khớp build cuối. Đồng hành khỏe, có khay và tự chạy đã bật. Serve/VAPID không đổi; Funnel tắt.
 
-Final ZIP SHA-256: `cce1a17a86daa045b674820e808712d23a2bf088a35639ba103a94675ea9c145`.
+Kiểm tra trước/sau giữ 28 kết quả, 107 sự kiện, 139 mốc, một chủ sở hữu, hai đăng ký, một danh tính điện thoại. Bằng chứng chỉ lưu mã băm/số đếm ngoài Git. Kiểm tra ứng dụng thật xác nhận thông báo cập nhật, mở thẳng chi tiết và mở kết quả cũ bên trong, không có tuyến thứ ba.
 
-Physical iPhone observation remains the owner's acceptance step: open the Home Screen app on its private connection and tap **Cập nhật** when **Phiên bản 1.3.0** appears. No reinstall, pairing or subscription reset is required.
+SHA-256 ZIP: `cce1a17a86daa045b674820e808712d23a2bf088a35639ba103a94675ea9c145`.
+
+Người dùng vẫn cần quan sát iPhone: mở từ Màn hình chính trên kết nối riêng, chọn **Cập nhật** khi thấy **Phiên bản 1.3.0**. Không cần cài, ghép nối hoặc đặt lại đăng ký.

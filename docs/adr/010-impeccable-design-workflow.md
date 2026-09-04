@@ -1,8 +1,8 @@
-# ADR 010: Impeccable design workflow
+# ADR 010 — Quy trình thiết kế Impeccable
 
-- **Status:** Accepted
-- **Decision:** Install Impeccable project-locally and use it for every user-visible surface. Gate 0 applies shape, critique, harden, and adapt.
-- **Context:** The utility must be intentional and accessible without turning a diagnostic spike into marketing UI.
-- **Alternatives:** Ad hoc agent styling, a large design system before product proof, unreviewed framework defaults.
-- **Consequences:** PRODUCT.md and DESIGN.md are durable authorities; visual work is bounded, evidence-based, and subject to product constraints.
-- **Validation needed:** Trusted project hook, detector pass, target-width screenshots, and bounded finish review.
+- **Trạng thái:** Đã chấp nhận.
+- **Quyết định:** Cài Impeccable trong dự án và dùng cho mọi phần người dùng nhìn thấy. Gate 0 áp dụng `shape`, `critique`, `harden` và `adapt`.
+- **Bối cảnh:** Công cụ cần được thiết kế có chủ đích, dễ tiếp cận; bản thử nghiệm chẩn đoán không cần trở thành trang quảng cáo.
+- **Phương án đã cân nhắc:** Tác nhân tự đặt kiểu dáng tùy lúc; xây hệ thống thiết kế lớn trước khi chứng minh sản phẩm; dùng giao diện framework chưa rà soát.
+- **Hệ quả:** `PRODUCT.md` và `DESIGN.md` giữ định hướng lâu dài. Công việc giao diện có số vòng kiểm tra giới hạn, dựa trên bằng chứng và tuân theo phạm vi sản phẩm.
+- **Kiểm chứng theo kế hoạch ban đầu:** Hook dự án đã được tin cậy, kiểm tra tự động, ảnh ở bề rộng mục tiêu và rà soát cuối có giới hạn.

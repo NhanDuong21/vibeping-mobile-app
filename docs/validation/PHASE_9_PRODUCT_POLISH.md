@@ -1,30 +1,30 @@
-# Phase 9 product polish and accessibility validation
+# Giai đoạn 9 — Hoàn thiện giao diện và khả năng tiếp cận
 
-Date: 2026-09-02
+Ngày ghi nhận: 02/09/2026.
 
-## Scope
+## Phạm vi
 
-- onboarding, activity, event detail, allowance detail, computer, settings, diagnostics, update available, offline, permission denied, stale subscription, desktop stopped, and unexpected safe-error states;
-- 320/375/390/430 px widths, light/dark/system themes, reduced motion, keyboard focus, heading structure, accessible names, 44 px touch targets, contrast, 125% root-text stress, long Vietnamese content, safe-area padding, and horizontal overflow;
-- production bundle composition, lazy route chunks, font and library policy, cached shell, and Vietnamese client-copy audit.
+Thiết lập ban đầu, hoạt động, chi tiết sự kiện/hạn mức, máy tính, cài đặt, chẩn đoán, có cập nhật, mất mạng, quyền bị từ chối, đăng ký cũ, máy chủ tắt và lỗi bất ngờ an toàn.
 
-## Bounded Impeccable pass
+Kiểm tra 320/375/390/430 px, giao diện sáng/tối/hệ thống, giảm chuyển động, focus, cấu trúc tiêu đề, tên cho công nghệ hỗ trợ, vùng chạm 44 px, tương phản, tăng chữ 125%, tiếng Việt dài, vùng an toàn và tràn ngang. Rà soát gói biên dịch, trang tải theo nhu cầu, phông/thư viện, giao diện đệm và câu chữ.
 
-The initial audit scored 18/20. It found one WCAG contrast failure on the coral unread-count badge, repeated eyebrow labels that weakened hierarchy, Unicode arrows that did not express consistent icon semantics, a development-machine name in onboarding, and a global reduced-motion override that suppressed unrelated browser behavior.
+## Vòng Impeccable có giới hạn
 
-One bounded fix round darkened the coral token to give white text a 5.08:1 contrast ratio, simplified page headings, replaced navigation glyphs with explicit SVG chevrons, removed the fake machine name, and limited reduced-motion behavior to real transitions and the loading pulse. The final audit scored 20/20. One subsequent light/dark confirmation reviewed the resulting screenshots; no second visual fix round was needed.
+Đánh giá đầu đạt 18/20, phát hiện: huy hiệu chưa đọc san hô không đủ tương phản WCAG; nhãn đầu mục lặp làm yếu phân cấp; mũi tên Unicode không nhất quán; tên máy phát triển trong thiết lập; quy tắc giảm chuyển động toàn cục ảnh hưởng quá rộng.
 
-Ignored evidence lives under `.runtime/phase9/initial` and `.runtime/phase9/confirmation`. It includes contact sheets and individual viewport captures without production data or secrets.
+Một vòng sửa làm tối màu san hô để chữ trắng đạt 5,08:1, đơn giản tiêu đề, dùng mũi tên SVG rõ, bỏ tên máy giả và chỉ giảm các chuyển động thực/nhịp tải. Đánh giá cuối đạt 20/20. Một lần xác nhận ảnh sáng/tối sau đó không cần vòng sửa hình ảnh thứ hai.
 
-## Automated evidence
+Bằng chứng được Git bỏ qua trong `.runtime/phase9/initial` và `.runtime/phase9/confirmation`, gồm ảnh ghép và từng màn hình, không có dữ liệu sản phẩm thật hoặc bí mật.
 
-- the maintained Phase 9 Playwright suite exercises all required primary and recovery states in both light and dark projects;
-- Axe reports no WCAG A/AA violations after the fix; every audited page has one visible `h1`, no measured target below 44 px, and no horizontal overflow at its assigned width or after 125% root-text stress;
-- a non-visual interaction test verifies system-theme resolution, reduced-motion behavior for toggles and loading feedback, and visible keyboard focus;
-- the Vietnamese copy gate rejects common accidental English, raw protocol/storage/error terms, loopback addresses, and the removed fake machine name in client templates;
-- the production initial bundle is 488.26 kB raw and 127.89 kB estimated transfer. Every product page is a lazy route chunk, the shell imports only the required Ionic host/router elements, fonts are local system fonts, and no decorative or external font request was introduced;
-- the Angular service worker remains the sole cached application shell, with an explicit user-controlled update state.
+## Bằng chứng tự động
 
-## Manual boundary
+- Bộ Playwright được duy trì bao phủ màn hình chính và khôi phục ở sáng/tối.
+- Axe không còn lỗi WCAG A/AA; mỗi trang có một `h1` hiển thị, không vùng chạm đo được dưới 44 px, không tràn ngang ở bề rộng được giao hoặc khi tăng chữ 125%.
+- Kiểm thử tương tác xác minh giao diện hệ thống, giảm chuyển động công tắc/nhịp tải và focus bàn phím.
+- Kiểm tra câu chữ chặn tiếng Anh vô tình lọt, thuật ngữ giao thức/lưu trữ/lỗi thô, địa chỉ loopback và tên máy giả đã bỏ.
+- Gói tải đầu tại thời điểm đó: 488,26 kB thô, ước tính truyền 127,89 kB. Mỗi trang tải theo nhu cầu; khung chỉ nhập phần Ionic host/router cần dùng, phông hệ thống cục bộ, không thêm phông ngoài hay yêu cầu trang trí.
+- Angular service worker là lớp giao diện đệm duy nhất; cập nhật do người dùng chủ động chọn.
 
-Browser automation and desktop screenshot review cannot prove physical iPhone font rendering, real Safari browser bars, Home Screen safe-area behavior, notification permission UI, or Lock Screen display. Those remain explicit Phase 10 morning acceptance steps; Phase 9 makes no physical-device claim.
+## Cần người dùng xác nhận
+
+Tự động trình duyệt và ảnh desktop không chứng minh cách iPhone thật dựng phông, thanh Safari, vùng an toàn Màn hình chính, hộp quyền hoặc thông báo màn hình khóa. Những việc này thuộc nghiệm thu giai đoạn 10.

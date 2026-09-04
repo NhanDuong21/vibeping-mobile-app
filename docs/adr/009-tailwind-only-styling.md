@@ -1,8 +1,8 @@
-# ADR 009: Tailwind-only styling authoring
+# ADR 009 — Chỉ viết kiểu dáng bằng Tailwind
 
-- **Status:** Accepted
-- **Decision:** Author screen/component styling only with Tailwind utilities. Keep one minimal global Tailwind/token/platform input and never hand-edit generated output.
-- **Context:** A single predictable authoring system avoids Ionic-default drift and scattered styles.
-- **Alternatives:** SCSS, component CSS, CSS modules, Tailwind CDN, mixed authoring.
-- **Consequences:** Class-heavy templates require discipline; central tokens remain small; framework global imports are allowed only when unavoidable.
-- **Validation needed:** PWA static checks, Impeccable detector, code review, and future Angular architecture rules.
+- **Trạng thái:** Đã chấp nhận.
+- **Quyết định:** Chỉ dùng lớp tiện ích Tailwind cho màn hình/component. Giữ một tệp đầu vào toàn cục tối thiểu cho Tailwind, giá trị thiết kế và yêu cầu nền tảng; không sửa tay đầu ra được sinh.
+- **Bối cảnh:** Một cách viết thống nhất giúp tránh giao diện mặc định Ionic lệch hướng và kiểu dáng rải rác.
+- **Phương án đã cân nhắc:** SCSS, CSS component, CSS modules, Tailwind CDN, phối nhiều cách viết.
+- **Hệ quả:** Template nhiều lớp cần kỷ luật; giá trị thiết kế tập trung phải gọn; chỉ nhập CSS toàn cục framework khi không tránh được.
+- **Kiểm chứng theo kế hoạch ban đầu:** Kiểm tra tĩnh PWA, công cụ Impeccable, rà soát mã và quy tắc kiến trúc Angular ở giai đoạn sau.

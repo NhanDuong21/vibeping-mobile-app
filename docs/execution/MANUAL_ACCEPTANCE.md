@@ -1,89 +1,89 @@
-# Manual iPhone acceptance
+# Nghiệm thu thủ công trên iPhone
 
-No row in this document is passed by automation. The human completes these checks after the release candidate is running at the existing private origin.
+Danh sách ghi lại xác nhận của người dùng, không được đánh dấu đạt bằng tự động. Giữ nguyên các ô đã xác nhận và còn chờ. Đây là hồ sơ nghiệm thu nền tảng V1; các biên bản bản mới không tự hoàn tất những ô còn trống.
 
-## Morning handoff
+## Kiểm tra lần đầu sau bàn giao
 
 1. Mở `Start VibePing.bat` nếu VibePing chưa chạy.
 2. Kết nối Tailscale trên iPhone.
 3. Mở biểu tượng VibePing hiện có trên Màn hình chính.
-4. Hoàn tất ghép nối/cập nhật một lần nếu được hỏi. Nếu vẫn thấy giao diện Gate 0, đóng VibePing, mở lại một lần, rồi tải lại một lần; không xóa biểu tượng và không đăng ký thông báo lại trừ khi ứng dụng yêu cầu.
-5. Xác nhận trạng thái điện thoại đã sẵn sàng.
+4. Hoàn tất ghép nối/cập nhật một lần nếu được hỏi. Nếu vẫn thấy Gate 0, đóng, mở lại một lần rồi tải lại một lần; không xóa biểu tượng hoặc đăng ký lại trừ khi ứng dụng yêu cầu.
+5. Xác nhận điện thoại đã sẵn sàng.
 6. Lên lịch thông báo thử sau 10 giây.
 7. Khóa iPhone trước khi hết 10 giây.
-8. Ghi lại kết quả hiển thị, âm thanh/rung và hành vi khi chạm thông báo.
+8. Ghi nhận hiển thị, âm thanh/rung và hành vi khi chạm.
 
-Do Angular service worker thay thế worker Gate 0 tại cùng scope, lần mở đầu tiên có thể cần đúng một vòng đóng/mở/tải lại để worker mới giành quyền điều khiển. Đây là bước cập nhật một lần, không phải cài lại PWA.
+Angular service worker thay worker Gate 0 trong cùng phạm vi; lần mở đầu có thể cần đúng một vòng đóng/mở/tải lại để worker mới tiếp quản. Đây là cập nhật một lần, không phải cài lại PWA.
 
-## Installation and update
+## Cài đặt và cập nhật
 
-- [x] Tailscale is connected on the iPhone.
-- [x] The existing VibePing Home Screen icon opens the final product.
-- [x] The final product replaces the Gate 0 interface.
-- [x] The private origin has not changed.
-- [x] No reinstall is required, or the documented one-time reload succeeds.
+- [x] Tailscale đã kết nối trên iPhone.
+- [x] Biểu tượng VibePing hiện có trên Màn hình chính mở bản sản phẩm cuối.
+- [x] Bản sản phẩm đã thay giao diện Gate 0.
+- [x] Địa chỉ riêng không đổi.
+- [x] Không cần cài lại, hoặc cách tải lại một lần đã thành công.
 
-## Push notifications
+## Thông báo
 
-- [x] A notification scheduled for 10 seconds appears on the locked iPhone.
-- [x] Tapping the notification opens or focuses VibePing.
-- [x] Foreground delivery behaves correctly.
-- [x] Background delivery behaves correctly.
-- [x] Delivery works after removing VibePing from the app switcher.
-- [x] Delivery works with iPhone cellular data and laptop Wi-Fi.
-- [x] A queued signal arrives after the iPhone goes offline and returns online.
-- [x] Delivery works after the final Rust process restarts.
-- [x] Restart does not require enabling notifications or reinstalling the PWA.
+- [x] Thông báo hẹn 10 giây xuất hiện trên iPhone đã khóa.
+- [x] Chạm thông báo mở hoặc đưa VibePing lên trước.
+- [x] Nhận đúng khi ứng dụng đang mở.
+- [x] Nhận đúng khi ứng dụng chạy nền.
+- [x] Nhận sau khi vuốt VibePing khỏi trình chuyển ứng dụng.
+- [x] Nhận khi iPhone dùng dữ liệu di động và laptop dùng Wi-Fi.
+- [x] Tín hiệu chờ đến sau khi iPhone mất mạng rồi có lại.
+- [x] Nhận sau khi tiến trình Rust bản cuối khởi động lại.
+- [x] Khởi động lại không cần bật thông báo hoặc cài PWA lại.
 
-Physical evidence on 2026-09-02: the locked iPhone displayed the delayed test notification with sound or vibration, and tapping it opened or focused VibePing.
+Bằng chứng ngày 02/09/2026: iPhone đã khóa hiển thị thông báo thử trễ, có âm thanh hoặc rung; chạm mở hoặc đưa VibePing lên trước.
 
-## Codex attention
+## Tín hiệu Codex
 
-- [ ] A real Codex task-start signal appears as current work without a push.
-- [ ] A real Codex completion creates one activity event and one notification.
-- [ ] A permission-required state creates one return-needed notification when safely testable.
-- [ ] A failed test followed by a passing test creates no false failure notification.
-- [ ] An unresolved final failed test creates one failure notification.
+- [ ] Bắt đầu công việc Codex thật hiện thành công việc hiện tại mà không gửi thông báo.
+- [ ] Hoàn tất Codex thật tạo một hoạt động và một thông báo.
+- [ ] Trạng thái cần cấp phép tạo một thông báo cần quay lại, khi có thể thử an toàn.
+- [ ] Kiểm thử lỗi rồi đạt không tạo thông báo lỗi sai.
+- [ ] Kiểm thử cuối lỗi chưa được sửa tạo một thông báo lỗi.
 
-## Codex allowance
+## Hạn mức Codex
 
-- [x] Real allowance windows are visible and understandable.
-- [x] Percent remaining and local reset time are correct.
-- [x] Manual refresh works.
-- [ ] No internal bucket identifier appears as the main label.
-- [ ] Low/critical behavior is simulated without changing the real account.
+- [x] Khung hạn mức thật hiển thị dễ hiểu.
+- [x] Phần trăm còn lại và giờ đặt lại địa phương đúng.
+- [x] Làm mới thủ công hoạt động.
+- [ ] Không có mã nhóm nội bộ làm nhãn chính.
+- [ ] Mô phỏng mức thấp/rất thấp mà không đổi tài khoản thật.
 
-## Lifecycle and state
+## Vòng đời và dữ liệu
 
-- [ ] `Start VibePing.bat` starts the application.
-- [ ] Running Start a second time reports the existing instance safely.
-- [ ] `Stop VibePing.bat` stops the application gracefully.
-- [ ] The PWA shows saved history and a stopped-laptop state after Stop.
-- [ ] `Restart VibePing.bat` restores service.
-- [ ] History, phone registration, and allowance state survive restart.
+- [ ] `Start VibePing.bat` khởi động ứng dụng.
+- [ ] Chạy Start lần hai báo an toàn rằng đã có phiên chạy.
+- [ ] `Stop VibePing.bat` dừng an toàn.
+- [ ] PWA hiện lịch sử đã lưu và trạng thái laptop dừng sau Stop.
+- [ ] `Restart VibePing.bat` khôi phục dịch vụ.
+- [ ] Lịch sử, đăng ký điện thoại và hạn mức còn sau khởi động lại.
 
-## Interface and settings
+## Giao diện và cài đặt
 
-- [x] Light theme is usable.
-- [x] Dark theme is usable.
-- [x] System theme follows the iPhone.
-- [x] No screen overflows horizontally on the iPhone.
-- [ ] All visible client text is Vietnamese.
-- [x] Settings persist and affect behavior.
-- [ ] Quiet hours, including an overnight interval, behave correctly.
-- [ ] Minimal, balanced, and full lock-screen privacy modes behave correctly.
+- [x] Giao diện sáng dùng được.
+- [x] Giao diện tối dùng được.
+- [x] Giao diện hệ thống theo iPhone.
+- [x] Không màn hình nào tràn ngang trên iPhone.
+- [ ] Mọi chữ hiển thị của ứng dụng là tiếng Việt.
+- [x] Cài đặt được giữ và có tác dụng.
+- [ ] Giờ yên tĩnh, gồm khoảng qua đêm, hoạt động đúng.
+- [ ] Ba mức riêng tư màn hình khóa, từ ít đến nhiều chi tiết, hoạt động đúng.
 
-## Seven-day soak gate
+## Thử dùng liên tục bảy ngày
 
-- [ ] No manual process rescue is needed.
-- [ ] No phone registration reset is needed.
-- [ ] No PWA reinstall is needed.
-- [ ] No database repair is needed.
-- [ ] No duplicate completion notifications are observed.
-- [ ] No final attention event is lost.
-- [ ] No allowance stage repeats within one reset cycle.
-- [ ] Start, Stop, and Restart remain reliable.
-- [ ] Offline recovery remains reliable.
-- [ ] No raw technical error reaches the primary interface.
+- [ ] Không cần cứu tiến trình thủ công.
+- [ ] Không cần đặt lại đăng ký điện thoại.
+- [ ] Không cần cài lại PWA.
+- [ ] Không cần sửa cơ sở dữ liệu.
+- [ ] Không thấy thông báo hoàn tất trùng.
+- [ ] Không mất sự kiện cuối cần chú ý.
+- [ ] Không lặp mức cảnh báo hạn mức trong cùng chu kỳ.
+- [ ] Khởi động, Dừng và Khởi động lại vẫn tin cậy.
+- [ ] Khôi phục sau mất mạng vẫn tin cậy.
+- [ ] Không lỗi kỹ thuật thô xuất hiện trên giao diện chính.
 
-Stable `v1.0.0` remains blocked until this physical matrix and soak gate are complete.
+Mốc ổn định `v1.0.0` trong kế hoạch gốc vẫn cần hoàn tất ma trận này và thử dùng bảy ngày. Tài liệu này không tự tuyên bố các bản phát hành sau đã được nghiệm thu.

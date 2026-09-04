@@ -1,5 +1,7 @@
 # VibePing 1.2.0 — Phiên làm việc
 
+Ghi chú lịch sử cho phiên bản trong tiêu đề. Để cài hoặc cập nhật bản hiện tại, xem [hướng dẫn vận hành](INSTALL_VI.md).
+
 Màn Hoạt động gọn hơn: mỗi tác vụ Codex chỉ xuất hiện một lần, dù bạn đã gửi nhiều yêu cầu trong tác vụ đó.
 
 - Một phiên chứa nhiều lượt làm việc. Gửi yêu cầu mới cập nhật phiên và đưa phiên lên đầu; hai tác vụ trong cùng dự án vẫn tách riêng.
@@ -16,4 +18,4 @@ Màn Hoạt động gọn hơn: mỗi tác vụ Codex chỉ xuất hiện một 
 3. Mở lại **Bat San sang.bat** nếu đang dùng Sẵn sàng, hoặc **Start VibePing.bat** để chạy thủ công.
 4. Trên iPhone, mở VibePing, chờ **Có bản VibePing mới — Phiên bản 1.2.0**, rồi bấm **Cập nhật**. Không cần xóa biểu tượng, ghép nối hay đăng ký thông báo lại.
 
-Tên phiên và thời gian chỉ dùng dữ liệu đã lưu. Nếu thiếu tên, app dùng tên trung tính; nếu thiếu thời điểm bắt đầu, app không tính thời lượng. Kết quả đã bị giới hạn dung lượng ở bản cũ vẫn giữ nguyên phần đã lưu và lời giải thích trong chi tiết. Số lượt phản ánh lịch sử còn được giữ theo cài đặt thời gian lưu.
+Tên phiên và thời gian chỉ dùng dữ liệu đã lưu. Nếu thiếu tên, ứng dụng dùng tên trung tính; nếu thiếu thời điểm bắt đầu, ứng dụng không tính thời lượng. Kết quả đã bị giới hạn dung lượng ở bản cũ vẫn giữ nguyên phần đã lưu và lời giải thích trong chi tiết. Số lượt phản ánh lịch sử còn được giữ theo cài đặt thời gian lưu.

@@ -1,6 +1,6 @@
 ---
 name: VibePing
-description: A calm private signal from Windows to iPhone.
+description: Tín hiệu riêng tư, nhẹ nhàng từ Windows đến iPhone.
 colors:
   vibe-canvas: "#f3f7f4"
   vibe-surface: "#ffffff"
@@ -84,180 +84,200 @@ components:
     padding: "16px"
 ---
 
-# Design System: VibePing
+# Hệ thống thiết kế VibePing
 
-## Overview
+Các tên trường và giá trị ở đầu tệp được giữ để công cụ đọc. Các tiêu đề cấp hai giữ từ khóa tiếng Anh tương ứng vì bộ đọc thiết kế dùng chúng để nhận diện cấu trúc.
 
-**Creative North Star: "Quiet signal"**
+## Overview — Tổng quan
 
-VibePing is an operational utility. The interface should feel calm, precise, and trustworthy when glanced at on a phone. Status and next action outrank decoration. It is not a marketing page, analytics dashboard, chat client, or cyberpunk control panel.
+**Creative North Star: “Quiet signal” — Tín hiệu nhẹ nhàng**
 
-Personal extends the incumbent world through familiar project identities, ordinary Settings controls and a small daily recap. Always ready is represented on the phone as a factual Windows status section. This record describes the implemented and tested feature; it does not claim that Always ready has been enabled on the user's installed host.
+VibePing là công cụ dùng hằng ngày. Giao diện cần bình tĩnh, rõ và đáng tin khi nhìn nhanh trên điện thoại. Trạng thái và việc cần làm quan trọng hơn trang trí; không thiết kế như trang quảng cáo, bảng phân tích, ứng dụng chat hoặc bảng điều khiển kiểu viễn tưởng.
 
-**Key Characteristics:**
+Cá nhân hóa kế thừa giao diện hiện có qua tên/biểu tượng dự án quen thuộc, cài đặt thông thường và tổng kết ngày nhỏ. Sẵn sàng chỉ hiển thị trạng thái Windows thực tế trên điện thoại. Tài liệu mô tả tính năng đã triển khai và kiểm thử, không khẳng định người dùng đã bật Sẵn sàng trên máy đang cài.
 
-- Tinted fields, sparse rules and restrained semantic color.
-- Local system type with clear status, task and metadata hierarchy.
-- One persistent work identity with separate requests, recorded time and retained final results.
-- A whole-image mascot with bounded, state-aware motion.
-- Plain Vietnamese, visible focus and explicit saved or unconfirmed states.
+**Đặc điểm chính:**
 
-The accepted light and dark captures in `.impeccable/review/personal`, including the 320 px and 1024 px profiles and stale Windows state, support the recorded form. The finish verdict resolves both scored fixes. The native Windows tray was not visually captured; this document records its mobile status presentation only.
+- Nền pha màu nhẹ, ít đường phân cách, màu trạng thái tiết chế.
+- Phông hệ thống cục bộ; phân cấp rõ trạng thái, công việc và thông tin phụ.
+- Một định danh công việc lâu dài, các yêu cầu riêng, thời gian ghi nhận và kết quả cuối được giữ.
+- Linh vật dùng nguyên hình, chuyển động theo trạng thái và có giới hạn.
+- Tiếng Việt dễ hiểu, focus rõ, phân biệt đã lưu và chưa xác nhận.
 
-The 1.3 light and dark captures in `.impeccable/review/work-details` record the compact idle/feed presentation, latest and previous request content, and single-request detail at phone widths, with a centered feed at 1024 px. The work-detail rules below follow the built source; capture fixture content does not establish product names or result copy.
+Ảnh sáng/tối trong `.impeccable/review/personal`, gồm hồ sơ ở 320 px/1024 px và trạng thái Windows cũ, là bằng chứng cho bố cục được ghi nhận. Đánh giá cuối đã giải quyết hai điểm cần sửa. Khay Windows native chưa có ảnh kiểm chứng; tài liệu chỉ ghi cách hiển thị trạng thái trên mobile.
 
-## Colors
+Ảnh bản 1.3 trong `.impeccable/review/work-details` ghi nhận trạng thái rảnh/danh sách gọn, yêu cầu mới/cũ và công việc một yêu cầu ở bề rộng điện thoại, cùng danh sách căn giữa ở 1024 px. Quy tắc dưới đây theo mã đã biên dịch; tên và nội dung trong dữ liệu giả không trở thành quy tắc sản phẩm.
 
-Green-tinted neutrals carry the interface; mint is a calm signal accent, with restrained amber and coral for exceptions. The frontmatter preserves the central source tokens from `apps/mobile/src/styles.css`.
+## Colors — Màu sắc
 
-### Primary
+Nền trung tính pha xanh giữ giao diện dịu; xanh bạc hà làm điểm nhấn, hổ phách và san hô dành cho ngoại lệ. Phần đầu tệp giữ các giá trị chính từ `apps/mobile/src/styles.css`.
 
-- **Signal mint** (`vibe-mint`) carries readiness, focus, enabled switches, selected navigation and primary action in dark mode.
-- **Deep signal green** (`vibe-green`) keeps accent text readable on light backgrounds.
-- **Soft mint** (`vibe-mint-soft`) supplies quiet selected-state fills.
+### Màu chính
 
-### Secondary
+- **Xanh bạc hà** (`vibe-mint`): sẵn sàng, focus, công tắc bật, điều hướng được chọn và hành động chính ở giao diện tối.
+- **Xanh đậm** (`vibe-green`): chữ nhấn dễ đọc trên nền sáng.
+- **Bạc hà nhạt** (`vibe-mint-soft`): nền nhẹ cho trạng thái được chọn.
 
-- **Attention amber** (`vibe-amber`) marks waiting, checking or unconfirmed status.
-- **Failure coral** (`vibe-coral`) marks failed or disconnected operational states where the component calls for it.
+### Màu trạng thái
 
-### Neutral
+- **Hổ phách** (`vibe-amber`): đang chờ, đang kiểm tra hoặc chưa xác nhận.
+- **San hô** (`vibe-coral`): lỗi hoặc mất kết nối tại thành phần phù hợp.
 
-- **Tinted canvas / green-black night** (`vibe-canvas`, `vibe-night`) are the page grounds.
-- **White / dark green surface** (`vibe-surface`, `vibe-surface-dark`) distinguish necessary containers.
-- **Deep ink / pale paper** (`vibe-ink`, `vibe-paper`) carry primary text and contrasting primary-action text.
-- **Muted green / soft sage** (`vibe-muted`, `vibe-sage`) carry metadata, timestamps and supporting copy.
-- **Pale / dark green rules** (`vibe-rule`, `vibe-rule-dark`) separate rows and sections without heavy framing.
+### Màu trung tính
 
-Light is the default for a calm, readable first launch. Light, dark, and system themes remain first-class choices in product settings, and a user's later choice is retained. Theme changes must preserve semantic color meaning and contrast.
+- `vibe-canvas` / `vibe-night`: nền trang sáng pha màu / tối xanh đen.
+- `vibe-surface` / `vibe-surface-dark`: nền trắng / xanh tối của vùng chứa cần thiết.
+- `vibe-ink` / `vibe-paper`: chữ chính và chữ tương phản trên nút chính.
+- `vibe-muted` / `vibe-sage`: thông tin phụ, thời gian, hướng dẫn.
+- `vibe-rule` / `vibe-rule-dark`: đường phân cách nhẹ.
 
-**The Quiet Accent Rule.** Project color belongs to the small identity icon beside the project name. It does not recolor the page or replace the separate textual operational state. The selector labels are “Xanh bạc hà”, “Xanh dương”, “Xanh lá”, “Hổ phách” and “San hô”; retain the Vietnamese label “Xanh bạc hà” for the internal mint choice.
+Mặc định lần đầu là giao diện sáng. Sáng, tối và theo hệ thống đều là lựa chọn chính thức, được lưu khi người dùng đổi. Đổi giao diện phải giữ ý nghĩa màu và độ tương phản.
 
-## Typography
+**Quy tắc màu nhấn dự án:** chỉ dùng ở biểu tượng nhỏ cạnh tên dự án. Không đổi màu cả trang hoặc thay chữ trạng thái. Nhãn lựa chọn là “Xanh bạc hà”, “Xanh dương”, “Xanh lá”, “Hổ phách” và “San hô”; lựa chọn nội bộ `mint` vẫn mang nhãn “Xanh bạc hà”.
 
-**Display and body font:** the same local system UI stack in the frontmatter. No external font or icon CDN. The system face is an operational reading face; hierarchy comes from size, weight and whitespace rather than expressive display typography.
+## Typography — Chữ và phân cấp
 
-### Hierarchy
+**Phông tiêu đề và nội dung:** dùng chung bộ phông hệ thống ở đầu tệp. Không tải phông hoặc biểu tượng từ CDN. Phân cấp bằng kích thước, độ đậm và khoảng trắng.
 
-- **Headline:** compact bold page and project names, wrapping when long.
-- **Title:** section headings and the prominent work title.
-- **Row title:** bold project, work and request-disclosure labels.
-- **Body:** supporting copy, state and duration; longer explanations use the relaxed body line height.
-- **Field:** native input and select values stay larger than their labels.
-- **Label:** short bold form labels and actions.
-- **Metadata:** source project names, timestamps and notes remain secondary. Timestamps and recap values use tabular numerals.
+### Vai trò chữ
 
-All visible client copy is plain Vietnamese. Lead with current state and recovery action. Never show raw protocol names, stack traces, HTTP statuses, database errors, or internal identifiers. A secondary copyable technical report may expose sanitized diagnostics only after explicit expansion.
+- **Headline:** tên trang/dự án đậm, gọn, xuống dòng khi dài.
+- **Title:** tiêu đề khu vực và tên công việc nổi bật.
+- **Row title:** tên dự án, công việc và hàng mở yêu cầu.
+- **Body:** hướng dẫn, trạng thái, thời lượng; nội dung dài dùng giãn dòng dễ đọc.
+- **Field:** giá trị ô nhập và danh sách chọn lớn hơn nhãn.
+- **Label:** nhãn ngắn và hành động in đậm.
+- **Metadata:** tên dự án gốc, thời gian và ghi chú ở mức phụ. Thời gian và số tổng kết dùng chữ số có độ rộng đều nhau.
 
-## Layout
+Nội dung hiển thị bằng tiếng Việt, nói trạng thái hiện tại và cách khôi phục trước. Không đưa tên giao thức thô, dấu vết lỗi, mã HTTP, lỗi cơ sở dữ liệu hoặc mã định danh nội bộ lên thông báo chính. Báo cáo kỹ thuật đã lọc chỉ xuất hiện khi chủ động mở rộng.
 
-Hierarchy comes from size, weight, and whitespace rather than display typography. Body copy stays comfortably readable at phone distance. Use a 4 px spacing basis, with 8/12/16/24/32 px as the common rhythm; leave more space above a new section than below its heading.
+## Layout — Bố cục
 
-Prefer open layout, clear rules and sparse containers. The Personal and Settings pages use a centered single column with a maximum width of 32 rem and 20 px side gutters. Major Settings sections begin after 32 px and a rule, with 24 px top padding. Icon and accent fields share two equal columns with a 12 px gap; notification controls remain full-width rows. The same narrow measure stays centered in the captured 1024 px layout.
+Dùng đơn vị khoảng cách cơ sở 4 px, thường là 8/12/16/24/32 px. Khoảng trên một mục mới lớn hơn khoảng giữa tiêu đề và nội dung của mục. Chữ phải đọc thoải mái khi cầm điện thoại.
 
-Design mobile-first at 320, 375, 390, and 430 px. Respect iPhone safe areas and dynamic text, prevent horizontal overflow, keep a logical semantic outline, preserve keyboard focus, use live regions sparingly, and never communicate state by color alone.
+Ưu tiên bố cục thoáng, đường phân cách rõ và ít vùng đóng khung. Trang Cá nhân hóa/Cài đặt có một cột căn giữa, rộng tối đa 32 rem, lề ngang 20 px. Mục cài đặt lớn bắt đầu sau khoảng cách 32 px và đường kẻ, có đệm trên 24 px. Hai ô biểu tượng/màu nhấn chia đều, cách 12 px; công tắc thông báo chiếm cả hàng. Bố cục vẫn căn giữa ở 1024 px.
 
-Long project identifiers wrap beneath the editable display name. Labels, native select values and disclosure arrows must fit the 320 px form. The existing main tabs remain Hoạt động, Máy tính and Cài đặt. Project lists and profiles are reached through Cài đặt and use a back link; their subpages do not retain the main bottom bar. Main tab pages reserve space for the fixed navigation and bottom safe area.
+Thiết kế từ mobile tại 320/375/390/430 px. Tôn trọng vùng an toàn iPhone, chữ động, thứ tự tiêu đề hợp lý và focus bàn phím; không tràn ngang, không dùng vùng thông báo trực tiếp quá nhiều, không chỉ dựa vào màu.
 
-## Elevation & Depth
+Tên gốc dự án dài được xuống dòng dưới tên có thể sửa. Nhãn, giá trị chọn native và mũi tên mở rộng phải vừa ở 320 px. Giữ ba tab **Hoạt động**, **Máy tính**, **Cài đặt**. Danh sách/hồ sơ dự án đi từ Cài đặt, có đường quay lại và không giữ thanh tab chính ở trang con. Trang tab chính chừa chỗ cho thanh cố định và vùng an toàn dưới.
 
-The system is flat at rest: tinted grounds, rules and a small number of contrasting surfaces establish depth. The prominent session has a border, not a cast card shadow. Keep the existing small switch-thumb shadow as a control affordance; it does not establish a general card-elevation vocabulary. The timeline dot's ground-colored ring keeps its sequence line legible. Focus is explicit with a mint outline (3 px) and offset (3 px).
+## Elevation — Độ nổi và chiều sâu
 
-## Shapes
+Giao diện tĩnh chủ yếu phẳng: nền pha màu, đường kẻ và ít vùng tương phản tạo chiều sâu. Thẻ phiên nổi bật dùng viền, không dùng bóng đổ. Bóng nhỏ của nút gạt là dấu hiệu điều khiển, không phải mẫu bóng cho mọi thẻ.
 
-Necessary containers use gentle 12–16 px corners, with smaller 8 px corners for control selections. Inputs and native selects use a 12 px corner, a thin theme-aware rule border, 12 px horizontal padding and a minimum 48 px height. Switch tracks, navigation selection marks and status dots are rounded. Primary actions remain at least 44×44 px; the profile save action fills the column and is at least 48 px tall.
+Vòng nền quanh chấm diễn biến giúp đường nối dễ đọc. Focus dùng viền bạc hà 3 px, cách thành phần 3 px.
 
-Project identity icons are small outlined SVGs (16 px), paired with readable text. Available choices are Mèo, Nhịp tim, Lớp học, Mã nguồn and Tia sáng. Use the official local VibePing app icon in product mastheads and install surfaces; do not substitute a text lettermark or redraw the mascot as an icon.
+## Shapes — Hình dạng
 
-## Components
+Vùng chứa cần thiết bo góc 12–16 px; lựa chọn điều khiển nhỏ dùng 8 px. Ô nhập/chọn native bo 12 px, viền mảnh theo giao diện, đệm ngang 12 px, cao tối thiểu 48 px. Rãnh công tắc, dấu chọn điều hướng và chấm trạng thái được bo tròn.
 
-### Buttons and fields
+Hành động chính có vùng chạm tối thiểu 44×44 px; nút lưu hồ sơ rộng cả cột và cao ít nhất 48 px. Biểu tượng dự án là SVG nét 16 px, có chữ đi kèm: Mèo, Nhịp tim, Lớp học, Mã nguồn, Tia sáng. Đầu trang và hướng dẫn cài đặt dùng biểu tượng VibePing chính thức cục bộ; không thay bằng chữ hoặc vẽ lại linh vật thành icon.
 
-Actions are direct and compact. Primary controls use deep ink with pale text in light mode and mint with deep ink in dark mode. Secondary recovery actions use readable text, underline where present, and the global focus outline. Retain touch feedback and clear disabled states; permission follows a direct tap.
+## Components — Thành phần giao diện
 
-Fields show a bold label above the native input or select with an 8 px gap. Notification switches sit at the trailing edge of rule-separated rows with at least 56 px row height and a 44 px switch hit area. The visible track is 48×28 px with a white 20 px thumb. Enabled mint is paired with the switch's accessible checked state.
+### Nút và ô nhập
 
-### Project profile and notification rules
+Hành động ngắn, trực tiếp. Nút chính dùng nền mực đậm/chữ sáng ở giao diện sáng, nền bạc hà/chữ đậm ở giao diện tối. Hành động khôi phục phụ có chữ dễ đọc, gạch chân tại nơi đang dùng và focus toàn cục. Giữ phản hồi chạm, trạng thái vô hiệu rõ và chỉ xin quyền sau thao tác trực tiếp.
 
-Profiles follow the Settings form: back link, editable display name, original project name, two icon/accent selectors, project notification switches, bounded threshold selectors, full-width save action, then project work history. The display name is limited to 60 characters; the source name remains secondary context.
+Nhãn đậm nằm trên ô nhập/chọn, cách 8 px. Công tắc thông báo ở cuối hàng có đường phân cách; hàng cao ít nhất 56 px, vùng chạm công tắc 44 px. Rãnh thấy được 48×28 px, nút trắng 20 px. Màu bật bạc hà phải đi cùng trạng thái checked cho công nghệ hỗ trợ.
 
-**The Confirmed Identity Rule.** Shared project names, icons and accents change only after a successful save. Keep failed edits available to retry, show “Đã lưu hồ sơ dự án.” after success, and label cached profiles explicitly. The editor may show its draft; activity and other shared identity surfaces retain the confirmed profile until it is saved.
+### Hồ sơ và quy tắc thông báo dự án
 
-Global notification types remain master controls. A project receives a type only when enabled both globally and for that project; quiet hours still apply. The four project types are completed work, Codex waiting, final tests not passing and ready previews. Global allowance controls remain separate.
+Thứ tự: quay lại, tên hiển thị, tên gốc, chọn biểu tượng/màu, công tắc thông báo, chọn ngưỡng có giới hạn, nút lưu cả chiều rộng, lịch sử dự án. Tên hiển thị tối đa 60 ký tự; tên gốc là thông tin phụ.
 
-Completion thresholds offer every job, 2 minutes or 5 minutes. Waiting reminders offer off, once after 5 minutes or once after 10 minutes. Project selectors add “Theo cài đặt chung” for inheritance. Keep these bounded choices in ordinary selects; this is not a rule builder. The global explanation states that a missing start time still permits a completion notification and that return-needed work and final test failure follow their selected notification types and quiet hours.
+**Chỉ dùng danh tính đã lưu:** tên, biểu tượng và màu dùng chung chỉ đổi sau khi lưu thành công. Giữ bản sửa lỗi để thử lại, báo “Đã lưu hồ sơ dự án.” khi thành công, gắn nhãn hồ sơ lấy từ bộ đệm. Trình sửa có thể hiện bản nháp; Hoạt động và nơi khác vẫn dùng hồ sơ đã xác nhận.
 
-Project history reuses the compact work row and direct detail path. Retain current state and full final-answer access. Cached history is labeled and offers retry; previous-page loading and failure have explicit actions.
+Công tắc chung quyết định cuối. Một loại thông báo phải bật cả ở mức chung lẫn dự án; giờ yên tĩnh vẫn áp dụng. Bốn loại theo dự án: hoàn tất, Codex đang chờ, kiểm thử cuối chưa đạt, bản xem trước sẵn sàng. Hạn mức vẫn điều khiển riêng ở mức chung.
 
-### Windows readiness
+Ngưỡng hoàn tất: mọi công việc, 2 phút hoặc 5 phút. Nhắc chờ: tắt, một lần sau 5 phút hoặc một lần sau 10 phút. Dự án có thêm “Theo cài đặt chung”. Dùng danh sách chọn thông thường. Giải thích rõ: thiếu giờ bắt đầu vẫn cho phép báo hoàn tất; công việc cần quay lại và kiểm thử cuối chưa đạt theo loại thông báo và giờ yên tĩnh đã chọn.
 
-“Sẵn sàng trên Windows” is a rule-separated Settings section with a small status dot, bold Vietnamese state, secondary context and “Kiểm tra lại laptop”. The phone reports the local companion and explains that startup and tray actions happen on Windows; it offers no phone-side Start or Stop.
+Lịch sử dùng hàng công việc gọn và mở thẳng chi tiết. Giữ trạng thái hiện tại và kết quả đầy đủ. Lịch sử đệm có nhãn, cách thử lại và hành động rõ khi tải trang trước hoặc gặp lỗi.
 
-**The Dated Readiness Rule.** A previous successful check must not remain a present-tense healthy claim after it loses freshness. While checking, stale or unavailable, show the corresponding state and the previous “Lần kiểm tra trước” date/time when available; show the sign-in setting only with a current ready result. Invalidate on hide, refresh on foreground return, page return and reconnection, and check every 30 seconds while visible. An enabled host heartbeat older than 75 seconds remains stale.
+### Sẵn sàng trên Windows
 
-The visible explanation points to the Windows package's “Bật Sẵn sàng” action and local tray. It states that stopping waits for a manual start or the next opted-in Windows sign-in. Native tray styling and appearance are outside this visual record.
+Mục này trong Cài đặt có đường phân cách, chấm nhỏ, trạng thái tiếng Việt đậm, thông tin phụ và “Kiểm tra lại laptop”. Điện thoại báo về tiến trình đồng hành và giải thích thao tác chạy/khay nằm trên Windows; không có nút Khởi động/Dừng từ điện thoại.
 
-### Work feed and inline request details
+**Gắn thời gian cho bằng chứng cũ:** kết quả kiểm tra thành công trước đây không được tiếp tục nói máy đang khỏe khi đã cũ. Khi đang kiểm tra, quá hạn hoặc không đọc được, hiện trạng thái tương ứng và “Lần kiểm tra trước” kèm ngày giờ nếu có. Chỉ hiện lựa chọn chạy khi đăng nhập cùng kết quả sẵn sàng còn mới.
 
-**The Persistent Work Rule.** One verified Codex conversation keeps one top-level identity, labeled Công việc. Explicit parent-thread ancestry joins child and nested-agent threads to their root; user-created forks, a shared session identifier or the same project alone never establish membership. Unknown or invalid ancestry is not guessed. Each retained request remains a Yêu cầu with its original hashed source and turn identities. The latest retained root request supplies the work's primary state and answer, even when a child request started later; child requests contribute to the retained count without replacing that primary request. Show the most recently updated running work or a current actionable work in the prominent card, without repeating it in the list. When idle, use a small Codex đang nghỉ block. Other rows are grouped under Đang làm việc, Cần chú ý and Gần đây only when populated. History without thread identity remains independently accessible under Hoạt động cũ.
+Đánh dấu cần kiểm tra lại khi trang ẩn; đọc lại lúc ứng dụng/trang hiện, kết nối lại và mỗi 30 giây khi nhìn thấy. Nhịp xác nhận máy chủ đã bật cũ hơn 75 giây là dữ liệu cũ. Hướng dẫn trỏ đến **Bật Sẵn sàng** và khay trong gói Windows; Dừng chỉ chạy lại khi khởi động thủ công hoặc lần đăng nhập đã bật tiếp theo. Diện mạo khay native nằm ngoài bằng chứng giao diện này.
 
-Active work retains the existing bordered surface, 16 px corners and padding, local icon and 22 px title. Recent work uses open, rule-separated rows with 16 px bold titles, project on one line, request count, state/time, one readable result sentence and a chevron. Long titles use at most two lines. The entire row is one focusable link with a 44 px minimum target; omit repeated CTA and signal metadata.
+### Danh sách công việc và yêu cầu mở tại chỗ
 
-**The Observed Time Rule.** Show recorded stages and timestamps only. The prominent active card shows the current request's real duration and latest stage. Fresh running work on the home screen shows Vietnamese seconds, minutes and hours, such as 1 giờ 12 phút 34 giây, with tabular numerals in the existing position. Both home timer spans use `role="timer"` and `aria-live="off"` so each tick does not request a live announcement; the surrounding state region remains polite. A foreground clock updates once a second independently of the 15-second network reconciliation, pauses while hidden or offline, and reads current wall time on return. Missing starts are explained inside detail. Stale, unconfirmed or disconnected work stays bounded by its last signal and stops live motion; completed durations remain fixed. Detail and history retain minute precision. Work detail can show recorded start and update times, but never presents their span as total work duration.
+**Một công việc xuyên suốt:** cuộc hội thoại Codex đã xác minh có một định danh cấp đầu, gọi **Công việc**. Quan hệ cha-con rõ ràng đưa tác nhân phụ và tác nhân lồng vào gốc; bản tách do người dùng tạo, cùng mã phiên hoặc cùng dự án không đủ để gộp. Không đoán quan hệ thiếu/sai.
 
-**The Two-Level Reading Rule.** Activity opens Chi tiết công việc with the latest retained root request's full timeline and Codex answer already visible under Yêu cầu gần nhất. If no root request is retained, use the latest available request without inventing a root answer. Other requests, including child and nested-agent requests, use Yêu cầu trước đó disclosure rows that expand independently in place, without another route. A work with one request omits these labels and counters. Older pages load on demand while the primary request stays first. Previous child-work URLs resolve to the verified root work; existing event and notification links expand their exact requested answer, including requests outside the loaded page. Authoritative membership reconciles old child-work caches without changing request identities, original answers or timelines. Reconciled grouping and previously viewed answers remain available from the offline cache; cached content is labeled and offers retry.
+Mỗi lượt được lưu vẫn là **Yêu cầu**, giữ mã nguồn và lượt đã băm ban đầu. Yêu cầu gốc mới nhất còn lưu quyết định trạng thái/kết quả chính, kể cả khi tác nhân phụ bắt đầu sau. Yêu cầu phụ góp vào số lượng nhưng không thay yêu cầu chính.
 
-Full results preserve stored headings, lists, code and original content; a truncated stored answer explicitly directs the user to Codex for the rest. Timeline markers retain tabular timestamps, the thin connecting line and established semantic colors. Privacy remains collapsed. Resolved test failures no longer flag the work as needing attention; their original timeline markers remain visible. Result excerpts in both current and legacy feed rows select a readable sentence, exclude internal review output, code and paths, and fall back to Đã có kết quả từ Codex when none remains. Without an excerpt, request rows can use the last recorded stage and legacy events use their safe summary or title fallback. Safe retained names remain titles; missing or internal names become Công việc VibePing · HH:mm. The existing mascot, bottom navigation, themes and allowance motion remain in place.
+Thẻ nổi bật chọn công việc đang chạy mới cập nhật nhất hoặc công việc đang cần xử lý, không lặp lại trong danh sách. Khi rảnh, dùng khối nhỏ **Codex đang nghỉ**. Chỉ hiện nhóm **Đang làm việc**, **Cần chú ý**, **Gần đây** khi có dữ liệu. Lịch sử thiếu mã hội thoại vẫn đọc riêng trong **Hoạt động cũ**.
 
-**The Fresh Detail Signal Rule.** Beside the detail's working state, show one decorative three-bar signal (24 px) only for the selected running session with fresh evidence under 120 seconds old. Full uses a gentle scaleY/opacity loop (2.4 seconds); Balanced, Minimal and system reduced motion keep the static mark. Cancel the loop when hidden or offscreen. Remove the mark for waiting, terminal, offline or stale states. Keep the status text still and authoritative, with the timeline and retained final answer in their existing reading order.
+Thẻ đang làm giữ viền, góc/đệm 16 px, biểu tượng cục bộ và tên 22 px. Công việc gần đây là hàng thoáng có đường phân cách: tên đậm 16 px, dự án một dòng, số yêu cầu, trạng thái/thời gian, một câu trích đoạn dễ đọc và mũi tên. Tên tối đa hai dòng. Cả hàng là một liên kết có focus và vùng chạm ít nhất 44 px; không lặp lời kêu gọi bấm hoặc thông tin tín hiệu.
 
-### Daily recap
+**Chỉ hiển thị thời gian có bằng chứng:** giữ đúng giai đoạn và mốc giờ đã ghi. Thẻ đang làm hiện thời lượng yêu cầu hiện tại và giai đoạn mới nhất. Ở trang chủ, dữ liệu đang chạy còn mới hiện giây/phút/giờ bằng tiếng Việt, ví dụ **1 giờ 12 phút 34 giây**, với chữ số đều nhau ở vị trí cũ.
 
-“Hôm nay” is four quiet definition-list rows below Activity: “Yêu cầu đã theo dõi”, “Công việc hoàn tất”, “Lần kiểm thử chưa đạt” and “Thời gian ghi nhận”. Muted labels sit opposite right-aligned bold tabular values, with 12 px row gaps. It has no chart, score or dashboard card grid.
+Hai bộ đếm trang chủ dùng `role="timer"`, `aria-live="off"` để không yêu cầu đọc mỗi giây; vùng trạng thái xung quanh vẫn thông báo nhẹ. Đồng hồ cập nhật mỗi giây độc lập với lần đối soát mạng 15 giây; tạm dừng khi ẩn/mất mạng, lấy giờ thực khi quay lại. Thiếu giờ bắt đầu thì giải thích trong chi tiết. Dữ liệu cũ, chưa xác nhận hoặc mất kết nối chỉ tính đến tín hiệu cuối và dừng chuyển động; thời lượng đã hoàn tất giữ cố định. Chi tiết/lịch sử vẫn hiển thị đến phút. Không lấy khoảng từ giờ bắt đầu đến cập nhật để gọi là tổng thời gian công việc.
 
-Observed time runs from the recorded start to the last signal; overlapping intervals count once. Keep that explanation under the rows, prefix cached summaries with “Tổng kết đã lưu.”, and show loading or reconnection copy when no summary is available. The recap does not imply total working time beyond observed evidence.
+**Hai tầng đọc:** mở **Chi tiết công việc** sẽ thấy diễn biến và câu trả lời của yêu cầu gốc mới nhất còn lưu dưới **Yêu cầu gần nhất**. Nếu không còn yêu cầu gốc, dùng yêu cầu mới nhất có sẵn, không dựng câu trả lời gốc.
 
-### Whole-image mascot and motion
+Các yêu cầu khác, kể cả tác nhân phụ/lồng, nằm ở **Yêu cầu trước đó**, mở độc lập tại chỗ, không sang tuyến mới. Công việc một yêu cầu bỏ nhãn phân cấp và bộ đếm. Trang cũ tải theo nhu cầu trong khi yêu cầu chính vẫn đầu tiên.
 
-The masthead keeps the official cat PNG whole: a 40 px image within a 48 px companion area. Motion transforms the intact image and adds restrained SVG status marks, a ring or brief completion sparkles. Working/resting can breathe; waiting has a sparse small sway; completion acknowledges the event; failure shakes briefly. Offline, stopped and unconfirmed states share the subdued grayscale image and dashed ring. A small coffee mark can appear only for observed work exceeding 30 minutes. Nearby text remains the operational authority.
+Địa chỉ công việc con cũ mở về gốc đã xác minh; liên kết sự kiện/thông báo mở đúng câu trả lời, kể cả ngoài trang đã tải. Đối soát bộ đệm cũ không đổi mã yêu cầu, nội dung hoặc diễn biến. Nhóm đã đối soát và kết quả đã xem vẫn dùng được khi mất mạng, có nhãn dữ liệu lưu và cách thử lại.
 
-Motion is a core layer of VibePing Alive: a private signal travelling from the laptop to the iPhone. Keep the Quiet signal palette and open composition. Use state motion, brief event celebrations, navigation continuity, animated allowance changes, and physical touch feedback. Spring, local ripple, SVG path drawing, and bounded stagger are appropriate when they explain a real state or action.
+Kết quả đầy đủ giữ tiêu đề, danh sách, mã và nội dung gốc. Nếu bị giới hạn dung lượng, chỉ rõ cần mở Codex để đọc phần còn lại. Mốc diễn biến giữ giờ với chữ số đều, đường nối mảnh và màu trạng thái. Phần riêng tư mặc định thu gọn.
 
-The focal sequence is a new live signal: status acknowledgment, feed insertion, then unread feedback. Event identifiers prevent replay after REST reconciliation or reconnect. Never invent task progress or keep old data visually live. The connection diagram describes readiness, not proof of physical notification delivery.
+Kiểm thử đã được sửa không còn làm công việc cần chú ý; mốc lỗi cũ vẫn trong lịch sử. Trích đoạn ở hàng mới/cũ chọn câu dễ đọc, loại nội dung rà soát nội bộ, mã và đường dẫn. Không còn câu phù hợp thì dùng **Đã có kết quả từ Codex**. Yêu cầu thiếu trích đoạn có thể dùng giai đoạn cuối; sự kiện cũ dùng tóm tắt/tên an toàn.
 
-Full (Tối đa) is the default; Balanced (Vừa phải) keeps brief state feedback; Minimal (Tối giản) keeps static, textual feedback. System reduced motion overrides the local level immediately. Pause loops offscreen, on hidden Ionic pages, and in the background. At most two coordinated focal loops run per viewport. Use transform/opacity or bounded SVG strokes; avoid perpetual blur, shadow painting, or decorative timers.
+Giữ tên đã lưu nếu an toàn; thiếu tên hoặc tên nội bộ dùng **Công việc VibePing · HH:mm**. Giữ linh vật, tab, giao diện và chuyển động hạn mức hiện có.
 
-Timing: touch feedback 140–180 ms, navigation 240–340 ms, state changes 350–460 ms, event acknowledgment up to 760 ms; cap stagger at 240 ms. Content stays available throughout. Primary actions remain at least 44×44 px and permission follows a direct tap.
+**Tín hiệu chi tiết còn mới:** chỉ hiện ba vạch trang trí 24 px cạnh trạng thái của phiên đang được chọn, đang chạy và có bằng chứng dưới 120 giây. Tối đa dùng vòng scaleY/opacity nhẹ 2,4 giây; Vừa phải, Tối giản và giảm chuyển động hệ thống giữ dấu tĩnh. Hủy vòng khi ẩn/ngoài màn hình. Bỏ dấu khi chờ, kết thúc, mất mạng hoặc dữ liệu cũ. Chữ trạng thái đứng yên; diễn biến và kết quả giữ thứ tự.
 
-The mascot cancels its Web Animations when motion is disabled or it leaves the viewport, does not replay the initial state as a new event, and reserves ambient loops for Full. Completion sparkles have a bounded 900 ms fade; this local decoration does not delay state text or interaction.
+### Tổng kết Hôm nay
 
-### Saved allowance and Lock Screen previews
+Bốn hàng dưới Hoạt động: **Yêu cầu đã theo dõi**, **Công việc hoàn tất**, **Lần kiểm thử chưa đạt**, **Thời gian ghi nhận**. Nhãn dịu, giá trị đậm căn phải với chữ số đều; cách hàng 12 px. Không thêm biểu đồ, điểm số hay lưới thẻ phân tích.
 
-Saved Codex limits remain visible when disconnected, labeled as the last reading with its original local date and time. Keep the existing percentage hierarchy and theme tokens; never imply that a cached reset deadline refreshes the numbers. Use one restrained notice on the detail page and a secondary timestamp in the activity summary.
+Thời gian tính từ bắt đầu đã ghi đến tín hiệu cuối; khoảng trùng chỉ tính một lần. Giữ giải thích dưới các hàng; tổng kết đệm có tiền tố **Tổng kết đã lưu.** Chưa có dữ liệu thì báo đang tải hoặc kết nối lại. Không ngụ ý đây là tổng thời gian làm việc ngoài bằng chứng quan sát.
 
-Lock Screen previews inherit the same theme and use the local app icon with an app-name/time header, event title, and a single short body. The three privacy modes show event only, project only, or task plus project; examples come from the latest eligible event or are explicitly labeled illustrative. Share the backend renderer with actual delivery. Crossfade only when revealing more detail; remove previous details immediately when restricting privacy, and disable motion for reduced-motion users.
+### Linh vật nguyên hình và chuyển động
 
-## Do's and Don'ts
+Đầu trang dùng nguyên PNG mèo chính thức: ảnh 40 px trong vùng 48 px. Chỉ biến đổi cả ảnh, thêm dấu SVG nhỏ, vòng tín hiệu hoặc tia hoàn tất ngắn. Đang làm/nghỉ có thể thở nhẹ; chờ thì nghiêng nhẹ thưa; hoàn tất phản hồi sự kiện; lỗi rung ngắn. Mất mạng, dừng và chưa xác nhận dùng ảnh xám dịu và vòng đứt. Dấu cà phê chỉ xuất hiện khi thời gian quan sát vượt 30 phút. Chữ bên cạnh luôn là nguồn giải thích trạng thái.
 
-### Do:
+VibePing Alive biểu diễn tín hiệu riêng từ laptop đến iPhone, giữ bảng màu Quiet signal và bố cục thoáng. Chuyển động trạng thái, phản hồi sự kiện ngắn, chuyển trang liên tục, thay đổi hạn mức và phản hồi chạm phải giải thích trạng thái/thao tác thật. Có thể dùng lò xo, gợn cục bộ, nét SVG và hiệu ứng xuất hiện lệch thời gian có giới hạn.
 
-- **Do** keep status, task and next action ahead of decoration, with readable Vietnamese text accompanying every state color.
-- **Do** preserve work and request identities, observed timestamps, final-answer access and explicit cached-state labels across Personal integrations.
-- **Do** use confirmed project identity in shared views, retaining failed drafts for retry.
-- **Do** keep global notification types and quiet hours visible as the authority for project filtering.
-- **Do** refresh Windows readiness on return and show dated previous evidence when current readiness is unknown.
-- **Do** stop mascot loops offscreen, on hidden pages and under reduced motion; keep the PNG intact.
+Thứ tự tín hiệu mới: xác nhận trạng thái, thêm vào danh sách, phản hồi chưa đọc. Mã sự kiện ngăn phát lại sau REST/kết nối lại. Không bịa tiến độ hoặc làm dữ liệu cũ trông như đang chạy. Sơ đồ kết nối chỉ giải thích độ sẵn sàng, không chứng minh thông báo đã tới thiết bị.
 
-### Don't:
+**Tối đa** (`Full`) mặc định; **Vừa phải** (`Balanced`) giữ phản hồi ngắn; **Tối giản** (`Minimal`) giữ dấu tĩnh và chữ. Giảm chuyển động hệ thống ghi đè ngay lựa chọn cục bộ. Dừng vòng ngoài màn hình, trên trang Ionic ẩn và khi chạy nền. Tối đa hai vòng gây chú ý phối hợp trong một vùng nhìn. Dùng transform/opacity hoặc nét SVG có giới hạn; tránh làm mờ, vẽ bóng liên tục hoặc bộ đếm trang trí.
 
-- **Don't** add nested cards, giant heroes, decorative gradients, glass effects, fake charts or ornamental badges.
-- **Don't** turn a project accent into a page theme or use it to imply operational status.
-- **Don't** present cached numbers, old host checks or unobserved time as current live evidence.
-- **Don't** add phone-side runtime controls, a chat surface or a new Personal tab.
-- **Don't** replace the local app icon with a text lettermark or expose raw technical errors.
+Thời gian: phản hồi chạm 140–180 ms; chuyển trang 240–340 ms; đổi trạng thái 350–460 ms; xác nhận sự kiện tối đa 760 ms; độ trễ lệch giữa các phần tối đa 240 ms. Nội dung luôn đọc/tương tác được; vùng chạm chính ít nhất 44×44 px.
 
-**Authoring discipline:** Tailwind utilities are the only screen/component styling authoring system. One minimal global input file may contain the Tailwind import, central tokens, and unavoidable platform primitives. Do not add SCSS, Sass, component CSS, large selector stylesheets, Tailwind CDN, or visual reliance on default Ionic styles.
+Linh vật hủy Web Animations khi tắt chuyển động hoặc ra khỏi màn hình; không coi trạng thái ban đầu là sự kiện mới. Chỉ Tối đa có vòng chuyển động nền. Tia hoàn tất mờ đi trong 900 ms, không trì hoãn chữ hoặc tương tác.
 
-**Workflow discipline:** Every user-visible surface uses the project-local Impeccable skill. New work records product truth, shapes the task, establishes or inherits the visual world, then applies the craft floor. Gate 0 specifically uses shape, critique, harden, and adapt, with one bounded screenshot/fix pass and one confirmation pass. Product constraints override generic visual ambition.
+### Hạn mức đã lưu và xem trước màn hình khóa
 
-**Not canonized:** The uncaptured native tray appearance, fixture-specific names/counts, captured internal result text and the inherited empty Activity heading in the review captures are not design-system rules. No visual defect is promoted into a reusable token by this update. The 1.3 refinement introduces no new palette, type scale, raster pixels or visual world.
+Khi mất kết nối, giữ hạn mức đã lưu, ghi rõ là lần đọc trước cùng ngày giờ địa phương gốc. Giữ phân cấp phần trăm và màu giao diện. Mốc đặt lại trong bộ đệm không tự làm mới con số. Chi tiết có một thông báo nhẹ; tóm tắt hoạt động có thời gian phụ.
+
+Bản xem trước thông báo dùng cùng giao diện, biểu tượng cục bộ, tên ứng dụng/thời gian, tiêu đề sự kiện và một dòng nội dung ngắn. Ba chế độ cho thấy chỉ sự kiện, chỉ dự án hoặc công việc kèm dự án; ví dụ lấy từ sự kiện đủ điều kiện mới nhất hoặc ghi rõ minh họa.
+
+Dùng chung bộ dựng nội dung phía máy chủ với lần gửi thật. Chỉ chuyển mờ khi mở thêm chi tiết; khi tăng riêng tư phải xóa chi tiết cũ ngay, không đợi hiệu ứng. Tắt chuyển động khi người dùng yêu cầu giảm.
+
+## Do's and Don'ts — Nên làm và không làm
+
+### Nên làm
+
+- Đưa trạng thái, công việc và hành động lên trước trang trí; mọi màu trạng thái có chữ tiếng Việt đi cùng.
+- Giữ định danh công việc/yêu cầu, mốc quan sát, quyền đọc kết quả và nhãn dữ liệu đệm.
+- Dùng hồ sơ dự án đã xác nhận; giữ bản nháp lỗi để thử lại.
+- Làm rõ công tắc chung và giờ yên tĩnh quyết định bộ lọc dự án.
+- Đọc lại Sẵn sàng khi quay lại; ghi ngày giờ bằng chứng cũ nếu chưa biết trạng thái hiện tại.
+- Dừng vòng linh vật khi ngoài màn hình, trang ẩn hoặc giảm chuyển động; giữ nguyên PNG.
+
+### Không làm
+
+- Không thêm thẻ lồng nhau, vùng mở đầu quá lớn, màu chuyển trang trí, kính mờ, biểu đồ giả hoặc huy hiệu trang trí.
+- Không biến màu dự án thành giao diện cả trang hoặc màu trạng thái vận hành.
+- Không trình bày số đệm, kiểm tra máy cũ hoặc thời gian chưa quan sát như dữ liệu trực tiếp.
+- Không thêm điều khiển tiến trình từ điện thoại, chat hoặc tab Cá nhân hóa mới.
+- Không thay biểu tượng bằng chữ hoặc đưa lỗi kỹ thuật thô lên giao diện.
+
+**Viết kiểu dáng:** chỉ dùng lớp tiện ích Tailwind cho màn hình/component. Một tệp toàn cục tối thiểu có thể chứa import Tailwind, giá trị thiết kế và yêu cầu nền tảng không tránh được. Không thêm SCSS, Sass, CSS component, tệp selector lớn, Tailwind CDN hoặc phụ thuộc giao diện mặc định Ionic.
+
+**Quy trình:** mọi phần người dùng thấy đều dùng skill Impeccable trong dự án. Ghi đúng sản phẩm, xác định phần việc, kế thừa/chọn định hướng rồi áp dụng chuẩn chất lượng. Gate 0 dùng shape, critique, harden và adapt, một vòng ảnh/sửa có giới hạn rồi một vòng xác nhận. Giới hạn sản phẩm luôn được ưu tiên.
+
+**Không coi là quy tắc:** diện mạo khay native chưa chụp, tên/số liệu giả, kết quả nội bộ trong ảnh và tiêu đề Hoạt động trống kế thừa. Không biến lỗi giao diện thành giá trị thiết kế dùng lại. Bản tinh chỉnh 1.3 không thêm bảng màu, thang chữ, ảnh raster hoặc định hướng hình ảnh mới.

@@ -1,8 +1,8 @@
-# ADR 005: Rust modular monolith and SQLite
+# ADR 005 — Rust chia mô-đun và SQLite
 
-- **Status:** Accepted for future V1
-- **Decision:** Ship one Rust 1.98 Windows executable, organized by feature with explicit adapters, using SQLite as source of truth.
-- **Context:** One-user local operation needs durability and simple distribution, not services.
-- **Alternatives:** Node backend, multiple processes/services, phone-owned IndexedDB, hosted database.
-- **Consequences:** One lifecycle and transaction boundary; strict module/file rules prevent a monolithic `main.rs`. IndexedDB remains disposable cache.
-- **Validation needed:** Later migration, crash recovery, concurrency, backup, and vertical-slice tests.
+- **Trạng thái:** Đã chấp nhận cho V1 ở thời điểm lập quyết định.
+- **Quyết định:** Phát hành tệp thực thi Rust 1.98 cho Windows, tổ chức theo tính năng với bộ kết nối tách rõ, dùng SQLite làm dữ liệu chính.
+- **Bối cảnh:** Một người dùng cục bộ cần lưu trữ bền vững và phân phối đơn giản.
+- **Phương án đã cân nhắc:** Máy chủ Node, nhiều tiến trình/dịch vụ, IndexedDB trên điện thoại làm dữ liệu chính, cơ sở dữ liệu thuê ngoài.
+- **Hệ quả:** Một ranh giới vòng đời và giao dịch; quy tắc mô-đun/tệp ngăn `main.rs` phình to. IndexedDB chỉ là bộ đệm có thể dựng lại.
+- **Kiểm chứng theo kế hoạch ban đầu:** Kiểm tra nâng cấp cấu trúc, khôi phục sau lỗi, truy cập đồng thời, sao lưu và luồng chức năng hoàn chỉnh.

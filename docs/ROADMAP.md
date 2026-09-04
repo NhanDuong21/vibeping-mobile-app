@@ -1,52 +1,56 @@
-# VibePing V1 execution roadmap
+# Lộ trình xây dựng nền tảng V1
 
-Gate 0 and Gate 1 are completed risk validations. The ten phases below are the production implementation plan for release candidate `1.0.0-rc.1`. Each phase ends in a working vertical slice, automated validation, an updated build ledger, and a local checkpoint commit. Physical iPhone acceptance remains a human gate.
+Đây là kế hoạch lịch sử cho bản ứng viên `1.0.0-rc.1`. Gate 0 và Gate 1 đã hoàn tất kiểm chứng rủi ro; các giai đoạn dưới đây được ghi nhận hoàn tất trong [sổ triển khai](execution/BUILD_STATUS.md).
 
-## Verified gates
+Mỗi giai đoạn bàn giao một phần dùng được từ đầu đến cuối, có kiểm tra tự động, cập nhật sổ và commit mốc theo yêu cầu của đợt triển khai đó. Việc này không thay quy định chỉ commit khi người dùng yêu cầu trong [AGENTS.md](../AGENTS.md). Nghiệm thu iPhone thật vẫn do người dùng thực hiện.
 
-- **Gate 0 — PASS:** stable private Tailscale Serve origin, installable Home Screen PWA, persistent VAPID identity and phone subscription, physical Lock Screen/background delivery, cellular/offline evidence, and delivery after the Rust process restarted.
-- **Gate 1 — PASS:** signed-in Codex account and dynamic allowance windows read through official `codex app-server` methods, normalized without reading credentials or recording account email.
+## Hai mốc đã đạt
 
-## Phase 1 — Production walking skeleton
+- **Gate 0:** địa chỉ Tailscale Serve riêng ổn định; PWA cài lên Màn hình chính; giữ VAPID/đăng ký; có bằng chứng màn hình khóa/chạy nền và nhận sau khởi động lại Rust. Các trường hợp dữ liệu di động/ngoại tuyến được phân biệt rõ với bằng chứng PoC trước trong [biên bản](validation/GATE_0_TAILSCALE_WEB_PUSH.md).
+- **Gate 1:** đọc tài khoản Codex đã đăng nhập và khung hạn mức động qua phương thức chính thức của `codex app-server`, không đọc thông tin đăng nhập hoặc ghi email.
 
-Create strict Angular/Ionic/Tailwind and Rust/SQLite production workspaces, generate the API contract, embed the production web build, and prove health, bootstrap, SSE, SPA fallback, service-worker shell, and browser rendering on a development port that does not disturb Gate 0.
+## Giai đoạn 1 — Ứng dụng nền tảng chạy từ đầu đến cuối
 
-## Phase 2 — Manual Windows lifecycle
+Tạo workspace Angular/Ionic/Tailwind và Rust/SQLite với kiểm tra nghiêm ngặt; sinh hợp đồng API; nhúng web đã biên dịch; chứng minh sức khỏe, khởi tạo, SSE, mở lại tuyến SPA, giao diện đệm service worker và trình duyệt ở cổng không ảnh hưởng Gate 0.
 
-Ship explicit `start`, `run`, `stop`, `restart`, `status`, `doctor`, and `open` commands with single-instance enforcement, private local shutdown, durable intent, stale-process recovery, runtime paths under local app data, and no Windows auto-start.
+## Giai đoạn 2 — Vòng đời Windows thủ công
 
-## Phase 3 — Pairing, PWA installation, and production Web Push
+Lệnh `start`, `run`, `stop`, `restart`, `status`, `doctor`, `open`; chỉ một phiên chạy; điều khiển dừng cục bộ riêng; lưu ý định người dùng; xử lý thông tin tiến trình cũ; dữ liệu trong local app data. Giai đoạn này chưa có tự chạy Windows; lựa chọn đó được bổ sung có chủ đích ở 1.1.1.
 
-Port the proven push behavior into production modules: one-time owner pairing, Tailscale identity checks, notification onboarding, VAPID and subscription migration, durable outbox, retry/TTL handling, stale-device recovery, delayed test push, and stable service-worker identity.
+## Giai đoạn 3 — Ghép nối, cài PWA và Web Push
 
-## Phase 4 — Codex attention events
+Đưa hành vi đã chứng minh vào mô-đun sản phẩm: ghép nối dùng một lần, kiểm tra danh tính Tailscale, hướng dẫn quyền, chuyển VAPID/đăng ký, outbox bền vững, thử lại/TTL, khôi phục thiết bị cũ, gửi thử trễ và danh tính service worker ổn định.
 
-Integrate supported Codex notify/hooks, deterministic executable selection, safe idempotent configuration merge, private ingestion/spool, normalized turn and attention events, deduplication, activity persistence, SSE publication, and eligible notification jobs.
+## Giai đoạn 4 — Tín hiệu cần chú ý từ Codex
 
-## Phase 5 — Codex allowance experience
+Tích hợp notify/hook được hỗ trợ; chọn tệp thực thi xác định; ghép cấu hình an toàn lặp lại được; nhận riêng/spool; chuẩn hóa lượt/sự kiện; chống trùng; lưu hoạt động; SSE và thông báo đủ điều kiện.
 
-Supervise `codex app-server`, persist all dynamic primary/secondary windows, refresh and recover, create low/critical/exhausted alerts once per reset cycle, and expose the allowance summary/detail experience without internal identifiers.
+## Giai đoạn 5 — Hạn mức Codex
 
-## Phase 6 — Activity and offline mobile experience
+Giám sát App Server; lưu khung primary/secondary động; làm mới/khôi phục; cảnh báo thấp/rất thấp/hết một lần mỗi chu kỳ; tóm tắt/chi tiết không lộ mã nội bộ.
 
-Build the activity timeline, current turn, event detail, unread state, cursor pagination, REST bootstrap, SSE reconciliation, IndexedDB cache, offline/stale states, notification deep links, and coherent service-worker updates.
+## Giai đoạn 6 — Hoạt động và ngoại tuyến
 
-## Phase 7 — Computer, settings, and diagnostics
+Diễn biến, lượt hiện tại, chi tiết, chưa đọc, phân trang con trỏ, REST khởi tạo, đối soát SSE, IndexedDB, mất mạng/dữ liệu cũ, liên kết thông báo và cập nhật service worker nhất quán.
 
-Add operational laptop status, delayed test action, production-backed notification/allowance/quiet-hour/privacy/theme/retention settings, notification recovery, and a plain-language diagnostic report that is safe to copy.
+## Giai đoạn 7 — Máy tính, Cài đặt, Chẩn đoán
 
-## Phase 8 — Reliability, recovery, and security hardening
+Trạng thái laptop, gửi thử trễ, cài đặt thông báo/hạn mức/giờ yên tĩnh/riêng tư/giao diện/lưu lịch sử, khôi phục thông báo và báo cáo chẩn đoán dễ hiểu, an toàn khi sao chép.
 
-Exercise database backup/migration/recovery, outbox and spool restart paths, child-process recovery, network/provider faults, graceful shutdown, host/origin/CSRF controls, pairing abuse cases, security headers, redaction, secret scanning, and recovery commands.
+## Giai đoạn 8 — Độ tin cậy và bảo mật
 
-## Phase 9 — Product design polish and accessibility
+Sao lưu/nâng cấp/khôi phục dữ liệu, outbox/spool qua khởi động lại, tiến trình con, lỗi mạng/dịch vụ gửi, dừng an toàn, Host/origin/CSRF, chống lạm dụng ghép nối, header bảo mật, lọc dữ liệu, quét bí mật và lệnh khôi phục.
 
-Run bounded Impeccable critique, harden, adapt, audit, and polish passes across every state at 320/375/390/430 px, light/dark/system themes, reduced motion, keyboard/focus semantics, dynamic Vietnamese copy, performance budgets, and client-copy auditing.
+## Giai đoạn 9 — Hoàn thiện thiết kế và khả năng tiếp cận
 
-## Phase 10 — Windows release candidate and acceptance preparation
+Áp dụng Impeccable critique/harden/adapt/audit/polish có giới hạn ở mọi trạng thái, 320/375/390/430 px, sáng/tối/hệ thống, giảm chuyển động, bàn phím/focus, tiếng Việt động, giới hạn hiệu năng và kiểm tra câu chữ.
 
-Build and package `1.0.0-rc.1` as a self-contained Windows x64 bundle, smoke-test clean extraction and lifecycle, preserve the private origin and Gate 0 identity during reversible cutover, leave the final process running when safe, and prepare the complete morning and seven-day acceptance checklists.
+## Giai đoạn 10 — Đóng gói và chuẩn bị nghiệm thu
 
-## Release boundary
+Tạo gói Windows x64 tự chứa `1.0.0-rc.1`; kiểm tra giải nén/vòng đời sạch; giữ địa chỉ riêng và danh tính Gate 0 khi chuyển có thể quay lại; để tiến trình cuối chạy khi an toàn; chuẩn bị danh sách nghiệm thu lần đầu và bảy ngày.
 
-Phase 10 may reach `READY_FOR_PERSONAL_ACCEPTANCE`. Stable `v1.0.0` requires the human to complete physical iPhone acceptance and the seven-day soak gate. No phase adds remote control, public exposure, accounts, cloud state, paid infrastructure, native packaging, or automatic startup.
+## Ranh giới phát hành
+
+Giai đoạn 10 đạt `READY_FOR_PERSONAL_ACCEPTANCE` — sẵn sàng nghiệm thu cá nhân. Mốc ổn định `v1.0.0` của kế hoạch gốc cần đủ kiểm tra iPhone và bảy ngày sử dụng.
+
+Kế hoạch V1 ban đầu không thêm điều khiển từ xa, truy cập công khai, tài khoản, dữ liệu đám mây, hạ tầng trả phí, gói native hoặc tự chạy. Bản 1.1.1 về sau cho phép tự chạy khi đăng nhập và khôi phục cục bộ theo lựa chọn rõ ràng; xem [ADR 011](adr/011-personal-and-always-ready.md).

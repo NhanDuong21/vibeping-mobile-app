@@ -1,59 +1,47 @@
-# VibepingMobile
+# Ứng dụng iPhone của VibePing
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.6.
+Thư mục này chứa PWA Angular/Ionic được thêm vào Màn hình chính iPhone. Ứng dụng hiển thị hoạt động Codex, hạn mức, trạng thái laptop và cài đặt. SQLite trên Windows giữ dữ liệu chính; IndexedDB trên điện thoại chỉ lưu bản đệm.
 
-## Development server
+## Công nghệ và cách tổ chức
 
-To start a local development server, run:
+- Angular 22, Ionic Angular 9, Tailwind CSS; phiên bản cụ thể được khóa trong `package.json` và `pnpm-lock.yaml`.
+- Tính năng nằm trong `src/app/features/`. Trang chỉ nối trạng thái với tương tác; nghiệp vụ, mạng và lưu trữ nằm ngoài trang.
+- Signals quản lý trạng thái giao diện; RxJS quản lý luồng và tác vụ bất đồng bộ.
+- Kiểu dữ liệu API lấy từ `contracts/generated/api.ts` ở gốc repo; không sửa tay tệp này.
 
-```bash
-ng serve
+## Chạy từ mã nguồn
+
+Máy phát triển cần Node.js, pnpm theo `packageManager` của repo, Rust theo `rust-toolchain.toml` và bộ công cụ biên dịch MSVC trên Windows. Các lệnh dưới đây chạy từ **thư mục gốc repo**.
+
+Sinh hợp đồng API và chạy ứng dụng cùng máy chủ phát triển:
+
+```powershell
+pnpm run generate:contracts
+.\scripts\dev.ps1
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Chỉ mở máy chủ phát triển Angular tại `http://localhost:4200/`:
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```powershell
+pnpm --filter vibeping-mobile start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Angular tự tải lại khi mã nguồn thay đổi. Lệnh này chỉ phục vụ giao diện; để kiểm tra đầy đủ API và tích hợp máy chủ, dùng quy trình phát triển hoặc bản phát hành của repo.
 
-```bash
-ng generate --help
+## Biên dịch và kiểm thử
+
+```powershell
+pnpm run build:mobile
+pnpm run lint
+pnpm run typecheck
+pnpm run test:mobile
 ```
 
-## Building
+Bản biên dịch dùng cấu hình Angular của dự án, bao gồm bước xử lý Tailwind. Kiểm thử đơn vị dùng Vitest. Bộ kiểm thử trình duyệt dùng Playwright ở `tests/e2e/`, chạy qua script của repo:
 
-To build the project run:
-
-```bash
-ng build
+```powershell
+pnpm run build:release
+pnpm run e2e
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Để chạy toàn bộ các bước bắt buộc trước bàn giao, dùng `.\scripts\check.ps1`. Xem [chiến lược kiểm thử](../../docs/TEST_STRATEGY.md) và [quy định repo](../../AGENTS.md).

@@ -1,89 +1,99 @@
-# Execution decisions
+# Sổ quyết định triển khai
 
-## 2026-09-02 — Preserve the verified baseline
+Các mục dưới đây ghi quyết định ngày **02/09/2026** của đợt xây dựng nền tảng V1. Phạm vi và quyền thực hiện là của đợt đó, không tự cho phép tác nhân ở nhiệm vụ mới. Các thay đổi về sau xem [ADR](../adr/), [kiến trúc hiện tại](../ARCHITECTURE.md) và ghi chú phát hành.
 
-The campaign starts from clean commit `388c723`, which contains legitimate work after `6139525`. Gate 0 and Gate 1 remain PASS. Spike source and evidence stay intact and production code will port proven behavior rather than call spike code at runtime.
+## Giữ nền tảng đã kiểm chứng
 
-## 2026-09-02 — Keep Gate 0 live during early phases
+Bắt đầu từ commit sạch `388c723`, gồm công việc hợp lệ sau `6139525`. Gate 0/Gate 1 vẫn đạt. Giữ mã và bằng chứng thử nghiệm; đưa hành vi đã chứng minh vào mã sản phẩm, không gọi mã thử nghiệm khi chạy sản phẩm.
 
-Gate 0 owns `127.0.0.1:8787` and the stable private Serve root. Production development uses a non-conflicting local port until Phase 10 has a reversible cutover plan and the final server has passed alternate-port smoke tests.
+## Giữ Gate 0 chạy ở giai đoạn đầu
 
-## 2026-09-02 — Infer the Impeccable shape from the authorized brief
+Gate 0 giữ `127.0.0.1:8787` và gốc Serve riêng. Phát triển sản phẩm ở cổng khác cho đến khi giai đoạn 10 có kế hoạch chuyển/quay lại và máy chủ cuối đạt kiểm tra nhanh cổng phụ.
 
-The user explicitly requested an unattended run and supplied the audience, job, copy, states, widths, visual direction, platform, accessibility bar, and anti-goals. No optional design interview is needed. “Quiet signal” remains the established visual authority; production surfaces use Operate mode, restrained color, familiar mobile affordances, sparse containers, and no decorative assets.
+## Kế thừa định hướng Impeccable đã được giao
 
-## 2026-09-02 — Official Codex boundaries
+Trong đợt này người dùng đã yêu cầu chạy không cần theo dõi và cung cấp đối tượng, mục đích, câu chữ, trạng thái, bề rộng, hướng hình ảnh, nền tảng, chuẩn tiếp cận và giới hạn. Không cần hỏi thêm tùy chọn thiết kế. Giữ **Quiet signal**, chế độ Operate, màu tiết chế, điều khiển mobile quen thuộc, ít vùng đóng khung và không thêm tài nguyên trang trí.
 
-Use the documented stdio JSONL App Server protocol. Account and allowance state come from `account/read`, `account/rateLimits/read`, and `account/rateLimits/updated`. Final completion uses the documented user-level `notify` command and its `agent-turn-complete` payload. Never consume a rate-limit reset, read credential files, or depend on undocumented transcript formats.
+## Ranh giới Codex chính thức
 
-## 2026-09-02 — Phase commit hashes in the ledger
+Dùng App Server stdio JSONL: `account/read`, `account/rateLimits/read`, `account/rateLimits/updated`. Hoàn tất qua notify cấp người dùng và dữ liệu `agent-turn-complete`. Không tiêu lượt đặt lại hạn mức, không đọc tệp đăng nhập hoặc dựa vào định dạng transcript không được công bố.
 
-Because a commit cannot embed its own hash, the next phase finalizes the previous row. After Phase 10, one documentation-only bookkeeping commit records the exact Phase 10 release checkpoint while leaving the product history and ten requested phase commits intact.
+## Mã commit trong sổ
 
-## 2026-09-02 — Production web asset and CSP compatibility
+Commit không thể chứa mã của chính nó; giai đoạn sau hoàn tất hàng trước. Sau giai đoạn 10 có một commit chỉ ghi sổ để lưu mã phát hành chính xác, giữ lịch sử sản phẩm và mười commit giai đoạn đã được yêu cầu.
 
-The Angular production build emits root-relative asset URLs so SPA refreshes remain valid even under a strict `base-uri` policy. Critical CSS inlining is disabled because its generated inline load handler conflicts with `script-src 'self'`. The CSP keeps scripts self-only and permits inline styles because Ionic web components apply runtime styles; browser tests fail on any resulting console error and Phase 8 will re-audit the policy.
+## Tài nguyên web và chính sách CSP
 
-The Rust build fingerprints every generated web asset before embedding it. This prevents Cargo from reusing a stale embedded PWA when only Angular output changes.
+Build Angular tạo URL tài nguyên tính từ gốc để tải lại SPA hoạt động với `base-uri` nghiêm ngặt. Tắt chèn critical CSS trực tiếp vì hàm tải nội tuyến được sinh xung đột `script-src 'self'`.
 
-## 2026-09-02 — Private lifecycle control without a public shutdown route
+CSP chỉ cho script cùng nguồn, cho kiểu dáng nội tuyến do web component Ionic cần áp dụng lúc chạy. Kiểm thử trình duyệt lỗi khi có lỗi console; giai đoạn 8 kiểm toán lại chính sách. Build Rust tính dấu nhận diện mọi tài nguyên web trước nhúng, tránh Cargo dùng lại PWA cũ khi chỉ đầu ra Angular đổi.
 
-The production host uses a second ephemeral loopback listener for shutdown control. Its address and per-run random token live only in the ignored local runtime directory; Tailscale Serve proxies only the application port, so the control channel is not reachable through the private web origin. A file lock remains held for the host lifetime. `status` verifies the application health contract and treats unreadable or unreachable PID metadata as stale.
+## Điều khiển tiến trình cục bộ riêng
 
-Windows background creation uses `CreateProcessW` with handle inheritance disabled and no console window. This is required so `start` returns even when invoked through a pipe or test harness; the child writes directly to rotating local logs. Normal stop never force-kills the process.
+Máy chủ có listener loopback tạm thứ hai để dừng. Địa chỉ/token ngẫu nhiên mỗi lần chạy chỉ ở thư mục dữ liệu cục bộ được Git bỏ qua. Serve chỉ chuyển cổng ứng dụng, không tới kênh điều khiển. Khóa tệp giữ suốt vòng đời. `status` kiểm tra hợp đồng sức khỏe thật, coi thông tin PID không đọc/truy cập được là cũ.
 
-## 2026-09-02 — Production owner and push trust boundary
+Windows dùng `CreateProcessW` không kế thừa handle, không cửa sổ console, để `start` trả về kể cả khi gọi qua pipe/bộ thử. Tiến trình con ghi log luân phiên trực tiếp. Dừng bình thường không cưỡng bức giết tiến trình.
 
-The first owner claim uses an eight-character, ten-minute, single-use code whose database representation is SHA-256 only. Tailscale identity headers are trusted only when Serve presents a `.ts.net` Host; direct localhost spoofing is rejected. Mutations require JSON, the matching private HTTPS Origin, and a per-run CSRF token. Before a claim, only subscription readiness and a rate-limited test are allowed.
+## Chủ sở hữu và độ tin cậy của thông báo
 
-Gate 0 migration is deliberately copy-only. Production creates a timestamped backup, reuses the proven VAPID identity and subscription, leaves the original directory untouched, and attaches the imported unclaimed subscription only after pairing. Angular's service worker is the sole push/click handler; the wrapper worker only imports `ngsw-worker.js`, and push payloads use Angular's `navigateLastFocusedOrOpen` contract.
+Nhận chủ lần đầu dùng mã tám ký tự, hạn 10 phút, một lần, chỉ lưu SHA-256. Chỉ tin header Tailscale khi Serve cung cấp Host `.ts.net`; chặn giả mạo trực tiếp localhost. Ghi cần JSON, đúng Origin HTTPS riêng và CSRF mỗi lần chạy. Trước nhận chủ chỉ cho trạng thái đăng ký và gửi thử có giới hạn tần suất.
 
-## 2026-09-02 — Reviewed Codex hooks plus documented notify
+Chuyển Gate 0 chỉ sao chép: sao lưu có thời gian, dùng lại VAPID/đăng ký đã chứng minh, giữ nguồn, gắn đăng ký nhập sau ghép nối. Service worker Angular là bên duy nhất xử lý push/click; worker bao chỉ nhập `ngsw-worker.js`, nội dung dùng `navigateLastFocusedOrOpen`.
 
-Completion comes from the documented user-level `notify` array. Current work, permission attention, final test state, and reliable preview evidence come from documented lifecycle hooks. VibePing merges only its owned user-level handlers, forwards a pre-existing notifier, leaves project/plugin hooks such as Impeccable untouched, and requires the normal `/hooks` review. It never passes the trust-bypass flag.
+## Hook được duyệt và notify được hỗ trợ
 
-Hook payloads are normalized before they reach IPC. The durable schema contains hashed session/turn keys, the sanitized project leaf, a closed signal, and time only. Transcript files are never opened and raw prompt/tool content is never stored. Post-tool test classification is advisory turn state: an intermediate failure never notifies; only an unresolved failure at Stop/completion becomes an attention event.
+Hoàn tất từ mảng notify cấp người dùng. Công việc hiện tại, xin phép, kiểm thử cuối và bằng chứng bản xem trước từ hook vòng đời được hỗ trợ. Chỉ ghép hook thuộc VibePing, chuyển tiếp notify cũ, giữ hook dự án/plugin như Impeccable; bắt buộc duyệt `/hooks`, không truyền cờ bỏ tin cậy.
 
-## 2026-09-02 — Supervised allowance through the official App Server
+Tại giai đoạn này, dữ liệu bền vững chỉ gồm khóa phiên/lượt băm, tên cuối dự án đã lọc, tín hiệu thuộc tập cố định và giờ. Không mở transcript hoặc lưu lời nhắc/nội dung công cụ. Kết quả kiểm thử sau công cụ chỉ là trạng thái tham khảo: lỗi giữa chừng không báo; lỗi chưa sửa tại Stop/hoàn tất mới tạo cần chú ý. Cơ chế giữ câu trả lời cuối được bổ sung ở RC8, mô tả trong kiến trúc hiện tại.
 
-Production ports Gate 1's documented `initialize`, `initialized`, `account/read`, and `account/rateLimits/read` flow into one long-lived supervised child. Update notifications, completion refresh, serialized manual refresh, and a ten-minute fallback poll share one reader. Unexpected exits use 1/5/20/60-second bounded backoff; stale last-good data remains visible and activity/push ingestion continues independently.
+## Giám sát hạn mức qua App Server
 
-Internal limit IDs are SHA-256 keys only. A returned human label is accepted only when bounded and free of identifier/credential patterns; otherwise the duration supplies the Vietnamese label. Alert state is keyed by hashed window plus reset timestamp, so low, critical, and exhausted advance once per cycle without altering the real account for tests.
+Đưa chuỗi `initialize`, `initialized`, `account/read`, `account/rateLimits/read` của Gate 1 vào một tiến trình con sống lâu. Sự kiện cập nhật, hoàn tất, làm mới thủ công tuần tự và đọc dự phòng 10 phút dùng một bộ đọc. Thoát bất ngờ thử lại sau 1/5/20/60 giây; giữ dữ liệu tốt cũ, không chặn nhận hoạt động/push. Nhịp đọc sau đó được thay ở RC7.
 
-## 2026-09-02 — Offline activity is a replaceable projection
+Mã nhóm nội bộ chỉ là SHA-256. Chỉ nhận nhãn có giới hạn, không giống mã định danh/bí mật; còn lại đặt nhãn tiếng Việt theo thời lượng. Trạng thái cảnh báo theo khung băm + giờ đặt lại, nên thấp/rất thấp/hết chỉ tiến một lần mỗi chu kỳ, không đổi tài khoản thật để thử.
 
-SQLite remains the only activity source of truth. The PWA caches a bounded 100-event projection with current-work, allowance-summary, pagination, last-sync, and pending read metadata. It labels any cache-only view, retries read intents after reconnect, reconciles SSE through REST, and collapses duplicate IDs. Notification links target exact event detail routes; a missing or expired event produces a calm return path rather than a raw API error.
+## Hoạt động ngoại tuyến là bản sao có thể dựng lại
 
-The common owner guard now covers private bootstrap, activity, allowance, and foreground stream reads after pairing. Before the first claim these reads remain available only to support local setup; every read-state mutation requires the claimed owner plus the existing same-origin JSON/CSRF boundary.
+SQLite là dữ liệu chính. PWA đệm tối đa 100 sự kiện, công việc hiện tại, tóm tắt hạn mức, phân trang, lần đồng bộ và thao tác đã đọc chờ gửi. Gắn nhãn khi chỉ dùng đệm, gửi lại thao tác sau kết nối, đối soát SSE bằng REST và gộp ID trùng.
 
-Angular's service worker remains the sole offline shell. A ready version produces an explicit Vietnamese update banner and reloads only after the user taps Update. There is no background forced refresh that could discard in-progress reading state.
+Liên kết thông báo mở đúng chi tiết; sự kiện thiếu/hết hạn có đường quay lại dễ hiểu. Sau ghép nối, lớp kiểm tra chủ áp dụng đọc dữ liệu riêng, hoạt động, hạn mức và luồng. Trước nhận chủ, đọc chỉ để hỗ trợ thiết lập cục bộ; mọi ghi đã đọc cần chủ, JSON cùng origin và CSRF.
 
-## 2026-09-02 — Preferences govern delivery without erasing activity
+Service worker Angular là giao diện ngoại tuyến duy nhất. Có bản mới thì hiện lời mời tiếng Việt và chỉ tải lại khi bấm Cập nhật, không tự làm mất trạng thái đang đọc.
 
-Notification-type toggles suppress only the corresponding push job; the authoritative activity event is still committed and remains visible in the owner-bound feed. Quiet hours store local `HH:MM` boundaries with the phone offset at edit time, and a start later than the end crosses midnight. Permission-required, unresolved final-failure, critical, and exhausted signals may bypass quiet hours only when the explicit urgent exception is enabled.
+## Cài đặt điều khiển gửi, vẫn giữ hoạt động
 
-The low allowance threshold is user-configurable from 1–50 percent, while critical and exhausted alerts have a separate enable switch. Private mode changes lock-screen body copy to a generic instruction. The explicit delayed test notification bypasses ordinary preference filters because it is a direct diagnostic action rather than a product event.
+Tắt loại thông báo chỉ ngăn việc gửi; sự kiện vẫn ghi trong danh sách theo chủ. Giờ yên tĩnh lưu `HH:MM` và độ lệch giờ điện thoại lúc sửa; bắt đầu muộn hơn kết thúc nghĩa là qua nửa đêm.
 
-## 2026-09-02 — Diagnostics are a closed sanitized projection
+Xin phép, lỗi cuối chưa sửa, hạn mức rất thấp/hết chỉ vượt giờ yên tĩnh khi đã bật ngoại lệ khẩn. Ngưỡng thấp chọn 1–50%; rất thấp/hết có công tắc riêng. Riêng tư thay nội dung khóa bằng lời hướng dẫn chung. Gửi thử trễ bỏ qua bộ lọc thông thường vì là thao tác chẩn đoán trực tiếp.
 
-The Computer page aggregates only operational readiness already owned by the Rust process. Diagnostics derive plain-language checks and recovery actions from those stable values and local database health. The copyable technical report is deliberately constructed from version, enum states, counts, and timestamps; it never serializes an error object, filesystem path, Tailscale identity, Codex account field, endpoint, or key. Notification recovery remains an explicit iPhone action and never edits iOS permissions remotely.
+## Chẩn đoán chỉ dùng dữ liệu đã lọc
 
-## 2026-09-02 — Recovery is explicit, validated, and owner-protected
+Máy tính tổng hợp độ sẵn sàng mà Rust đang quản lý. Chẩn đoán tạo kiểm tra/hướng khôi phục từ giá trị ổn định và sức khỏe SQLite. Báo cáo sao chép chỉ gồm phiên bản, enum, số đếm, thời gian; không xuất đối tượng lỗi, đường dẫn, danh tính Tailscale/tài khoản Codex, endpoint hoặc khóa. Khôi phục thông báo là thao tác trên iPhone, không sửa quyền iOS từ xa.
 
-SQLite is checked before and after migrations. An existing database receives a checkpointed, retained pre-migration copy; migration failure closes the pool and restores the exact prior bytes before returning operational Vietnamese copy. Restore accepts only a bounded, checksummed VibePing bundle with SQLite identity, requires `--confirm`, requires the app to be stopped, takes a pre-restore database copy, validates the restored database through the normal connector, and rolls back on failure. Notification reset has the same stop and confirmation boundary and does not replace the owner or VAPID identity.
+## Khôi phục rõ ràng và bảo vệ theo chủ
 
-The Windows data root uses an inheritance-free ACL for the current user SID and Local System. This is the chosen Windows protection for persistent VAPID, SQLite, control metadata, logs, and local backups: it preserves the exact imported sender identity and supports unattended background use without placing decryption material in the process environment. The app refuses to apply recursive ACL changes to a filesystem root, the user profile root, or the working directory. Manual backup bundles remain sensitive if copied outside this protected location.
+Kiểm tra SQLite trước/sau nâng cấu trúc. Dữ liệu cũ được checkpoint và sao lưu trước; lỗi đóng pool rồi phục hồi đúng byte cũ, trả lời tiếng Việt dễ hiểu.
 
-## 2026-09-02 — Finish the interface with one bounded polish round
+Restore chỉ nhận gói VibePing có giới hạn, checksum và danh tính SQLite đúng; cần `--confirm` và ứng dụng dừng. Tạo bản sao trước khôi phục, kiểm tra qua bộ kết nối bình thường, hoàn nguyên nếu lỗi. Đặt lại thông báo cũng cần dừng/xác nhận, không thay chủ hoặc VAPID.
 
-Phase 9 keeps the established Quiet Signal direction and product architecture. The initial Impeccable audit found one real WCAG contrast failure on the unread badge, excessive repeated eyebrow labels, ambiguous Unicode arrows, a development-machine name in onboarding, and an over-broad reduced-motion reset. One bounded fix round corrected those issues, added explicit motion handling only where movement exists, and introduced maintained accessibility and Vietnamese-copy gates. A single light/dark screenshot confirmation then closed the visual loop; later non-visual tests do not reopen it.
+Thư mục dữ liệu Windows dùng ACL không kế thừa cho SID hiện tại và Local System, bảo vệ VAPID, SQLite, điều khiển, log, bản sao. Giữ đúng khóa gửi nhập vào, hỗ trợ nền mà không đặt vật liệu giải mã trong môi trường tiến trình.
 
-## 2026-09-02 — Ship a portable release candidate, not a developer checkout
+Từ chối đổi ACL đệ quy ở gốc hệ thống tệp, gốc hồ sơ người dùng hoặc thư mục làm việc. Bản sao chuyển ra ngoài vẫn nhạy cảm.
 
-The personal Windows x64 package contains exactly one embedded `vibeping.exe`, four explicit-action BAT launchers, and one Vietnamese guide. BAT files are UTF-8 with BOM and CRLF so Windows PowerShell 5.1 and `cmd.exe` preserve Vietnamese copy and `%~dp0` paths containing spaces. The package does not auto-start and requires no Node.js, pnpm, Rust, or Cargo on the user machine.
+## Hoàn thiện giao diện trong một vòng sửa
 
-Codex discovery prefers a native official `codex.exe` over npm command shims. This keeps the installed integration functional after developer runtimes are removed from `PATH`, while preserving the documented notify/hooks flow and its mandatory `/hooks` trust review.
+Giai đoạn 9 giữ Quiet signal và kiến trúc. Lần đầu phát hiện lỗi WCAG huy hiệu chưa đọc, nhãn lặp, mũi tên Unicode khó hiểu, tên máy phát triển trong thiết lập và giảm chuyển động áp dụng quá rộng.
 
-## 2026-09-02 — Cut over without changing private identity
+Một vòng sửa xử lý các điểm này, giới hạn giảm chuyển động đúng nơi và thêm kiểm tra tiếp cận/tiếng Việt được duy trì. Một vòng ảnh sáng/tối xác nhận kết thúc kiểm tra hình ảnh; các kiểm thử không liên quan hình ảnh về sau không mở lại vòng này.
 
-Phase 10 first copied the complete Gate 0 rollback state, verified sender/subscription hashes, and passed the packaged binary on an alternate port. The final process then imported Gate 0 VAPID and subscription data copy-only into protected production storage, retained the source and a timestamped backup, and took over only the existing loopback port. Tailscale Serve remained tailnet-only at the same private origin and Funnel remained off. Rollback means gracefully stopping the release candidate and starting the preserved Gate 0 process; it never changes the Serve mapping or deletes phone identity.
+## Gói ứng viên tự chứa
+
+Gói ban đầu có đúng `vibeping.exe` đã nhúng web, bốn BAT thao tác rõ ràng và hướng dẫn tiếng Việt. BAT UTF-8 BOM/CRLF giữ chữ và `%~dp0` có dấu cách trên PowerShell 5.1/`cmd.exe`. Bản này chưa tự chạy, máy dùng không cần Node.js/pnpm/Rust/Cargo. Gói chín tệp và Sẵn sàng được thêm ở 1.1.1.
+
+Chọn Codex ưu tiên `codex.exe` native chính thức hơn tệp gọi npm, để tích hợp hoạt động khi bỏ công cụ phát triển khỏi `PATH`, vẫn theo notify/hook và bước tin cậy bắt buộc.
+
+## Chuyển bản giữ danh tính riêng
+
+Giai đoạn 10 sao lưu đủ trạng thái quay lại Gate 0, xác minh băm người gửi/đăng ký và thử gói ở cổng phụ. Tiến trình cuối chỉ chép VAPID/đăng ký vào dữ liệu sản phẩm được bảo vệ, giữ nguồn/bản sao có thời gian rồi tiếp quản cổng loopback cũ.
+
+Serve vẫn chỉ tailnet tại origin cũ; Funnel tắt. Quay lại là dừng RC an toàn rồi chạy Gate 0 đã giữ, không sửa Serve hoặc xóa danh tính điện thoại.

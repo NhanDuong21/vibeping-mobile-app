@@ -1,29 +1,31 @@
-# Conversation identity 1.3.1 validation
+# Kiểm chứng định danh hội thoại 1.3.1
 
-## Delivered repair
+Biên bản lịch sử của bản 1.3.1.
 
-Verified delegated-agent ancestry now groups retained requests under their conversation root. The projection preserves source thread/turn hashes, public request IDs, result records and notification targets. It does not infer identity from a shared project, a user fork or `sessionId` alone.
+## Phần sửa đã bàn giao
 
-Hook metadata follows explicit parent links with a bounded optional budget. A stalled ancestry lookup retains any answer already fetched. A host-owned reconciliation worker reads metadata at startup and retries unresolved history while the explicitly started host runs. It stores hashed identity and safe titles only; reconciliation itself emits no completion event or push notification.
+Quan hệ tác nhân phụ đã xác minh đưa các yêu cầu còn lưu về hội thoại gốc, giữ mã băm hội thoại/lượt, mã yêu cầu công khai, kết quả và đích thông báo. Không suy ra từ dự án chung, bản tách người dùng hoặc riêng `sessionId`.
 
-The latest main request remains primary even when child requests have later ordinals. Pagination includes that request on the first page, including a one-item page, and retains every child request on subsequent pages. Phone caches reconcile using server-owned membership. Old child-work URLs become canonical URLs with their exact request query preserved, including offline reload after resolution.
+Đọc thông tin hook theo liên kết cha rõ ràng với thời gian bổ sung có giới hạn. Tra quan hệ bị kẹt vẫn giữ câu trả lời đã lấy. Tiến trình đối soát của máy chủ đọc lúc khởi động và thử lại lịch sử chưa rõ khi máy chủ được chủ động chạy. Chỉ lưu định danh băm và tên an toàn; đối soát không tạo hoàn tất hoặc thông báo.
 
-The installed Codex app-server was checked through metadata-only reads and its ancestor filter. This corresponds to the documented [app-server thread metadata and listing APIs](https://learn.chatgpt.com/docs/app-server). No Codex credentials or account email were read.
+Yêu cầu chính mới nhất giữ vai trò chính dù yêu cầu con có thứ tự muộn hơn. Trang đầu luôn có yêu cầu chính, kể cả kích thước một mục; các yêu cầu con vẫn có ở trang sau. Bộ đệm điện thoại đối soát theo quan hệ từ máy chủ. URL con cũ chuyển về URL chuẩn, giữ truy vấn đúng yêu cầu, gồm tải lại ngoại tuyến sau phân giải.
 
-## Verification
+App Server đang cài được kiểm tra bằng cách chỉ đọc thông tin mô tả và bộ lọc tổ tiên, tương ứng [API thông tin và danh sách hội thoại App Server](https://learn.chatgpt.com/docs/app-server). Không đọc thông tin đăng nhập hoặc email.
 
-- Formatting, lint, type checking, generated-contract freshness, Tailwind/production builds, Rust formatting/clippy and release builds passed.
-- 128 mobile tests, 150 Rust workspace tests, six Gate 0 tests and all 122 browser scenarios passed. New regressions cover nested ancestry, independent forks, invalid/cyclic metadata, backfilled results and notification IDs, paging, foreground identity, old phone caches, old URLs and offline answers.
-- All eight new light/dark, 320 px/1024 px feed/detail captures passed the bounded finish review. Its two findings—optional ancestry timing out an already-fetched answer and old URLs retaining detached offline data—were corrected and verified. Final disposition: `ship`.
-- The final ZIP passed clean extraction, lifecycle, private health, PWA, REST, SSE, real Codex allowance, synthetic attention, delayed queue and restart persistence without a developer runtime.
-- The real 1.3.0 service worker upgraded to 1.3.1 after a versioned notice and explicit activation, retaining its local data and offline shell.
+## Kiểm chứng
 
-## Installed host
+- Format, lint, kiểu, hợp đồng mới, build Tailwind/sản phẩm, format/Clippy Rust và bản phát hành đạt.
+- 128 mobile, 150 Rust, sáu Gate 0 và 122 kịch bản trình duyệt đạt. Hồi quy mới: quan hệ lồng, bản tách độc lập, thông tin sai/vòng, kết quả/ID thông báo chuyển đổi, phân trang, định danh khi mở, bộ đệm/URL cũ và kết quả ngoại tuyến.
+- Tám ảnh mới sáng/tối 320/1024 px của danh sách/chi tiết qua đánh giá có giới hạn. Hai lỗi đã sửa: tra quan hệ tùy chọn làm hết thời gian câu trả lời đã lấy; URL cũ giữ dữ liệu ngoại tuyến tách rời. Kết luận `ship`.
+- ZIP cuối đạt giải nén, vòng đời, sức khỏe riêng, PWA, REST/SSE, hạn mức thật, sự kiện giả, hàng đợi trễ và dữ liệu qua khởi động lại khi không có công cụ phát triển.
+- Service worker thật 1.3.0 → 1.3.1 hiện phiên bản và yêu cầu kích hoạt, giữ dữ liệu và giao diện ngoại tuyến.
 
-The final package replaced the existing installation after protected executable/data backups. Local and private health, all installed package files and PWA manifest hashes match 1.3.1. The companion, tray and opted-in Windows startup are healthy. Private Serve configuration and VAPID identity are unchanged; Funnel remains off.
+## Máy cài tại thời điểm ghi nhận
 
-Integrity checks preserved 31 stored final results, 111 activity records, 146 timeline stages, one owner, two subscriptions and one phone identity. Actual Codex metadata confirmed three child threads of one retained parent; the new projection presents those four source identities as one work with 12 retained requests at verification time. Its representative request comes from the parent. Live app QA confirmed the 1.3.1 notice, the single parent work and an original child result expanding within that work.
+Gói thay bản cũ sau sao lưu tệp/dữ liệu bảo vệ. Sức khỏe localhost/riêng, tệp cài và manifest khớp 1.3.1. Đồng hành, khay và tự chạy đã bật hoạt động khỏe. Serve/VAPID giữ nguyên, Funnel tắt.
 
-Final ZIP SHA-256: `49f177c3cf2d4c3bd6226caeb7aa7cbd848c3add9f50431a8a14444f5aa07c42`.
+Giữ 31 kết quả, 111 sự kiện, 146 mốc, một chủ sở hữu, hai đăng ký, một danh tính điện thoại. Thông tin Codex thật xác nhận ba hội thoại con của một gốc; bốn nguồn thành một công việc có 12 yêu cầu còn lưu lúc kiểm chứng. Yêu cầu đại diện từ gốc. Kiểm tra trực tiếp xác nhận thông báo 1.3.1, một công việc gốc và mở kết quả con nguyên bản bên trong.
 
-Physical iPhone observation remains the owner's acceptance step: open the Home Screen app on its private connection and tap **Cập nhật** when **Phiên bản 1.3.1** appears. No reinstall or subscription reset is required.
+SHA-256 ZIP: `49f177c3cf2d4c3bd6226caeb7aa7cbd848c3add9f50431a8a14444f5aa07c42`.
+
+Người dùng vẫn cần quan sát iPhone: mở từ Màn hình chính trên kết nối riêng và chọn **Cập nhật** khi thấy **Phiên bản 1.3.1**. Không cần cài lại hoặc đặt lại đăng ký.

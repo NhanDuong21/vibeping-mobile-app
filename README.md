@@ -1,59 +1,47 @@
-# VibePing — Theo dõi đến từng giây 1.3.3
+# VibePing 1.3.3 — Theo dõi đến từng giây
 
-VibePing is a personal-production tool that notifies one user's iPhone when Codex finishes, needs attention, leaves final tests failing, has a preview ready, or approaches a usage allowance. Version 1.1.1 adds project profiles, personal notification rules, a living mascot, a small daily summary and an opted-in Windows companion. The persistent sessions, live cards, timelines and final Codex answers from 1.1 remain intact.
+VibePing giúp bạn theo dõi Codex trên iPhone khi rời laptop Windows. Ứng dụng báo khi công việc hoàn tất, cần bạn quay lại xử lý, kiểm thử cuối chưa đạt, có bản xem trước hoặc hạn mức Codex sắp hết. Bạn có thể đọc kết quả, xem lịch sử và thời gian làm việc đã ghi nhận trên điện thoại.
 
-Version 1.3.3 shows seconds on the home screen while Codex is working. The foreground display ticks once per second without extra network requests; background and offline clocks pause.
+Dữ liệu chính nằm trên Windows. Laptop và iPhone kết nối qua mạng Tailscale riêng của bạn; máy chủ chỉ lắng nghe trên localhost và dùng **Tailscale Serve** để cung cấp địa chỉ HTTPS riêng. **Không bật Tailscale Funnel.**
 
-Version 1.3.2 sends completion notifications only for a verified main conversation. Delegated-agent answers stay in the activity history without interrupting the phone. Unknown ancestry waits for reconciliation, and queued retries are checked again before delivery.
+## Bắt đầu từ đâu?
 
-Version 1.3.1 groups verified delegated-agent work under its parent conversation, including retained history and phone caches. The main request stays first, and all delegated results remain readable inline. Independent chats and user-created forks remain separate. Activity keeps two levels: a compact work feed and work detail with inline requests. The latest request opens directly to its original timeline and final answer; older requests expand in place. Idle status is compact, previews omit internal review output, and notification links open the exact request. Each conversation has one work identity; grouping uses explicit Codex agent ancestry rather than a shared project or fork origin.
+| Bạn muốn làm gì?                         | Tài liệu nên đọc                                  |
+| ---------------------------------------- | ------------------------------------------------- |
+| Cài đặt, cập nhật hoặc sử dụng hằng ngày | [Hướng dẫn cài và vận hành](docs/INSTALL_VI.md)   |
+| Xem thay đổi trong bản 1.3.3             | [Ghi chú phát hành 1.3.3](docs/release-1.3.3.md)  |
+| Tìm tài liệu và hiểu thuật ngữ           | [Mục lục tài liệu](docs/README.md)                |
+| Hiểu phạm vi sản phẩm                    | [Định hướng sản phẩm](PRODUCT.md)                 |
+| Hiểu cách hệ thống hoạt động             | [Kiến trúc](docs/ARCHITECTURE.md)                 |
+| Sửa mã nguồn                             | [Quy định dành cho tác nhân lập trình](AGENTS.md) |
 
-Gate 0 preserves the proven standards-based iPhone Web Push evidence from the stable private Tailscale Serve origin. Gate 1 preserves the proven signed-in Codex allowance path through the official App Server protocol. The self-contained Rust/SQLite release candidate now serves the Angular/Ionic PWA at that same private origin; the Gate 0 source, state, and rollback path remain preserved.
+## Bản hiện tại có gì?
 
-## Current status
+- **1.3.3:** hiển thị số giây khi Codex đang làm việc. Đồng hồ cập nhật mỗi giây khi trang đang mở, không tạo thêm yêu cầu mạng; tạm dừng khi chạy nền hoặc mất kết nối.
+- **1.3.2:** chỉ gửi thông báo hoàn tất cho cuộc hội thoại chính đã xác minh. Kết quả tác nhân phụ vẫn được lưu; trường hợp chưa rõ quan hệ sẽ chờ đối soát trước khi gửi.
+- **Từ 1.3.1:** mỗi cuộc hội thoại chính và các tác nhân phụ đã xác minh được gộp thành một **Công việc**. Mỗi **Yêu cầu** có diễn biến, thời gian, trạng thái đã đọc và kết quả riêng. Yêu cầu chính mới nhất mở sẵn; các yêu cầu khác mở trong cùng trang. Hội thoại độc lập và bản tách do người dùng tạo vẫn riêng biệt.
+- Các tính năng đã có gồm hồ sơ dự án, bộ lọc thông báo, linh vật theo trạng thái, tổng kết Hôm nay, giao diện sáng/tối và chế độ **Sẵn sàng** trên Windows do bạn chủ động bật.
 
-| Gate | Status | Meaning |
-| --- | --- | --- |
-| Phase 0 | COMPLETE | Product, architecture, quality, and security foundations are in place. |
-| Gate 0 | PASS | A physical iPhone received the Lock Screen push from the stable private origin before and after a Rust restart without reinstalling or resubscribing. |
-| Gate 1 | PASS | The real signed-in ChatGPT account returned sanitized allowance windows through Codex App Server. |
-| Phase 1 | COMPLETE | The generated-contract Angular/Ionic PWA is embedded in a loopback-only Rust/SQLite process with REST, SSE, PWA caching, browser E2E coverage, and release builds. |
-| Phase 2 | COMPLETE | Manual Windows lifecycle commands, single-instance control, graceful recovery, diagnostics, logs, and durable user intent are production-ready. |
-| Phase 3 | COMPLETE | Private owner pairing, PWA installation and permission onboarding, Gate 0 state import, persistent VAPID, subscriptions, and durable Web Push delivery are production-ready. |
-| Phase 4 | COMPLETE | Supported Codex notify/hooks feed a private durable activity stream, deduplicated attention events, SSE updates, and eligible push jobs without storing prompts or tool output. |
-| Phase 5 | COMPLETE | A supervised official Codex App Server session persists dynamic allowance windows, publishes live updates, deduplicates threshold alerts, and powers Vietnamese summary/detail views. |
-| Phase 6 | COMPLETE | The mobile Activity product now has a paginated unread feed, exact event detail links, bottom navigation, live reconciliation, IndexedDB recovery, stale states, and a deliberate app-update banner. |
-| Phase 7 | COMPLETE | Computer readiness, production notification preferences, overnight quiet hours, privacy/theme/retention controls, subscription recovery, and sanitized diagnostics are available on mobile. |
-| Phase 8 | COMPLETE | Database migration recovery, confirmed backup/restore/reset commands, lifecycle and push fault handling, private-host and browser security, cache/XSS safety, redaction, dependency audits, and Windows owner ACLs are hardened. |
-| Phase 9 | COMPLETE | Every required mobile surface and recovery state has completed the bounded Impeccable, accessibility, responsive, theme, motion, keyboard, copy, and performance audit. |
-| Phase 10 | COMPLETE | The `1.0.0-rc.1` Windows x64 package, clean-environment smoke test, reversible Gate 0 cutover, stable private origin, native Codex integration, and morning acceptance handoff are ready. |
+VibePing dành cho một người dùng, một laptop Windows x64, một tài khoản Codex đã đăng nhập và một iPhone. Phạm vi dự án giữ chi phí hạ tầng ở 0 đồng: không thêm tài khoản Apple Developer, App Store, tên miền trả phí, đường hầm công khai, máy chủ hay cơ sở dữ liệu đám mây. Thao tác với Codex vẫn thực hiện trong Codex.
 
-## Constraints
+## Chạy và kiểm tra mã nguồn
 
-V1 is for one Windows x64 laptop, one signed-in Codex account, one iPhone, and one personal Tailscale tailnet. It must cost 0 VND: no Apple Developer account, App Store, paid domain, public tunnel, cloud backend, cloud database, or VPS. Tailscale Funnel is forbidden.
+Chạy các lệnh tại **thư mục gốc repo**. Máy phát triển cần các công cụ trong [hướng dẫn mobile](apps/mobile/README.md); máy chỉ dùng gói Windows không cần Node.js, pnpm, Rust hoặc Cargo.
 
-## Developer commands
-
-Run all local checks:
+Kiểm tra toàn bộ dự án:
 
 ```powershell
 .\scripts\check.ps1
 ```
 
-Generate the API contract and start the production shell on a development port:
+Sinh hợp đồng API và chạy môi trường phát triển:
 
 ```powershell
 pnpm run generate:contracts
 .\scripts\dev.ps1
 ```
 
-Run the production browser suite after building the release executable:
-
-```powershell
-pnpm run e2e
-```
-
-Build and package the self-contained Windows x64 release:
+Biên dịch, đóng gói Windows x64 và kiểm thử bản phát hành:
 
 ```powershell
 pnpm run build:release
@@ -61,9 +49,13 @@ pnpm run package:windows
 pnpm run e2e:release
 ```
 
-The ignored output is `artifacts/VibePing-Windows-x64-v1.3.3/`, its ZIP, and its SHA-256 file. The nine-file package needs no Node.js, pnpm, Rust, or Cargo installation on the user machine. See [1.3.3 release notes](docs/release-1.3.3.md) for the live seconds display and update instructions; Personal, Always ready and Codex results remain available. The phase ledger below records the original V1 foundation; physical iPhone acceptance remains separate from automated release checks.
+Để chạy riêng bộ kiểm thử trình duyệt sau khi đã biên dịch tệp thực thi phát hành, dùng `pnpm run e2e`.
 
-Control the production process explicitly, or opt into Windows sign-in startup with `Bat San sang.bat` in the packaged release:
+Gói xuất ra nằm ở `artifacts/VibePing-Windows-x64-v1.3.3/`, kèm ZIP và tệp mã kiểm tra SHA-256. Các tệp này được Git bỏ qua. Gói gồm chín tệp và tự chứa phần chạy ứng dụng.
+
+## Điều khiển VibePing trên Windows
+
+Bạn có thể chạy thủ công hoặc bật khởi động cùng phiên đăng nhập Windows bằng `Bat San sang.bat` trong gói phát hành. Khi phát triển từ repo, dùng:
 
 ```powershell
 .\scripts\vibeping.ps1 start
@@ -74,45 +66,55 @@ Control the production process explicitly, or opt into Windows sign-in startup w
 .\scripts\vibeping.ps1 stop
 ```
 
-Back up or recover local state only while VibePing is stopped. Restore and notification reset deliberately require explicit confirmation:
+Các lệnh tương ứng là khởi động, xem trạng thái, chẩn đoán, khởi động lại, mở ứng dụng và dừng. Bạn cũng có thể gọi trực tiếp trên `vibeping.exe`. Lần khởi động chưa ghép nối sẽ hiển thị mã dùng một lần, có thời hạn ngắn, để nhập trên iPhone.
+
+Dữ liệu mặc định nằm trong `%LOCALAPPDATA%\VibePing`: SQLite, khóa ngăn chạy trùng, lựa chọn chạy/dừng, thông tin điều khiển nội bộ, nhật ký luân phiên và danh tính gửi thông báo. Có thể chọn thư mục khác bằng `-DataDir` hoặc `--data-dir`.
+
+Chỉ sao lưu và khôi phục khi VibePing đã dừng. Chạy tại thư mục chứa tệp thực thi:
 
 ```powershell
-vibeping backup
-vibeping restore --file <duong-dan-ban-sao> --confirm
-vibeping reset notifications --confirm
+.\vibeping.exe backup
+.\vibeping.exe restore --file <duong-dan-ban-sao> --confirm
+.\vibeping.exe reset notifications --confirm
 ```
 
-Manual backup bundles can include the private notification sender identity. Keep them inside the protected VibePing data directory or protect any copy you move elsewhere.
+`restore` khôi phục dữ liệu; `reset notifications` đặt lại dữ liệu thông báo. Hai thao tác cần cờ xác nhận `--confirm`. Bản sao lưu có thể chứa khóa riêng dùng để gửi thông báo; giữ nó trong thư mục VibePing được bảo vệ hoặc bảo vệ bản sao khi chuyển đi nơi khác.
 
-The same public commands are available directly on `vibeping.exe`. The first unpaired Start prints a short-lived one-time pairing code. Runtime data, the single-instance lock, user intent, private shutdown metadata, SQLite, rotating logs, and sender identity live under `%LOCALAPPDATA%\VibePing` unless `-DataDir`/`--data-dir` is supplied.
+## Tích hợp Codex
 
-Install, inspect, repair, or remove the Codex integration without replacing unrelated user hooks:
+Cài, xem trạng thái, sửa hoặc gỡ tích hợp bằng các lệnh sau. Tích hợp giữ lại các hook khác của bạn:
 
 ```powershell
-vibeping integrations codex install
-vibeping integrations codex status
-vibeping integrations codex repair
-vibeping integrations codex remove
+.\vibeping.exe integrations codex install
+.\vibeping.exe integrations codex status
+.\vibeping.exe integrations codex repair
+.\vibeping.exe integrations codex remove
 ```
 
-After install or repair, open Codex and run `/hooks` to review and trust the exact VibePing definitions. This human trust step is intentionally not bypassed.
+Sau khi cài hoặc sửa, mở Codex và chạy `/hooks` để xem, xác nhận tin cậy đúng các định nghĩa VibePing. Ứng dụng không tự bỏ qua bước này.
 
-Production imports the known Gate 0 VAPID and phone-registration files once, after first copying them to a timestamped local backup. The original Gate 0 directory is never modified or deleted. Phase 10 completed the reversible cutover while preserving the existing private origin, Tailscale Serve mapping, and Funnel-off state.
+## Các mốc đã kiểm chứng
 
-Use the preserved Gate 0 launcher only for an intentional rollback after stopping the release candidate:
+- **Gate 0 — đạt ngày 02/09/2026:** người dùng đã thấy thông báo trên màn hình khóa iPhone thật, trước và sau khi khởi động lại Rust, với cùng địa chỉ riêng và không cần cài hay đăng ký lại.
+- **Gate 1 — đạt:** đọc được hạn mức tài khoản Codex đã đăng nhập qua `codex app-server`; kết quả được lọc thông tin nhạy cảm.
+- **Giai đoạn 1–10 — hoàn tất nền tảng V1:** PWA Angular/Ionic được nhúng trong máy chủ Rust/SQLite, có kiểm thử tự động và gói Windows. Xem [sổ theo dõi triển khai](docs/execution/BUILD_STATUS.md) để biết chi tiết lịch sử.
+
+Kết quả kiểm thử tự động và việc dịch vụ gửi thông báo chấp nhận yêu cầu không chứng minh thông báo đã hiện trên iPhone thật. [Nghiệm thu trên thiết bị và sử dụng bảy ngày](docs/execution/MANUAL_ACCEPTANCE.md) vẫn cần người dùng ghi nhận.
+
+## Các bản thử nghiệm được giữ lại
+
+Gate 0 và Gate 1 nằm trong `spikes/` để kiểm tra lại các tích hợp rủi ro. Bản chính đã nhập một lần các tệp VAPID và đăng ký điện thoại đã biết từ Gate 0, sau khi sao lưu có dấu thời gian. Thư mục gốc Gate 0 được giữ nguyên.
+
+Chỉ quay lại Gate 0 khi chủ động muốn dùng bản cũ và đã dừng bản chính:
 
 ```powershell
 .\spikes\tailscale-web-push\scripts\Start-Gate0.ps1
 ```
 
-Read the signed-in Codex account limits:
+Lần chạy Gate 0 đầu tiên có thể mở trang chấp thuận chính thức của Tailscale. Chấp thuận Serve/HTTPS rồi chạy lại; thao tác này không bật Funnel. Mọi lần xác nhận Gate 0 mới đều cần quan sát trên iPhone thật.
+
+Đọc hạn mức qua công cụ thử nghiệm Gate 1:
 
 ```powershell
 cargo run -p vibeping-gate1 -- read
 ```
-
-Gate 0 passed on 2026-09-02 after the human observed delivery on the physical iPhone Lock Screen both before and after a Rust restart. Any future Gate 0 revalidation still requires the same physical confirmation; provider acceptance or desktop automation alone is insufficient.
-
-The first Gate 0 start may open Tailscale's official consent page. Approve Serve/HTTPS once, then run the start command again. This does not enable Funnel.
-
-See [PRODUCT.md](PRODUCT.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/execution](docs/execution), and [docs/validation](docs/validation) for durable decisions, execution evidence, and manual acceptance boundaries.

@@ -1,21 +1,23 @@
-# Completion notifications 1.3.2
+# Kiểm chứng thông báo hoàn tất 1.3.2
 
-The observed premature notifications were completed child-agent turns. Conversation grouping in 1.3.1 repaired activity membership but left completion delivery unchanged. The repair uses the same persisted, explicitly verified ancestry for notification eligibility.
+Biên bản lịch sử của bản 1.3.2.
 
-Known child completions and final test failures are retained as activity without queued pushes. Unknown ancestry retains a bounded pending job; each attempt waits 30 seconds for the existing host reconciliation worker, up to the original expiry. Confirmed main work remains eligible under the user's duration, privacy and scheduling preferences. Every attempt rechecks ancestry, including retries and recovered leases from older releases. Activity jobs whose retained source event has disappeared expire because their source cannot be verified.
+Thông báo đến sớm được xác định là lượt tác nhân phụ hoàn tất. Bản 1.3.1 sửa cách nhóm hoạt động nhưng chưa đổi điều kiện gửi. Bản này dùng cùng quan hệ cha-con đã xác minh và lưu để quyết định được gửi hay không.
 
-Regression coverage exercises a running main task with multiple child answers, one final main notification, result preservation, duplicate signals, metadata timeout followed by child/root resolution, persistence across database reopen, pending/retry/expired-lease checks, unknown-source expiry, child final failure and retained permission attention. Existing notification privacy and personal-policy tests now provide explicit main-task identities.
+Kết quả hoàn tất và kiểm thử cuối lỗi của tác nhân phụ vẫn lưu hoạt động nhưng không tạo việc gửi. Quan hệ chưa biết giữ việc chờ có giới hạn; mỗi lần đợi 30 giây cho tiến trình đối soát, tối đa đến hạn gốc. Công việc chính đã xác nhận vẫn tuân ngưỡng thời lượng, riêng tư và lịch gửi. Mọi lần thử, gồm lần gửi lại và quyền xử lý phục hồi từ bản cũ, đều kiểm lại quan hệ. Việc mất sự kiện nguồn hết hạn vì không thể xác minh.
 
-This is a delivery-only repair. The mobile layout, copy, palette, assets and notification interaction stay unchanged; the PWA version notice advances to 1.3.2. Physical iPhone notification observation remains separate from automated queue and upgrade checks.
+Hồi quy bao phủ công việc chính đang chạy có nhiều câu trả lời phụ, một thông báo chính cuối, giữ kết quả, tín hiệu trùng, đọc thông tin hết thời gian rồi phân giải con/gốc, mở lại cơ sở dữ liệu, chờ/thử lại/quyền xử lý hết hạn, nguồn chưa biết hết hạn, lỗi cuối tác nhân phụ và giữ thông báo cần xin phép. Kiểm thử riêng tư/chính sách cá nhân được cung cấp định danh công việc chính rõ ràng.
 
-## Release verification
+Đây là sửa cơ chế gửi. Bố cục, câu chữ, bảng màu, ảnh và thao tác thông báo không đổi; thông báo phiên bản PWA lên 1.3.2.
 
-- Formatting, lint, type checks, generated contracts, Tailwind/production builds, Rust formatting/clippy, release builds, architecture, hygiene, Vietnamese copy and dependency checks passed.
-- 128 mobile tests, 156 Rust workspace tests, six Gate 0 tests and 122 browser scenarios passed. All six new delivery regression tests passed.
-- The final nine-file ZIP passed extraction, lifecycle, private health, REST/SSE, PWA, real Codex allowance, fixture delivery, delayed queue and restart persistence checks without a developer runtime.
-- A real 1.3.1 service-worker cache received the 1.3.2 notice, activated after the update tap, and retained its local data and offline shell. The smoke assertion now allows backend releases to retain identical JavaScript assets while requiring a changed versioned manifest and the actual update interaction.
-- The installed private host and PWA manifest report 1.3.2. Protected upgrade checks preserved 32 results, 113 events, 153 timeline stages, one owner, two subscriptions and one phone identity. VAPID, private Serve and Windows startup settings remained unchanged; the companion and tray resumed healthy.
+## Kiểm chứng phát hành
 
-Final ZIP SHA-256: `433e6990db8705b479e9ffe6bb796b3f3fe6e0d1bf02d637ddf2dd9204d314d4`.
+- Format, lint, kiểu, hợp đồng, build Tailwind/sản phẩm, Rust format/Clippy/release, kiến trúc, vệ sinh repo, tiếng Việt và phụ thuộc đạt.
+- 128 mobile, 156 Rust, sáu Gate 0, 122 kịch bản trình duyệt và cả sáu hồi quy gửi mới đạt.
+- ZIP chín tệp đạt giải nén, vòng đời, sức khỏe riêng, REST/SSE, PWA, hạn mức thật, dữ liệu gửi mẫu, hàng đợi trễ và giữ dữ liệu qua khởi động lại khi không có công cụ phát triển.
+- Bộ đệm service worker thật 1.3.1 nhận thông báo 1.3.2, kích hoạt sau bấm cập nhật, giữ dữ liệu/giao diện ngoại tuyến. Phép kiểm tra cho phép bản sửa máy chủ giữ JavaScript giống nhau nhưng vẫn đòi manifest phiên bản đổi và thao tác cập nhật thật.
+- Máy cài riêng và manifest báo 1.3.2. Kiểm tra bảo vệ giữ 32 kết quả, 113 sự kiện, 153 mốc, một chủ sở hữu, hai đăng ký và một danh tính điện thoại. VAPID, Serve và tự chạy Windows không đổi; đồng hành/khay hoạt động khỏe trở lại.
 
-Delivery review disposition: `ship`. No layout or asset changes require a new visual direction. Physical iPhone delivery remains unobserved; no real test notification was sent to the phone during this repair.
+SHA-256 ZIP: `433e6990db8705b479e9ffe6bb796b3f3fe6e0d1bf02d637ddf2dd9204d314d4`.
+
+Đánh giá gửi kết luận `ship`. Không đổi bố cục/ảnh nên không cần hướng thiết kế mới. Chưa quan sát thông báo iPhone thật; không gửi thông báo thử thật đến điện thoại trong lần sửa này.

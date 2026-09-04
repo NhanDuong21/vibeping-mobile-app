@@ -1,4 +1,4 @@
-# Product
+# Định hướng sản phẩm VibePing
 
 <!-- impeccable:product-schema 1 -->
 
@@ -6,64 +6,71 @@
 
 web
 
-## Stack
+Mục này giữ tên `Platform` và giá trị `web` để công cụ đọc đúng nền tảng. Ứng dụng trên iPhone là PWA được thêm vào Màn hình chính.
 
-The V1 mobile client is a Home Screen PWA built with Angular 22, Ionic Angular 9, Tailwind CSS, Angular Signals, and RxJS; IndexedDB is introduced only as a replaceable cache. The Windows source-of-truth process is a Rust 1.98 modular monolith backed by SQLite. The production applications build on the preserved Gate 0 and Gate 1 spikes, which remain regression evidence for the two riskiest integrations.
+## Công nghệ
 
-## Audience and operating context
+Ứng dụng dùng Angular 22, Ionic Angular 9, Tailwind CSS, Angular Signals và RxJS. IndexedDB chỉ là bộ nhớ đệm có thể dựng lại. Phần chạy trên Windows là ứng dụng Rust 1.98 chia mô-đun theo tính năng, dùng SQLite làm dữ liệu chính.
 
-One person uses Codex on one Windows x64 laptop and carries one iPhone connected through the same personal Tailscale tailnet. They choose manual startup or opt into Windows sign-in startup and need reliable attention signals while away from the laptop, including on cellular data or with the phone locked.
+Hai bản thử nghiệm Gate 0 và Gate 1 được giữ để kiểm tra lại các tích hợp rủi ro. Ứng dụng chính phát triển từ những kết quả đã được kiểm chứng này.
 
-## Problem and jobs to be done
+## Người dùng và hoàn cảnh sử dụng
 
-Codex work can finish, need attention, leave tests failing, expose a preview, or consume an allowance while the user is elsewhere. VibePing must:
+Một người dùng Codex trên một laptop Windows x64, mang theo một iPhone và kết nối cả hai vào cùng mạng Tailscale riêng. Người dùng tự khởi động VibePing hoặc chủ động bật chạy cùng phiên đăng nhập Windows. Họ cần nhận tín hiệu đáng tin khi rời laptop, kể cả khi điện thoại dùng dữ liệu di động hoặc đang khóa.
 
-- notify the iPhone at those operational moments;
-- show Codex allowance windows and make low capacity understandable;
-- remain useful through temporary laptop, phone, or network interruption;
-- provide quiet confidence without turning the phone into a remote terminal or chat client.
+## Vấn đề cần giải quyết
 
-## Product purpose and positioning
+Khi người dùng ở nơi khác, Codex có thể làm xong, chờ xử lý, kết thúc với kiểm thử chưa đạt, có bản xem trước hoặc tiêu thụ gần hết hạn mức. VibePing cần:
 
-VibePing is a local-first attention bridge, not another Codex client. The Windows process owns durable state and sends standards-based Web Push over a stable private Tailscale origin. ChatGPT/Codex remains the place for remote interaction.
+- báo đến iPhone vào những thời điểm cần chú ý;
+- hiển thị các khung hạn mức Codex và giải thích khi sắp hết;
+- vẫn hữu ích khi laptop, điện thoại hoặc mạng tạm gián đoạn;
+- giúp người dùng yên tâm theo dõi, không biến điện thoại thành terminal hay ứng dụng chat.
 
-## V1 scope
+## Mục đích
 
-- Manual Windows start, stop, and restart.
-- In 1.1.1 Personal, project names, icons and subtle accents, project notification filters, completion-duration thresholds, one durable waiting reminder, a small daily summary, and state-aware whole-image mascot motion. Keep the existing tabs and final Codex results.
-- In 1.1.1 Always ready, explicitly enabled per-user Windows sign-in startup, a local tray and silent health checks with bounded recovery. Stop prevents recovery for the current sign-in session; the phone only reports status.
-- Activity signals for completed work, return-needed states, failed final tests, ready previews, and low Codex allowance.
-- In 1.3.1, a Codex conversation and its explicitly verified delegated-agent descendants form one Công việc in Activity. Retained requests are Yêu cầu, expanded inline in work detail with their own real timelines, observed durations, read states and retained results. The latest main request opens automatically; delegated results remain available inline. A single request has no hierarchy labels. Idle status is compact and full technical results stay in detail. Independent conversations and user-created forks never merge by project or shared session metadata. Historical data never gains invented stages, titles or start times.
-- Read the completed turn's assistant answer in activity detail, with a short excerpt in the feed and in the optional standard Lock Screen mode. This is a read-only result, not a conversation or command surface.
-- REST and SSE while the PWA is open; Web Push in the background.
-- Codex rate-limit data through `codex app-server` only.
-- Light, dark, and system themes; all client copy in Vietnamese.
-- SQLite as Windows source of truth and IndexedDB only as a mobile cache.
+VibePing là cầu nối thông báo, ưu tiên dữ liệu cục bộ. Tiến trình Windows giữ dữ liệu bền vững và gửi Web Push tiêu chuẩn qua địa chỉ Tailscale riêng ổn định. Khi cần tương tác, người dùng quay lại ChatGPT/Codex.
 
-## Non-goals
+## Phạm vi hiện có
 
-V1 has no reply or approval from the phone, terminal, remote command execution, remote desktop, chat, accounts, teams, billing, analytics dashboard, native Capacitor package, or automatic executable updates. It has no Apple distribution, paid domain, public tunnel, hosted backend, hosted database, or VPS.
+- Khởi động, dừng và khởi động lại trên Windows.
+- **Cá nhân hóa từ 1.1.1:** tên, biểu tượng và màu nhấn nhẹ cho dự án; bộ lọc thông báo theo dự án; ngưỡng thời lượng để báo hoàn tất; một lần nhắc chờ được lưu bền vững; tổng kết ngày; chuyển động nguyên hình linh vật theo trạng thái. Giữ các tab và kết quả Codex đã có.
+- **Sẵn sàng từ 1.1.1:** người dùng bật chạy cùng phiên đăng nhập Windows; khay điều khiển cục bộ; kiểm tra sức khỏe âm thầm và tự khôi phục có giới hạn. Dừng ngăn tự khôi phục trong phiên đăng nhập hiện tại. Điện thoại chỉ hiển thị trạng thái.
+- Theo dõi công việc hoàn tất, cần người dùng quay lại, kiểm thử cuối chưa đạt, bản xem trước sẵn sàng và hạn mức thấp.
+- **Từ 1.3.1:** một cuộc hội thoại Codex cùng các tác nhân phụ được xác minh là một **Công việc** trong Hoạt động. Từng lượt lưu lại là **Yêu cầu**, mở ngay trong chi tiết công việc với diễn biến thật, thời lượng quan sát được, trạng thái đã đọc và kết quả riêng. Yêu cầu chính mới nhất mở sẵn; kết quả tác nhân phụ vẫn đọc được. Công việc chỉ có một yêu cầu không cần nhãn phân cấp.
+- Trạng thái rảnh được trình bày gọn; kết quả kỹ thuật đầy đủ nằm trong chi tiết. Không gộp hội thoại độc lập hoặc bản tách do người dùng tạo chỉ vì cùng dự án hay thông tin phiên. Không tự thêm giai đoạn, tên hoặc giờ bắt đầu vào dữ liệu cũ.
+- Đọc câu trả lời cuối của Codex trong chi tiết; danh sách và chế độ thông báo tiêu chuẩn có thể hiển thị trích đoạn ngắn. Đây là nội dung chỉ đọc.
+- **Từ 1.3.2:** chỉ báo hoàn tất cho hội thoại chính đã xác minh; kết quả tác nhân phụ vẫn lưu trong lịch sử.
+- **Từ 1.3.3:** công việc đang chạy ở trang chủ hiển thị đến giây, cập nhật khi trang đang mở và có dữ liệu mới; đồng hồ tạm dừng khi chạy nền hoặc mất kết nối.
+- Dùng REST và SSE khi PWA mở; Web Push khi chạy nền. Chỉ đọc hạn mức qua `codex app-server`.
+- Có giao diện sáng, tối và theo hệ thống; nội dung ứng dụng bằng tiếng Việt. SQLite giữ dữ liệu chính; IndexedDB chỉ giữ bản đệm.
 
-## Product principles
+## Ngoài phạm vi
 
-1. **Attention, not control.** Signal the moment and return the user to Codex for action.
-2. **Private and local by default.** Keep state on Windows and traffic inside the tailnet.
-3. **Durable before clever.** Persist notification identity, subscriptions, events, and retries across restarts.
-4. **Operational language.** Explain what the user can do next; never lead with implementation jargon.
-5. **One proven vertical slice at a time.** Validate risky integrations before product expansion.
+Không có trả lời hoặc phê duyệt từ điện thoại, terminal, chạy lệnh từ xa, điều khiển màn hình, chat, tài khoản, nhóm, thanh toán, bảng phân tích, gói Capacitor native hay tự cập nhật tệp thực thi. Không phân phối qua Apple, dùng tên miền trả phí, đường hầm công khai, máy chủ/cơ sở dữ liệu thuê ngoài hoặc VPS.
 
-## Evidence on hand
+## Nguyên tắc sản phẩm
 
-The read-only sibling repository `../vibeping-ios-push-poc` previously proved standards-based iPhone Web Push, including Lock Screen/background delivery, cellular use, app-switcher removal, and offline catch-up through a temporary Quick Tunnel. Gate 0 validates the permanent private origin and restart behavior; it does not invent new claims.
+1. **Báo đúng lúc:** cho biết khi nào cần quay lại Codex để hành động.
+2. **Riêng tư và cục bộ:** giữ trạng thái trên Windows, truy cập ứng dụng trong mạng riêng.
+3. **Lưu bền vững:** giữ danh tính gửi, đăng ký thiết bị, sự kiện và công việc thử lại qua các lần khởi động.
+4. **Nói rõ việc cần làm:** dùng từ quen thuộc, giải thích bước tiếp theo trước chi tiết kỹ thuật.
+5. **Làm từng phần hoàn chỉnh:** kiểm chứng tích hợp rủi ro trước khi mở rộng sản phẩm.
 
-## V1 acceptance criteria
+## Bằng chứng nền tảng
 
-- A manually started Windows executable exposes the same private `.ts.net` PWA origin after restart.
-- The installed Home Screen PWA receives relevant Lock Screen/background notifications without reinstalling or recreating its subscription.
-- The mobile activity and allowance views recover after offline periods from Windows-owned state.
-- Real Codex allowance windows are read through the signed-in App Server session without handling credentials.
-- User-visible copy remains Vietnamese, accessible, calm, and free of raw technical errors.
+Repo bên cạnh `../vibeping-ios-push-poc` từng chứng minh Web Push tiêu chuẩn trên iPhone: màn hình khóa/chạy nền, dữ liệu di động, đóng ứng dụng khỏi trình chuyển ứng dụng và nhận bù sau mất mạng qua Quick Tunnel tạm thời. Repo đó chỉ được tham khảo, không sửa.
 
-## Accessibility and inclusion
+Gate 0 kiểm chứng địa chỉ riêng lâu dài và hành vi sau khởi động lại. Chỉ ghi nhận kết quả đã có bằng chứng.
 
-Touch targets are at least 44×44 px, content supports 320–430 px widths, contrast is strong in light and dark themes, safe areas are respected, permission is user-initiated, focus is visible, and reduced-motion preferences are honored.
+## Tiêu chí nghiệm thu nền tảng V1
+
+- Tệp thực thi Windows được khởi động thủ công vẫn cung cấp cùng địa chỉ PWA riêng `.ts.net` sau khởi động lại.
+- PWA trên Màn hình chính nhận thông báo liên quan khi khóa/chạy nền, không cần cài lại hoặc tạo lại đăng ký.
+- Màn hình hoạt động và hạn mức khôi phục từ dữ liệu Windows sau gián đoạn mạng.
+- Đọc được khung hạn mức Codex thật qua phiên App Server đã đăng nhập mà không xử lý thông tin đăng nhập.
+- Nội dung tiếng Việt dễ hiểu, dễ tiếp cận, bình tĩnh và không lộ lỗi kỹ thuật thô.
+
+## Khả năng tiếp cận
+
+Vùng chạm tối thiểu 44×44 px; hỗ trợ bề rộng 320–430 px; đủ tương phản ở giao diện sáng và tối; tôn trọng vùng an toàn iPhone. Chỉ xin quyền khi người dùng thao tác, luôn thấy vị trí focus và tuân theo lựa chọn giảm chuyển động.

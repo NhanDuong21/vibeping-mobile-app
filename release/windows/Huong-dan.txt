@@ -1,8 +1,8 @@
-VibePing 1.3.3 — Nhịp tín hiệu
+VibePing 1.3.3 — Theo dõi đến từng giây
 ========================================
 
 Yêu cầu
-- Windows x64 và Tailscale kết nối trên laptop, iPhone trong cùng tailnet.
+- Windows x64 và Tailscale kết nối trên laptop, iPhone trong cùng mạng Tailscale riêng.
 - Chỉ dùng Tailscale Serve riêng tư. Không bật Funnel.
 - Giải nén toàn bộ gói vào thư mục ổn định, không chạy từ trong ZIP.
 
@@ -21,7 +21,7 @@ Cập nhật từ bản cũ
 
 Sẵn sàng trên Windows
 - "Bat San sang.bat" (Bật Sẵn sàng): bật khay mèo, chạy khi đăng nhập và tự khôi phục máy chủ.
-- Tìm mèo VibePing trong khay hệ thống hoặc nhóm biểu tượng ẩn. Nhấp phải để mở app, khởi động, dừng hoặc thay lựa chọn đăng nhập.
+- Tìm mèo VibePing trong khay hệ thống hoặc nhóm biểu tượng ẩn. Nhấp phải để mở ứng dụng, khởi động, dừng hoặc thay lựa chọn đăng nhập.
 - Khi bấm Dừng, máy chủ không tự bật lại. Bạn có thể chọn Khởi động, hoặc đợi lần đăng nhập Windows tiếp theo nếu đã bật lựa chọn đó.
 - "Tat San sang.bat" (Tắt Sẵn sàng): tắt khay, khôi phục và chạy khi đăng nhập. Máy chủ giữ trạng thái hiện tại.
 - Giữ vibeping.exe và vibeping-ready.exe cạnh nhau. Không cần cài Node.js, pnpm, Rust hay Cargo.
@@ -36,7 +36,7 @@ Cá nhân hóa trên iPhone
 - Cài đặt > Dự án của bạn: tên, biểu tượng, màu nhấn, loại thông báo và lịch sử riêng.
 - Mặc định báo hoàn tất từ 2 phút, nhắc chờ một lần sau 5 phút. Có thể đổi chung hoặc theo dự án.
 - Công tắc thông báo chung và giờ yên tĩnh vẫn áp dụng. Không biết giờ bắt đầu thì vẫn báo hoàn tất.
-- Hoạt động giữ timeline, kết quả cuối Codex và có tổng kết Hôm nay.
+- Hoạt động giữ diễn biến, kết quả cuối Codex và có tổng kết Hôm nay.
 
 Khôi phục
 - Mất kết nối: kiểm tra Tailscale và biểu tượng khay trên laptop.
@@ -47,7 +47,7 @@ Khôi phục
 
 Chuyển thư mục hoặc gỡ VibePing
 1. Mở "Tat San sang.bat", rồi "Stop VibePing.bat". Đợi khay biến mất.
-2. Nếu gỡ app, chạy "vibeping.exe integrations codex remove" khi muốn gỡ tích hợp.
+2. Nếu gỡ ứng dụng, chạy "vibeping.exe integrations codex remove" khi muốn gỡ tích hợp.
 3. Chuyển hoặc xóa thư mục gói; nếu chuyển, bật Sẵn sàng từ thư mục mới và sửa tích hợp Codex theo đường dẫn mới.
 4. Chỉ xóa %LOCALAPPDATA%\VibePing khi chủ động muốn xóa toàn bộ dữ liệu.
 

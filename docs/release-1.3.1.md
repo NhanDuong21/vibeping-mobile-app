@@ -1,8 +1,10 @@
 # VibePing 1.3.1 — Gom đúng công việc cùng đoạn chat
 
-Các công việc hỗ trợ do agent phụ thực hiện trong cùng đoạn chat nay nằm chung với công việc chính. Bản sửa áp dụng cho cả lịch sử đã lưu và bộ nhớ trên điện thoại.
+Ghi chú lịch sử cho phiên bản trong tiêu đề. Để cài hoặc cập nhật bản hiện tại, xem [hướng dẫn vận hành](INSTALL_VI.md).
 
-- Xác định công việc cha bằng quan hệ agent mà Codex cung cấp. Các đoạn chat độc lập và bản fork do người dùng tạo vẫn giữ riêng.
+Các công việc hỗ trợ do tác nhân phụ thực hiện trong cùng đoạn chat nay nằm chung với công việc chính. Bản sửa áp dụng cho cả lịch sử đã lưu và bộ nhớ trên điện thoại.
+
+- Xác định công việc cha bằng quan hệ tác nhân cha-con mà Codex cung cấp. Các đoạn chat độc lập và bản tách do người dùng tạo vẫn giữ riêng.
 - Yêu cầu chính gần nhất cùng kết quả của nó luôn mở đầu. Kết quả hỗ trợ mở rộng ngay bên trong công việc, giữ nguyên nội dung và diễn biến.
 - Giữ liên kết công việc cũ, đích đến chính xác của thông báo, trạng thái đã đọc và các kết quả đã lưu để đọc khi mất mạng.
 - Khi thiếu thông tin nhóm, VibePing thử đối chiếu lại trong lúc máy đang chạy. Không tạo hoạt động hoặc gửi thông báo hoàn tất chỉ vì gom lại lịch sử.

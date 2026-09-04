@@ -1,27 +1,24 @@
-# Phase 7 computer, settings, and diagnostics validation
+# Giai đoạn 7 — Máy tính, Cài đặt và Chẩn đoán
 
-Date: 2026-09-02
+Ngày ghi nhận: 02/09/2026.
 
-## Scope
+## Phạm vi
 
-- owner-safe laptop, Codex, allowance-reader, notification, private-connection, and last-signal status;
-- explicit delayed notification test and diagnostic launch;
-- per-type notification controls, configurable allowance threshold, critical alerts, quiet hours including overnight intervals, and urgent exceptions;
-- lock-screen privacy, system/light/dark theme, activity retention, and explicit subscription re-registration;
-- plain diagnostic checks, actionable recovery, and a clipboard-ready sanitized technical report.
+Trạng thái laptop, Codex, bộ đọc hạn mức, thông báo, kết nối riêng và tín hiệu cuối được giới hạn theo chủ sở hữu. Có gửi thử trễ/chẩn đoán do người dùng chọn; công tắc loại thông báo, ngưỡng hạn mức, cảnh báo nghiêm trọng, giờ yên tĩnh qua đêm, ngoại lệ khẩn; riêng tư màn hình khóa, giao diện, thời gian giữ lịch sử, đăng ký lại thông báo và báo cáo đã lọc có thể sao chép.
 
-## Automated evidence
+## Bằng chứng tự động
 
-- 42 Rust tests cover the existing product plus preference validation/persistence, actual retention deletion, disabled delivery with retained activity, private push body, cross-midnight quiet policy, urgent bypass, configured allowance threshold, status aggregation, and diagnostic sanitization;
-- 14 Angular tests cover the existing mobile state plus theme behavior, complete preference save, computer availability, and fresh diagnostic mutation;
-- generated OpenAPI and TypeScript contracts include all Phase 7 endpoints and are fresh;
-- Angular lint, strict typecheck, production build, Rust formatting, Clippy with warnings denied, Rust release build, architecture, hygiene, and diff checks pass;
-- 36 Playwright checks run in light and dark iPhone projects. Phase 7 scenarios verify readiness labels, CSRF-bound delayed tests, the complete preferences payload, 23:00–06:30 overnight hours, denied-permission recovery, diagnostic actions, clipboard output, and WCAG 2 A/AA rules.
+- 42 kiểm thử Rust: kiểm tra/lưu cài đặt, xóa thật lịch sử hết hạn, tắt gửi vẫn lưu hoạt động, nội dung riêng tư, giờ qua đêm, ngoại lệ khẩn, ngưỡng hạn mức, tổng hợp trạng thái và lọc chẩn đoán.
+- 14 kiểm thử Angular: trạng thái mobile, giao diện, lưu toàn bộ cài đặt, khả năng kết nối máy tính và chạy chẩn đoán mới.
+- Hợp đồng OpenAPI/TypeScript có đủ API giai đoạn 7, được sinh mới. Lint, kiểu nghiêm ngặt, biên dịch Angular, định dạng Rust, Clippy không cảnh báo, bản Rust phát hành, kiến trúc, vệ sinh repo và diff đạt.
+- 36 kiểm tra Playwright sáng/tối iPhone: nhãn sẵn sàng, gửi thử trễ có CSRF, toàn bộ dữ liệu cài đặt, giờ 23:00–06:30, khôi phục quyền bị từ chối, chẩn đoán, sao chép và WCAG 2 A/AA.
 
-## Impeccable review
+## Rà soát Impeccable
 
-The established “Quiet signal” system continues through sparse rules, restrained semantic dots, clear state copy, and a three-destination mobile navigation. A 390×844 light/dark screenshot pass reviewed Computer, Settings, and Diagnostics. It led to a reusable 44 px switch target with an unambiguous enabled track, smaller diagnostic check headings, removal of duplicate failure copy, a non-overlapping save action, and recovery text that inherits the high-contrast primary foreground in both themes. Every failure state tells the user what to do without exposing raw technical errors.
+Giữ đường kẻ thưa, chấm màu tiết chế, chữ rõ và ba tab. Một vòng ảnh 390×844 sáng/tối xem Máy tính, Cài đặt và Chẩn đoán; đã tạo vùng chạm công tắc 44 px với rãnh bật rõ, giảm tiêu đề kiểm tra, bỏ lời lỗi trùng, sửa nút lưu chồng lấn và cho chữ khôi phục dùng màu chính đủ tương phản ở cả hai giao diện.
 
-## Manual boundary
+Mọi trạng thái lỗi chỉ rõ việc cần làm, không lộ lỗi kỹ thuật thô.
 
-No physical iPhone result is claimed. The morning matrix must still confirm Settings persistence after a real Home Screen relaunch, denied/re-enabled notification behavior through iOS Settings, delayed Lock Screen display, private lock-screen content, theme/safe-area rendering, diagnostic copy, and continued subscription delivery after production cutover.
+## Cần người dùng xác nhận
+
+Chưa có kết quả iPhone thật cho giai đoạn này. Cần kiểm tra cài đặt còn sau mở lại từ Màn hình chính, tắt/bật lại quyền qua Cài đặt iOS, thông báo trễ màn hình khóa, nội dung riêng tư, giao diện/vùng an toàn, sao chép chẩn đoán và đăng ký vẫn gửi sau chuyển bản.

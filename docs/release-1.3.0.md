@@ -1,11 +1,13 @@
 # VibePing 1.3.0 — Chi tiết công việc
 
+Ghi chú lịch sử cho phiên bản trong tiêu đề. Để cài hoặc cập nhật bản hiện tại, xem [hướng dẫn vận hành](INSTALL_VI.md).
+
 Từ Hoạt động, mở một công việc là đọc được ngay diễn biến và kết quả Codex. Yêu cầu gần nhất mở sẵn; các yêu cầu cũ mở rộng ngay tại chỗ. Công việc chỉ có một yêu cầu không còn nhãn phân cấp.
 
 - Mỗi tác vụ Codex vẫn xuất hiện một lần; các tác vụ cùng dự án giữ riêng lịch sử.
 - Khi không có việc đang chạy, trạng thái thu gọn thành **Codex đang nghỉ**. Công việc hoàn tất nằm trong danh sách Gần đây.
 - Dòng lịch sử gọn hơn, có tên, dự án, số yêu cầu, trạng thái và giờ cập nhật. Không còn thời lượng tổng dễ gây hiểu nhầm.
-- Preview dùng một câu dễ đọc; nội dung review kỹ thuật và đường dẫn được giữ trong kết quả đầy đủ. Tên bị thiếu có thêm giờ để phân biệt.
+- Bản xem trước dùng một câu dễ đọc; nội dung rà soát kỹ thuật và đường dẫn được giữ trong kết quả đầy đủ. Tên bị thiếu có thêm giờ để phân biệt.
 - Liên kết từ thông báo mở đúng yêu cầu trong công việc. Các kết quả đã đọc vẫn mở được khi mất mạng; cập nhật trực tiếp và tuỳ chọn chuyển động được giữ nguyên.
 
 ## Cập nhật
@@ -15,4 +17,4 @@ Từ Hoạt động, mở một công việc là đọc được ngay diễn bi�
 3. Mở lại **Bat San sang.bat** nếu đang dùng Sẵn sàng, hoặc **Start VibePing.bat** để chạy thủ công.
 4. Trên iPhone, mở VibePing, chờ **Có bản VibePing mới — Phiên bản 1.3.0**, rồi bấm **Cập nhật**. Không cần xóa biểu tượng, ghép nối hay đăng ký thông báo lại.
 
-Bản này giữ cấu trúc dữ liệu của 1.2.0 và không thêm migration. Số yêu cầu phản ánh lịch sử còn được giữ theo cài đặt thời gian lưu. Kết quả cũ giữ nguyên phần đã lưu, kể cả thông báo giới hạn dung lượng nếu có.
+Bản này giữ cấu trúc dữ liệu của 1.2.0 và không nâng cấp cấu trúc cơ sở dữ liệu. Số yêu cầu phản ánh lịch sử còn được giữ theo cài đặt thời gian lưu. Kết quả cũ giữ nguyên phần đã lưu, kể cả thông báo giới hạn dung lượng nếu có.

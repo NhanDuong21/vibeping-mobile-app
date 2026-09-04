@@ -1,8 +1,8 @@
-# ADR 007: Codex notify and hooks for future attention events
+# ADR 007 — Nhận sự kiện Codex qua notify và hook
 
-- **Status:** Proposed for a later phase
-- **Decision:** Prefer explicit supported Codex notify/hooks event paths and normalize them into VibePing domain events. Do not scrape UI or terminal output.
-- **Context:** Completion and return-needed signals need a reliable integration boundary.
-- **Alternatives:** OCR, polling the Codex UI, parsing console presentation, filesystem heuristics.
-- **Consequences:** Integration follows documented payloads and may need version compatibility; no implementation is scaffolded in Phase 0.
-- **Validation needed:** A later vertical slice must prove real events, deduplication, restart recovery, and safe failure mapping.
+- **Trạng thái:** Được đề xuất ở giai đoạn nền tảng; triển khai sau đó được ghi tại [giai đoạn 4](../validation/PHASE_4_CODEX_ATTENTION.md).
+- **Quyết định:** Ưu tiên đường sự kiện notify/hook được Codex hỗ trợ, chuẩn hóa thành sự kiện nghiệp vụ VibePing. Không trích xuất giao diện hoặc nội dung terminal.
+- **Bối cảnh:** Tín hiệu hoàn tất và cần người dùng quay lại phải có ranh giới tích hợp đáng tin.
+- **Phương án đã cân nhắc:** OCR, đọc giao diện Codex định kỳ, phân tích nội dung console, suy đoán từ hệ thống tệp.
+- **Hệ quả:** Theo đúng dữ liệu giao thức được hỗ trợ, có thể cần kiểm tra tương thích phiên bản. Không tạo mã khung trong giai đoạn 0.
+- **Kiểm chứng theo kế hoạch ban đầu:** Một phần triển khai sau phải chứng minh sự kiện thật, chống trùng, khôi phục sau khởi động lại và diễn đạt lỗi an toàn.

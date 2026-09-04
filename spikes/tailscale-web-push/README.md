@@ -1,8 +1,10 @@
-# Gate 0 — Tailscale Web Push
+# Gate 0 — Kiểm chứng Web Push qua Tailscale
 
-This isolated spike serves a Vietnamese diagnostic PWA from `127.0.0.1:8787`, persists one VAPID identity and the latest phone registration under `%LOCALAPPDATA%\VibePing\Gate0`, and sends encrypted standards-based Web Push. Tailscale Serve supplies the stable private HTTPS origin; Funnel is never used.
+Bản thử nghiệm độc lập này phục vụ PWA chẩn đoán tiếng Việt tại `127.0.0.1:8787`, lưu danh tính gửi VAPID và đăng ký điện thoại mới nhất trong `%LOCALAPPDATA%\VibePing\Gate0`, rồi gửi Web Push được mã hóa. Tailscale Serve cung cấp địa chỉ HTTPS riêng ổn định. Tuyệt đối không dùng Funnel.
 
-## Run
+## Chạy thử
+
+Chạy tại gốc repo. Nếu bản VibePing chính đang dùng cổng này, cần dừng bản chính trước khi chủ động quay lại Gate 0.
 
 ```powershell
 .\spikes\tailscale-web-push\scripts\Start-Gate0.ps1
@@ -12,6 +14,10 @@ This isolated spike serves a Vietnamese diagnostic PWA from `127.0.0.1:8787`, pe
 .\spikes\tailscale-web-push\scripts\Stop-Gate0.ps1
 ```
 
-Stop preserves Serve, VAPID, and phone state. Clean Up restores the exact Serve snapshot only when no later change is detected. It preserves push state unless `-DeletePushState` is supplied and the interactive `XOA` confirmation succeeds.
+Các lệnh lần lượt khởi động, xem trạng thái, gửi thông báo thử, khởi động lại và dừng. `-SkipBuild` dùng bản đã biên dịch.
 
-The physical iPhone result is authoritative. A provider acceptance or desktop notification is not a Gate 0 pass.
+## Dừng và dọn dẹp
+
+Stop giữ nguyên Serve, VAPID và đăng ký điện thoại. Clean Up chỉ khôi phục đúng bản chụp cấu hình Serve khi không phát hiện thay đổi mới hơn. Dữ liệu thông báo được giữ lại, trừ khi truyền `-DeletePushState` và nhập đúng xác nhận `XOA` khi được hỏi.
+
+Kết quả trên iPhone thật là bằng chứng quyết định. Dịch vụ gửi chấp nhận yêu cầu hoặc thông báo hiện trên máy tính chưa đủ để đánh dấu Gate 0 đạt. Xem [biên bản Gate 0](../../docs/validation/GATE_0_TAILSCALE_WEB_PUSH.md).
