@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { ProjectIdentity } from '../../personal';
 import { elapsedTime, relativeSignalTime, relativeTime } from '../../../core/formatting/time';
 import { activityProject, activityTaskTitle } from '../application/activity-presentation';
 import { ActivityStore } from '../application/activity.store';
@@ -9,7 +10,7 @@ import { WorkSessionCard } from './work-session-card';
 
 @Component({
   selector: 'app-live-status-card',
-  imports: [RouterLink, SignalMotion, MotionInView, WorkSessionCard],
+  imports: [RouterLink, SignalMotion, MotionInView, WorkSessionCard, ProjectIdentity],
   templateUrl: './live-status-card.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

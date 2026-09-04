@@ -1,7 +1,7 @@
 # Build status
 
-- **Current personal release:** 1.1.0 Sessions, following RC8; see `docs/release-1.1.0.md`.
-- **Release scope:** one persistent session per request, grouped activity, timeline, completion summary, lifecycle motion, and preserved final answers. Personal and Always ready are deferred by the owner.
+- **Current personal release:** 1.1.1 Personal + Always ready, following 1.1.0 Sessions; see `docs/release-1.1.1.md`.
+- **Release scope:** project profiles, personalized notification rules, one waiting reminder, a small daily summary, state-aware mascot, opt-in Windows sign-in startup, tray and host recovery. Existing sessions, timelines and final answers remain intact.
 - The ledger below is historical. Physical iPhone and soak acceptance remain human checks.
 
 - **Campaign branch:** `codex/vibeping-v1-rc1`

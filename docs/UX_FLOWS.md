@@ -2,7 +2,7 @@
 
 ## Desktop lifecycle
 
-The user manually starts VibePing through an executable or command file. Start verifies local prerequisites, launches one instance, checks health, and verifies the stable private URL. Stop drains and closes the process without stopping Tailscale or deleting device identity. Restart preserves the origin, VAPID identity, subscription, and durable application state. No Windows auto-start is offered.
+The user starts VibePing through an executable or command file, or enables Windows sign-in startup in 1.1.1. Start verifies local prerequisites, launches one instance, checks health, and verifies the stable private URL. Stop drains and closes the process without stopping Tailscale or deleting device identity, and prevents automatic recovery until Start or the next opted-in sign-in. Restart preserves the origin, VAPID identity, subscription, and durable application state. The Windows tray owns local runtime controls; the phone reports readiness only.
 
 ## Install on iPhone
 

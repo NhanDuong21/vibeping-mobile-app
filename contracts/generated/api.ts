@@ -20,6 +20,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/always-ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["always_ready_status"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/bootstrap": {
         parameters: {
             query?: never;
@@ -204,6 +220,54 @@ export interface paths {
             cookie?: never;
         };
         get: operations["status"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["projects"];
+        put: operations["save_project"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["rules"];
+        put: operations["save_rules"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["today"];
         put?: never;
         post?: never;
         delete?: never;
@@ -420,6 +484,16 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
         };
+        DailySummary: {
+            /** Format: int64 */
+            completed: number;
+            /** Format: int64 */
+            failedTests: number;
+            /** Format: int64 */
+            observedSeconds: number;
+            /** Format: int64 */
+            sessions: number;
+        };
         DiagnosticCheck: {
             action?: string | null;
             detail: string;
@@ -482,6 +556,12 @@ export interface components {
             privateIdentityReady: boolean;
             state: string;
         };
+        PersonalRules: {
+            /** Format: int32 */
+            completionMinMinutes: number;
+            /** Format: int32 */
+            waitingReminderMinutes: number;
+        };
         Preferences: {
             /** Format: int32 */
             allowanceThresholdPercent: number;
@@ -492,6 +572,20 @@ export interface components {
             /** Format: int32 */
             retentionDays: number;
             theme: string;
+        };
+        ProjectProfile: {
+            accent: string;
+            /** Format: int32 */
+            completionMinMinutes?: number | null;
+            displayName: string;
+            icon: string;
+            notifyCompletion: boolean;
+            notifyFinalFailure: boolean;
+            notifyPermission: boolean;
+            notifyPreview: boolean;
+            projectName: string;
+            /** Format: int32 */
+            waitingReminderMinutes?: number | null;
         };
         PublicKeyResponse: {
             publicKey: string;
@@ -508,6 +602,16 @@ export interface components {
             state: string;
             /** Format: int64 */
             unreadCount: number;
+        };
+        ReadyStatus: {
+            autoStart: boolean;
+            /** Format: date-time */
+            checkedAt?: string | null;
+            enabled: boolean;
+            /** Format: int32 */
+            recoveryCount: number;
+            state: string;
+            trayAvailable: boolean;
         };
         SubscriptionKeys: {
             auth: string;
@@ -588,6 +692,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ActivitySnapshot"];
+                };
+            };
+        };
+    };
+    always_ready_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadyStatus"];
                 };
             };
         };
@@ -678,6 +801,7 @@ export interface operations {
                 cursor?: string;
                 limit?: number;
                 grouped?: boolean;
+                project?: string;
             };
             header?: never;
             path?: never;
@@ -893,6 +1017,112 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PairingStatusResponse"];
+                };
+            };
+        };
+    };
+    projects: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectProfile"][];
+                };
+            };
+        };
+    };
+    save_project: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProjectProfile"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectProfile"];
+                };
+            };
+        };
+    };
+    rules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonalRules"];
+                };
+            };
+        };
+    };
+    save_rules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PersonalRules"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonalRules"];
+                };
+            };
+        };
+    };
+    today: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DailySummary"];
                 };
             };
         };

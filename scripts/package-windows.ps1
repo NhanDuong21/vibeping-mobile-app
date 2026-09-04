@@ -3,7 +3,7 @@ param([switch] $SkipBuild)
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$version = '1.1.0'
+$version = '1.1.1'
 $packageName = "VibePing-Windows-x64-v$version"
 $artifactRoot = Join-Path $repoRoot 'artifacts'
 $packageDirectory = Join-Path $artifactRoot $packageName
@@ -39,6 +39,9 @@ if (-not (Test-Path -LiteralPath $binary -PathType Leaf)) {
 }
 $files = @(
     @{ Source = $binary; Name = 'vibeping.exe' },
+    @{ Source = (Join-Path $repoRoot 'target\release\vibeping-ready.exe'); Name = 'vibeping-ready.exe' },
+    @{ Source = (Join-Path $templateRoot 'Bat San sang.bat'); Name = 'Bat San sang.bat' },
+    @{ Source = (Join-Path $templateRoot 'Tat San sang.bat'); Name = 'Tat San sang.bat' },
     @{ Source = (Join-Path $templateRoot 'Start VibePing.bat'); Name = 'Start VibePing.bat' },
     @{ Source = (Join-Path $templateRoot 'Stop VibePing.bat'); Name = 'Stop VibePing.bat' },
     @{ Source = (Join-Path $templateRoot 'Restart VibePing.bat'); Name = 'Restart VibePing.bat' },

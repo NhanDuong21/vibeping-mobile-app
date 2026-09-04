@@ -2,6 +2,7 @@ use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
 use vibeping::features::{
+    always_ready::command::{self as ready_command, ReadyArgs},
     codex_attention::command::{self as codex_command, CodexIntegrationArgs},
     lifecycle::{self, DataOptions, HostOptions, LifecycleCommand},
     recovery::{self, BackupArgs, ResetNotificationsArgs, RestoreArgs},
@@ -22,6 +23,8 @@ struct Cli {
 
 #[derive(Debug, Subcommand)]
 enum RootCommand {
+    #[command(about = "Khay Windows và khả năng sẵn sàng tự động")]
+    AlwaysReady(ReadyArgs),
     #[command(about = "Khởi động VibePing ở nền")]
     Start(HostOptions),
     #[command(about = "Chạy VibePing ở cửa sổ hiện tại")]
@@ -67,6 +70,7 @@ enum ResetCommand {
 #[tokio::main]
 async fn main() -> ExitCode {
     let result = match Cli::parse().command {
+        RootCommand::AlwaysReady(value) => ready_command::execute(value).await,
         RootCommand::Start(value) => lifecycle::execute(LifecycleCommand::Start(value)).await,
         RootCommand::Run(value) => lifecycle::execute(LifecycleCommand::Run(value)).await,
         RootCommand::Stop(value) => lifecycle::execute(LifecycleCommand::Stop(value)).await,

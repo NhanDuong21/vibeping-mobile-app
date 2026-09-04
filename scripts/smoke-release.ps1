@@ -8,7 +8,7 @@ param(
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Net.Http
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$packageName = 'VibePing-Windows-x64-v1.1.0'
+$packageName = 'VibePing-Windows-x64-v1.1.1'
 if ([string]::IsNullOrWhiteSpace($PackageZip)) {
     $PackageZip = Join-Path $repoRoot "artifacts\$packageName.zip"
 }
@@ -40,7 +40,7 @@ function Wait-Health {
     while ([DateTime]::UtcNow -lt $deadline) {
         try {
             $health = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/v1/health" -TimeoutSec 2
-            if ($health.status -eq 'ok' -and $health.version -eq '1.1.0') { return $health }
+            if ($health.status -eq 'ok' -and $health.version -eq '1.1.1') { return $health }
         }
         catch { Start-Sleep -Milliseconds 300 }
     }
@@ -156,7 +156,7 @@ function Queue-FakeDelayedPush {
 try {
     New-Item -ItemType Directory -Path $extractRoot -Force | Out-Null
     Expand-Archive -LiteralPath $PackageZip -DestinationPath $extractRoot
-    $required = @('vibeping.exe', 'Start VibePing.bat', 'Stop VibePing.bat', 'Restart VibePing.bat', 'Open VibePing.bat', 'Huong-dan.txt')
+    $required = @('vibeping.exe', 'vibeping-ready.exe', 'Bat San sang.bat', 'Tat San sang.bat', 'Start VibePing.bat', 'Stop VibePing.bat', 'Restart VibePing.bat', 'Open VibePing.bat', 'Huong-dan.txt')
     foreach ($name in $required) {
         if (-not (Test-Path -LiteralPath (Join-Path (Split-Path $binary) $name) -PathType Leaf)) {
             throw "Gói release thiếu $name"
@@ -189,7 +189,7 @@ try {
         }
     }
     $version = Invoke-Executable @('--version')
-    if ($version -ne 'vibeping 1.1.0') { throw "Sai phiên bản package: $version" }
+    if ($version -ne 'vibeping 1.1.1') { throw "Sai phiên bản package: $version" }
 
     $start = Invoke-Executable @('start', '--port', [string]$Port, '--data-dir', $dataDirectory)
     $started = $true

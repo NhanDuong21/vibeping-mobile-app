@@ -1,60 +1,36 @@
-# Cài và vận hành VibePing 1.0.0-rc.1
+# Cài và vận hành VibePing 1.1.1
 
-Đây là release candidate cá nhân cho một laptop Windows x64, một tài khoản Codex đã đăng nhập và một iPhone trong cùng tailnet. Đây chưa phải bản ổn định `1.0.0`.
+Giải nén toàn bộ ZIP Windows x64 vào một thư mục ổn định. Laptop và iPhone dùng cùng tailnet; giữ Tailscale Serve riêng tư, không bật Funnel. Máy dùng app không cần Node.js, pnpm, Rust hay Cargo.
 
-## Chuẩn bị
+## Khởi động và cập nhật
 
-- Giữ Tailscale kết nối trên laptop và iPhone.
-- Không bật Tailscale Funnel. VibePing chỉ dùng Tailscale Serve riêng tư.
-- Giải nén toàn bộ ZIP vào một thư mục mà bạn kiểm soát. Không chạy trực tiếp từ trong ZIP.
-- Máy sử dụng không cần cài Node.js, pnpm, Rust hay Cargo.
+Nếu đang dùng bản cũ, dừng VibePing và tạo bản sao lưu trước. Chép toàn bộ tệp trong gói mới vào đúng thư mục đang cài, giữ nguyên đường dẫn để tích hợp Codex vẫn tìm được app. Giữ dữ liệu cục bộ hiện có; không xóa dữ liệu ghép nối hay thông báo.
 
-## Khởi động lần đầu
+1. Mở **Start VibePing.bat** để chạy thủ công. Nhập mã ghép nối trên iPhone nếu được yêu cầu.
+2. Hoặc mở **Bat San sang.bat** để bật khay mèo, tự chạy khi đăng nhập Windows và khôi phục host.
+3. Trên iPhone mở biểu tượng VibePing đã thêm vào Màn hình chính. Khi thấy **Phiên bản 1.1.1**, bấm **Cập nhật**. Không xóa biểu tượng hoặc đăng ký lại thông báo.
 
-1. Mở `Start VibePing.bat` bằng thao tác của bạn. VibePing không tự khởi động cùng Windows.
-2. Giữ cửa sổ mở đủ lâu để đọc trạng thái và ghi lại mã ghép nối một lần nếu có.
-3. Kết nối Tailscale trên iPhone rồi mở biểu tượng VibePing hiện có trên Màn hình chính.
-4. Nhập mã nếu ứng dụng yêu cầu và hoàn tất các bước quyền thông báo.
-5. Nếu vẫn thấy giao diện Gate 0, đóng VibePing trên iPhone, mở lại một lần, rồi tải lại một lần. Không xóa biểu tượng và không đăng ký lại trừ khi ứng dụng yêu cầu.
+## Khay Windows
 
-Worker Angular mới dùng cùng địa chỉ và scope với Gate 0 nên lần cập nhật đầu có thể cần đúng một vòng đóng/mở/tải lại. Dữ liệu gửi và đăng ký cũ đã được nhập theo kiểu sao chép, không xóa nguồn.
+Tìm VibePing trong khay hoặc nhóm biểu tượng ẩn. Nhấp phải để mở app, khởi động, dừng, đổi lựa chọn đăng nhập hoặc tắt Sẵn sàng. Dừng giữ host tắt cho đến khi bạn chọn Khởi động hoặc đăng nhập Windows lần tiếp theo nếu đã bật lựa chọn đó.
 
-## Điều khiển hằng ngày
+**Tat San sang.bat** tắt khay và chạy khi đăng nhập, giữ nguyên trạng thái host. Muốn dừng cả host, dùng **Stop VibePing.bat**. **Restart VibePing.bat** và **Open VibePing.bat** vẫn hoạt động như trước.
 
-- `Start VibePing.bat`: khởi động nền và kiểm tra sẵn sàng.
-- `Stop VibePing.bat`: dừng mềm, giữ nguyên dữ liệu và Tailscale.
-- `Restart VibePing.bat`: dừng rồi khởi động lại an toàn.
-- `Open VibePing.bat`: mở địa chỉ Tailscale riêng ổn định.
+Trước khi chuyển thư mục hoặc gỡ app, tắt Sẵn sàng rồi dừng host, đợi khay biến mất. Giữ hai tệp chạy cạnh nhau; sau khi chuyển, bật lại Sẵn sàng và sửa tích hợp Codex theo đường dẫn mới.
 
-Các BAT luôn gọi `vibeping.exe` trong chính thư mục của chúng, kể cả khi đường dẫn có khoảng trắng.
+## Cá nhân hóa
 
-## Kiểm tra Codex
+Trong Cài đặt, chọn thời lượng báo hoàn tất, nhắc chờ và **Dự án của bạn**. Hồ sơ dự án cho phép đổi tên, biểu tượng, màu nhấn, lọc thông báo và xem lịch sử. Các công tắc chung và giờ yên tĩnh vẫn áp dụng.
 
-Mở PowerShell trong thư mục gói rồi chạy:
+## Codex, sao lưu và khôi phục
 
-```powershell
-.\vibeping.exe integrations codex status
-```
+Sau khi cài hoặc sửa tích hợp, chạy `/hooks` trong Codex và kiểm tra các hook VibePing. VibePing không bỏ qua bước tin cậy và không đọc tệp thông tin đăng nhập Codex.
 
-Kết quả cần cho thấy Notify và Hooks sẵn sàng. Sau khi cài hoặc sửa tích hợp, mở Codex, chạy `/hooks`, đọc đúng định nghĩa VibePing rồi tự đánh dấu tin cậy. VibePing không bỏ qua bước tin cậy này và không đọc tệp thông tin đăng nhập Codex.
-
-## Sao lưu và khôi phục
-
-Chỉ sao lưu hoặc khôi phục khi VibePing đã dừng:
+Chỉ sao lưu hoặc khôi phục khi host đã dừng:
 
 ```powershell
 .\vibeping.exe backup
 .\vibeping.exe restore --file <duong-dan-ban-sao> --confirm
 ```
 
-Bản sao có thể chứa danh tính gửi thông báo riêng. Giữ bản sao trong thư mục VibePing được bảo vệ hoặc tự bảo vệ mọi bản được chuyển ra ngoài.
-
-## Buổi sáng kiểm tra iPhone
-
-Thực hiện đúng ma trận trong `docs/execution/MANUAL_ACCEPTANCE.md`. Bắt đầu bằng thông báo trì hoãn 10 giây, khóa iPhone trước khi hết thời gian và ghi lại kết quả thật. Không coi phản hồi API hoặc kiểm thử desktop là bằng chứng thông báo đã hiện trên Màn hình khóa.
-
-## Giới hạn hiện tại
-
-- Ghép nối/cập nhật một lần, hiển thị thông báo trên iPhone thật, hành vi foreground/background và chạm để mở vẫn chờ người dùng xác nhận.
-- Tin cậy hook Codex vẫn cần người dùng thực hiện bằng `/hooks`.
-- Bản ổn định `1.0.0` bị chặn đến khi toàn bộ ma trận iPhone và giai đoạn dùng thử bảy ngày hoàn tất.
+Giữ bản sao trong thư mục được bảo vệ. Kiểm tra một lần đăng xuất/đăng nhập Windows và thông báo trên iPhone đã khóa sau khi cài; kiểm thử desktop không chứng minh thông báo đã hiện trên iPhone vật lý.

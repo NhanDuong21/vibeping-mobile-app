@@ -1,8 +1,300 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-04T09:50:45.8663705Z",
-  "title": "VibePing design direction",
-  "extensions": {},
+  "generatedAt": "2026-09-04T11:11:45.314Z",
+  "title": "Design System: VibePing",
+  "extensions": {
+    "colorMeta": {
+      "vibe-canvas": {
+        "role": "neutral",
+        "displayName": "Tinted canvas",
+        "tonalRamp": [
+          "oklch(15% 0.0058 153.78)",
+          "oklch(26% 0.0058 153.78)",
+          "oklch(38% 0.0058 153.78)",
+          "oklch(49% 0.0058 153.78)",
+          "oklch(61% 0.0058 153.78)",
+          "oklch(72% 0.0058 153.78)",
+          "oklch(84% 0.0058 153.78)",
+          "oklch(95% 0.0058 153.78)"
+        ]
+      },
+      "vibe-surface": {
+        "role": "neutral",
+        "displayName": "White surface",
+        "tonalRamp": [
+          "oklch(15% 0.0000 89.88)",
+          "oklch(26% 0.0000 89.88)",
+          "oklch(38% 0.0000 89.88)",
+          "oklch(49% 0.0000 89.88)",
+          "oklch(61% 0.0000 89.88)",
+          "oklch(72% 0.0000 89.88)",
+          "oklch(84% 0.0000 89.88)",
+          "oklch(95% 0.0000 89.88)"
+        ]
+      },
+      "vibe-ink": {
+        "role": "neutral",
+        "displayName": "Deep ink",
+        "tonalRamp": [
+          "oklch(15% 0.0325 164.37)",
+          "oklch(26% 0.0325 164.37)",
+          "oklch(38% 0.0325 164.37)",
+          "oklch(49% 0.0325 164.37)",
+          "oklch(61% 0.0325 164.37)",
+          "oklch(72% 0.0325 164.37)",
+          "oklch(84% 0.0325 164.37)",
+          "oklch(95% 0.0325 164.37)"
+        ]
+      },
+      "vibe-muted": {
+        "role": "neutral",
+        "displayName": "Muted green",
+        "tonalRamp": [
+          "oklch(15% 0.0332 165.48)",
+          "oklch(26% 0.0332 165.48)",
+          "oklch(38% 0.0332 165.48)",
+          "oklch(49% 0.0332 165.48)",
+          "oklch(61% 0.0332 165.48)",
+          "oklch(72% 0.0332 165.48)",
+          "oklch(84% 0.0332 165.48)",
+          "oklch(95% 0.0332 165.48)"
+        ]
+      },
+      "vibe-rule": {
+        "role": "neutral",
+        "displayName": "Pale green rule",
+        "tonalRamp": [
+          "oklch(15% 0.0143 162.44)",
+          "oklch(26% 0.0143 162.44)",
+          "oklch(38% 0.0143 162.44)",
+          "oklch(49% 0.0143 162.44)",
+          "oklch(61% 0.0143 162.44)",
+          "oklch(72% 0.0143 162.44)",
+          "oklch(84% 0.0143 162.44)",
+          "oklch(95% 0.0143 162.44)"
+        ]
+      },
+      "vibe-night": {
+        "role": "neutral",
+        "displayName": "Green-black night",
+        "tonalRamp": [
+          "oklch(15% 0.0217 167.72)",
+          "oklch(26% 0.0217 167.72)",
+          "oklch(38% 0.0217 167.72)",
+          "oklch(49% 0.0217 167.72)",
+          "oklch(61% 0.0217 167.72)",
+          "oklch(72% 0.0217 167.72)",
+          "oklch(84% 0.0217 167.72)",
+          "oklch(95% 0.0217 167.72)"
+        ]
+      },
+      "vibe-surface-dark": {
+        "role": "neutral",
+        "displayName": "Dark green surface",
+        "tonalRamp": [
+          "oklch(15% 0.0316 163.36)",
+          "oklch(26% 0.0316 163.36)",
+          "oklch(38% 0.0316 163.36)",
+          "oklch(49% 0.0316 163.36)",
+          "oklch(61% 0.0316 163.36)",
+          "oklch(72% 0.0316 163.36)",
+          "oklch(84% 0.0316 163.36)",
+          "oklch(95% 0.0316 163.36)"
+        ]
+      },
+      "vibe-paper": {
+        "role": "neutral",
+        "displayName": "Pale paper",
+        "tonalRamp": [
+          "oklch(15% 0.0066 160.08)",
+          "oklch(26% 0.0066 160.08)",
+          "oklch(38% 0.0066 160.08)",
+          "oklch(49% 0.0066 160.08)",
+          "oklch(61% 0.0066 160.08)",
+          "oklch(72% 0.0066 160.08)",
+          "oklch(84% 0.0066 160.08)",
+          "oklch(95% 0.0066 160.08)"
+        ]
+      },
+      "vibe-sage": {
+        "role": "neutral",
+        "displayName": "Soft sage",
+        "tonalRamp": [
+          "oklch(15% 0.0355 160.16)",
+          "oklch(26% 0.0355 160.16)",
+          "oklch(38% 0.0355 160.16)",
+          "oklch(49% 0.0355 160.16)",
+          "oklch(61% 0.0355 160.16)",
+          "oklch(72% 0.0355 160.16)",
+          "oklch(84% 0.0355 160.16)",
+          "oklch(95% 0.0355 160.16)"
+        ]
+      },
+      "vibe-rule-dark": {
+        "role": "neutral",
+        "displayName": "Dark green rule",
+        "tonalRamp": [
+          "oklch(15% 0.0394 164.49)",
+          "oklch(26% 0.0394 164.49)",
+          "oklch(38% 0.0394 164.49)",
+          "oklch(49% 0.0394 164.49)",
+          "oklch(61% 0.0394 164.49)",
+          "oklch(72% 0.0394 164.49)",
+          "oklch(84% 0.0394 164.49)",
+          "oklch(95% 0.0394 164.49)"
+        ]
+      },
+      "vibe-mint": {
+        "role": "primary",
+        "displayName": "Signal mint",
+        "tonalRamp": [
+          "oklch(15% 0.1509 160.43)",
+          "oklch(26% 0.1509 160.43)",
+          "oklch(38% 0.1509 160.43)",
+          "oklch(49% 0.1509 160.43)",
+          "oklch(61% 0.1509 160.43)",
+          "oklch(72% 0.1509 160.43)",
+          "oklch(84% 0.1509 160.43)",
+          "oklch(95% 0.1509 160.43)"
+        ]
+      },
+      "vibe-mint-soft": {
+        "role": "primary",
+        "displayName": "Soft mint",
+        "tonalRamp": [
+          "oklch(15% 0.0387 163.22)",
+          "oklch(26% 0.0387 163.22)",
+          "oklch(38% 0.0387 163.22)",
+          "oklch(49% 0.0387 163.22)",
+          "oklch(61% 0.0387 163.22)",
+          "oklch(72% 0.0387 163.22)",
+          "oklch(84% 0.0387 163.22)",
+          "oklch(95% 0.0387 163.22)"
+        ]
+      },
+      "vibe-green": {
+        "role": "primary",
+        "displayName": "Deep signal green",
+        "tonalRamp": [
+          "oklch(15% 0.0952 157.36)",
+          "oklch(26% 0.0952 157.36)",
+          "oklch(38% 0.0952 157.36)",
+          "oklch(49% 0.0952 157.36)",
+          "oklch(61% 0.0952 157.36)",
+          "oklch(72% 0.0952 157.36)",
+          "oklch(84% 0.0952 157.36)",
+          "oklch(95% 0.0952 157.36)"
+        ]
+      },
+      "vibe-amber": {
+        "role": "secondary",
+        "displayName": "Attention amber",
+        "tonalRamp": [
+          "oklch(15% 0.1273 72.96)",
+          "oklch(26% 0.1273 72.96)",
+          "oklch(38% 0.1273 72.96)",
+          "oklch(49% 0.1273 72.96)",
+          "oklch(61% 0.1273 72.96)",
+          "oklch(72% 0.1273 72.96)",
+          "oklch(84% 0.1273 72.96)",
+          "oklch(95% 0.1273 72.96)"
+        ]
+      },
+      "vibe-coral": {
+        "role": "secondary",
+        "displayName": "Failure coral",
+        "tonalRamp": [
+          "oklch(15% 0.1424 24.92)",
+          "oklch(26% 0.1424 24.92)",
+          "oklch(38% 0.1424 24.92)",
+          "oklch(49% 0.1424 24.92)",
+          "oklch(61% 0.1424 24.92)",
+          "oklch(72% 0.1424 24.92)",
+          "oklch(84% 0.1424 24.92)",
+          "oklch(95% 0.1424 24.92)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Page heading",
+        "purpose": "Compact operational page and project names; local system UI stack."
+      },
+      "title": {
+        "displayName": "Section title",
+        "purpose": "Settings sections and prominent session titles."
+      },
+      "row-title": {
+        "displayName": "Row title",
+        "purpose": "Earlier sessions and project list entries."
+      },
+      "body": {
+        "displayName": "Supporting text",
+        "purpose": "Vietnamese explanations, state and observed duration."
+      },
+      "field": {
+        "displayName": "Field value",
+        "purpose": "Native inputs and selects remain larger than their labels."
+      },
+      "label": {
+        "displayName": "Label and action",
+        "purpose": "Short form labels and direct actions."
+      },
+      "metadata": {
+        "displayName": "Secondary evidence",
+        "purpose": "Source project names, timestamps and factual notes."
+      }
+    },
+    "shadows": [
+      {
+        "name": "timeline-marker-ground",
+        "value": "0 0 0 4px var(--color-vibe-canvas)",
+        "purpose": "Ground-colored separation around the timeline marker; uses vibe-night in dark mode, not a cast card shadow."
+      }
+    ],
+    "motion": [
+      {
+        "name": "signal-enter",
+        "value": "460ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Existing bounded state and feed insertion."
+      },
+      {
+        "name": "mascot-working",
+        "value": "3200ms ease-in-out",
+        "purpose": "Whole-image breathing in Full only; bounded transform, cancelled offscreen or when motion is disabled."
+      },
+      {
+        "name": "mascot-resting",
+        "value": "6200ms ease-in-out",
+        "purpose": "Quiet whole-image resting loop in Full only."
+      },
+      {
+        "name": "mascot-waiting",
+        "value": "8000ms ease-in-out",
+        "purpose": "Sparse small whole-image sway with static Vietnamese waiting state."
+      },
+      {
+        "name": "mascot-reaction",
+        "value": "620ms cubic-bezier(0.16,1,0.3,1)",
+        "purpose": "One reaction for a new event or reconnection; Balanced uses opacity only."
+      },
+      {
+        "name": "mascot-failure",
+        "value": "280ms cubic-bezier(0.16,1,0.3,1)",
+        "purpose": "Bounded whole-image failure shake."
+      },
+      {
+        "name": "mascot-ring",
+        "value": "700ms ease-out",
+        "purpose": "Single Full-mode reaction ring."
+      },
+      {
+        "name": "mascot-completion-sparkles",
+        "value": "900ms ease-out",
+        "purpose": "Bounded Full-mode completion decoration; never delays text or interaction."
+      }
+    ]
+  },
   "components": [
     {
       "name": "Work session summary",
@@ -21,9 +313,30 @@
   ],
   "narrative": {
     "northStar": "Quiet signal",
-    "overview": "VibePing is an operational utility. The interface should feel calm, precise, and trustworthy when glanced at on a phone. Status and next action outrank decoration. It is not a marketing page, analytics dashboard, chat client, or cyberpunk control panel.",
-    "keyCharacteristics": [],
+    "overview": "VibePing is an operational utility. The interface should feel calm, precise, and trustworthy when glanced at on a phone. Status and next action outrank decoration. It is not a marketing page, analytics dashboard, chat client, or cyberpunk control panel.\n\nPersonal extends the incumbent world through familiar project identities, ordinary Settings controls and a small daily recap. Always ready is represented on the phone as a factual Windows status section. This record describes the implemented and tested feature; it does not claim that Always ready has been enabled on the user's installed host.",
+    "keyCharacteristics": [
+      "Tinted fields, sparse rules and restrained semantic color.",
+      "Local system type with clear status, task and metadata hierarchy.",
+      "One persistent session identity, recorded time and retained final results.",
+      "A whole-image mascot with bounded, state-aware motion.",
+      "Plain Vietnamese, visible focus and explicit saved or unconfirmed states."
+    ],
     "rules": [
+      {
+        "name": "The Quiet Accent Rule",
+        "body": "Project color belongs to the small identity icon beside the project name. It does not recolor the page or replace the separate textual operational state. The selector labels are “Xanh bạc hà”, “Xanh dương”, “Xanh lá”, “Hổ phách” and “San hô”; retain the Vietnamese label “Xanh bạc hà” for the internal mint choice.",
+        "section": "colors"
+      },
+      {
+        "name": "The Confirmed Identity Rule",
+        "body": "Shared project names, icons and accents change only after a successful save. Keep failed edits available to retry, show “Đã lưu hồ sơ dự án.” after success, and label cached profiles explicitly. The editor may show its draft; activity and other shared identity surfaces retain the confirmed profile until it is saved.",
+        "section": "components"
+      },
+      {
+        "name": "The Dated Readiness Rule",
+        "body": "A previous successful check must not remain a present-tense healthy claim after it loses freshness. While checking, stale or unavailable, show the corresponding state and the previous “Lần kiểm tra trước” date/time when available; show the sign-in setting only with a current ready result. Invalidate on hide, refresh on foreground return, page return and reconnection, and check every 30 seconds while visible. An enabled host heartbeat older than 75 seconds remains stale.",
+        "section": "components"
+      },
       {
         "name": "The Persistent Session Rule",
         "body": "One Codex request keeps one card identity as it moves from observed work to a completion summary. A later request gets a separate card, even in the same task or project. Keep the task title first, followed by project, plain-language state and observed duration; completion retains failed-test count when present and a short final-answer excerpt when available.",
@@ -35,7 +348,20 @@
         "section": "components"
       }
     ],
-    "dos": [],
-    "donts": []
+    "dos": [
+      "**Do** keep status, task and next action ahead of decoration, with readable Vietnamese text accompanying every state color.",
+      "**Do** preserve session identity, observed timestamps, final-answer access and explicit cached-state labels across Personal integrations.",
+      "**Do** use confirmed project identity in shared views, retaining failed drafts for retry.",
+      "**Do** keep global notification types and quiet hours visible as the authority for project filtering.",
+      "**Do** refresh Windows readiness on return and show dated previous evidence when current readiness is unknown.",
+      "**Do** stop mascot loops offscreen, on hidden pages and under reduced motion; keep the PNG intact."
+    ],
+    "donts": [
+      "**Don't** add nested cards, giant heroes, decorative gradients, glass effects, fake charts or ornamental badges.",
+      "**Don't** turn a project accent into a page theme or use it to imply operational status.",
+      "**Don't** present cached numbers, old host checks or unobserved time as current live evidence.",
+      "**Don't** add phone-side runtime controls, a chat surface or a new Personal tab.",
+      "**Don't** replace the local app icon with a text lettermark or expose raw technical errors."
+    ]
   }
 }

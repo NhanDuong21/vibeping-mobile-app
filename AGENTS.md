@@ -6,9 +6,9 @@ These rules apply to the entire repository. Implement only the current requested
 
 - VibePing is a one-user personal-production attention tool, not a remote-control or chat product.
 - All user-visible client copy is Vietnamese, plain, operational, and free of raw technical errors.
-- Do not add accounts, teams, billing, analytics, remote commands, terminal access, native packaging, Windows auto-start, public hosting, or paid infrastructure.
+- Do not add accounts, teams, billing, analytics dashboards, remote Codex commands, terminal access, native mobile packaging, public hosting, or paid infrastructure.
 - Never enable Tailscale Funnel. The backend binds only to localhost and is exposed privately with Tailscale Serve.
-- VibePing itself starts only through an explicit user action.
+- VibePing starts through an explicit action or the user-enabled Windows sign-in option added in 1.1.1. Local tray controls and bounded host recovery are authorized; Stop must prevent recovery until Start or the next opted-in Windows sign-in. Never add phone-side runtime controls.
 
 ## Architecture
 

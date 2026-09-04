@@ -41,7 +41,7 @@
           }
         }
         <p class="mt-1.5 break-words text-sm text-vibe-muted dark:text-vibe-sage">
-          {{ project(event) }}
+          <a [routerLink]="['/settings/projects', event.projectName]" class="inline-flex min-h-11 items-center text-vibe-green! underline underline-offset-4 dark:text-vibe-mint!"><app-project-identity [name]="event.projectName" /></a>
         </p>
         @if (description(event)) {
           <p class="mt-4 text-[0.9375rem] leading-6 text-vibe-muted dark:text-vibe-sage">

@@ -34,7 +34,7 @@ pub fn launch_url(origin: &str) -> Result<()> {
 }
 
 #[cfg(windows)]
-fn spawn_detached(executable: &Path, arguments: &[OsString]) -> Result<()> {
+pub(crate) fn spawn_detached(executable: &Path, arguments: &[OsString]) -> Result<()> {
     use std::{mem::size_of, os::windows::ffi::OsStrExt, ptr};
     use windows_sys::Win32::{
         Foundation::CloseHandle,
@@ -78,7 +78,7 @@ fn spawn_detached(executable: &Path, arguments: &[OsString]) -> Result<()> {
 }
 
 #[cfg(windows)]
-fn windows_command_line(executable: &OsStr, arguments: &[OsString]) -> Vec<u16> {
+pub(crate) fn windows_command_line(executable: &OsStr, arguments: &[OsString]) -> Vec<u16> {
     use std::os::windows::ffi::OsStrExt;
 
     let mut command = Vec::new();
@@ -114,7 +114,7 @@ fn append_quoted(command: &mut Vec<u16>, argument: &[u16]) {
 }
 
 #[cfg(not(windows))]
-fn spawn_detached(executable: &Path, arguments: &[OsString]) -> Result<()> {
+pub(crate) fn spawn_detached(executable: &Path, arguments: &[OsString]) -> Result<()> {
     use std::process::Stdio;
 
     Command::new(executable)

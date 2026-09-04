@@ -110,7 +110,7 @@
         <div class="mt-4 border-t border-vibe-rule pt-4 dark:border-vibe-rule-dark">
           <p class="break-words text-base font-bold leading-6">{{ workTitle() }}</p>
           <p class="mt-1 break-words text-sm text-vibe-muted dark:text-vibe-sage">
-            <span class="block truncate">{{ projectName() }}</span>
+            <span class="block truncate"><app-project-identity [name]="projectName()" /></span>
           </p>
           <div
             class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-vibe-muted dark:text-vibe-sage"
@@ -126,7 +126,7 @@
       <div class="mt-4 border-t border-vibe-rule pt-4 dark:border-vibe-rule-dark">
         <p class="break-words text-base font-bold leading-6">{{ recentTitle() }}</p>
         <p class="mt-1 break-words text-sm text-vibe-muted dark:text-vibe-sage">
-          {{ projectName() }} · {{ recentTime() }}
+          <app-project-identity [name]="projectName()" /> · {{ recentTime() }}
         </p>
       </div>
     }

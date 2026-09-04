@@ -1,6 +1,6 @@
 [package]
 name = "vibeping"
-version = "1.1.0"
+version = "1.1.1"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -35,7 +35,7 @@ uuid = { version = "=1.26.0", features = ["v4"] }
 web-push-native = "=0.5.0"
 
 [target.'cfg(windows)'.dependencies]
-windows-sys = { version = "=0.61.2", features = ["Win32_Foundation", "Win32_System_Threading"] }
+windows-sys = { version = "=0.61.2", features = ["Win32_Foundation", "Win32_Security", "Win32_System_Threading", "Win32_System_Registry", "Win32_System_LibraryLoader", "Win32_UI_WindowsAndMessaging", "Win32_UI_Shell", "Win32_Graphics_Gdi"] }
 
 [dev-dependencies]
 tempfile = "=3.27.0"
@@ -44,3 +44,7 @@ tower = { version = "=0.5.3", features = ["util"] }
 [[bin]]
 name = "export-openapi"
 path = "src/bin/export_openapi.rs"
+
+[[bin]]
+name = "vibeping-ready"
+path = "src/bin/vibeping_ready.rs"

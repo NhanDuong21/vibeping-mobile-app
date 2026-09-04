@@ -25,6 +25,7 @@ pub struct EventListQuery {
     cursor: Option<String>,
     limit: Option<u8>,
     grouped: Option<bool>,
+    project: Option<String>,
 }
 
 #[derive(Debug, Deserialize, IntoParams)]
@@ -68,7 +69,11 @@ pub async fn events(
     let store = ActivityStore::new(state.database.clone());
     let result = if query.grouped.unwrap_or(false) {
         store
-            .list_sessions(query.cursor.as_deref(), query.limit.unwrap_or(20))
+            .list_sessions_for_project(
+                query.cursor.as_deref(),
+                query.limit.unwrap_or(20),
+                query.project.as_deref(),
+            )
             .await
     } else {
         store

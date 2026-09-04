@@ -25,15 +25,15 @@ use super::{
 #[derive(Clone, Debug, Args)]
 pub struct HostOptions {
     #[arg(long, default_value_t = 8790, help = "Cổng cục bộ")]
-    port: u16,
+    pub(crate) port: u16,
     #[arg(long, help = "Thư mục dữ liệu cục bộ")]
-    data_dir: Option<PathBuf>,
+    pub(crate) data_dir: Option<PathBuf>,
 }
 
 #[derive(Clone, Debug, Args)]
 pub struct DataOptions {
     #[arg(long, help = "Thư mục dữ liệu cục bộ")]
-    data_dir: Option<PathBuf>,
+    pub(crate) data_dir: Option<PathBuf>,
 }
 
 #[derive(Clone, Debug, Subcommand)]
@@ -70,6 +70,7 @@ async fn start(options: HostOptions) -> Result<String> {
     let config = RuntimeConfig::discover(options.port, options.data_dir.clone())?;
     let paths = RuntimePaths::new(config.data_dir().to_path_buf());
     paths.ensure()?;
+    let _control = control_lock(&paths).await?;
     paths.write_intent(true)?;
     let result = start_enabled(&options, &paths).await;
     if result.is_err() {
@@ -155,6 +156,7 @@ async fn run(options: HostOptions) -> Result<String> {
 
 async fn stop(paths: RuntimePaths) -> Result<String> {
     paths.ensure()?;
+    let _control = control_lock(&paths).await?;
     paths.write_intent(false)?;
     let metadata = match paths.read_metadata() {
         Ok(Some(metadata)) => metadata,
@@ -165,6 +167,8 @@ async fn stop(paths: RuntimePaths) -> Result<String> {
         }
     };
     if !ipc::health_ready(&metadata.api_address).await {
+        let _ = ipc::request_shutdown(&metadata.control_address, &metadata.control_token).await;
+        wait_for_instance_release(&paths).await?;
         paths.clear_metadata()?;
         return Ok("VibePing đã dừng; trạng thái cũ đã được dọn".into());
     }
@@ -175,6 +179,45 @@ async fn stop(paths: RuntimePaths) -> Result<String> {
     wait_for_instance_release(&paths).await?;
     paths.clear_metadata()?;
     Ok("VibePing đã dừng an toàn".into())
+}
+
+pub(crate) async fn recover(paths: &RuntimePaths, port: u16) -> Result<()> {
+    let _control = control_lock(paths).await?;
+    if !paths.is_enabled() {
+        return Ok(());
+    }
+    // Never kill by PID. A hung process retains its instance lock and needs attention.
+    let running = paths.read_metadata().ok().flatten();
+    if let Some(metadata) = running {
+        if ipc::health_ready(&metadata.api_address).await {
+            return Ok(());
+        }
+        let _ = ipc::request_shutdown(&metadata.control_address, &metadata.control_token).await;
+    }
+    let guard = InstanceLock::acquire(&paths.lock_file())?;
+    drop(guard);
+    start_enabled(
+        &HostOptions {
+            port,
+            data_dir: Some(paths.data_dir().to_owned()),
+        },
+        paths,
+    )
+    .await?;
+    Ok(())
+}
+
+async fn control_lock(paths: &RuntimePaths) -> Result<InstanceLock> {
+    let deadline = Instant::now() + Duration::from_secs(25);
+    loop {
+        if let Ok(lock) = InstanceLock::acquire(&paths.data_dir().join("lifecycle-control.lock")) {
+            return Ok(lock);
+        }
+        if Instant::now() >= deadline {
+            bail!("Thao tác trước chưa xong; hãy thử lại");
+        }
+        sleep(Duration::from_millis(100)).await;
+    }
 }
 
 async fn restart(options: HostOptions) -> Result<String> {

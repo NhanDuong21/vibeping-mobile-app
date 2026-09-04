@@ -2,6 +2,8 @@ mod classifier;
 pub mod command;
 mod configuration;
 mod current_work;
+mod daily_summary;
+pub use daily_summary::DailySummary;
 mod detail;
 mod event_store;
 mod feed;

@@ -7,7 +7,7 @@
       "name": "MIT OR Apache-2.0",
       "identifier": "MIT OR Apache-2.0"
     },
-    "version": "1.1.0"
+    "version": "1.1.1"
   },
   "paths": {
     "/api/v1/activity": {
@@ -23,6 +23,26 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ActivitySnapshot"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/always-ready": {
+      "get": {
+        "tags": [
+          "crate::features::always_ready::http"
+        ],
+        "operationId": "always_ready_status",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyStatus"
                 }
               }
             }
@@ -141,6 +161,14 @@
             "required": false,
             "schema": {
               "type": "boolean"
+            }
+          },
+          {
+            "name": "project",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -353,6 +381,145 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PairingStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/personal/projects": {
+      "get": {
+        "tags": [
+          "personal_http"
+        ],
+        "operationId": "projects",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectProfile"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "personal_http"
+        ],
+        "operationId": "save_project",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectProfile"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectProfile"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/personal/rules": {
+      "get": {
+        "tags": [
+          "personal_http"
+        ],
+        "operationId": "rules",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonalRules"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "personal_http"
+        ],
+        "operationId": "save_rules",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PersonalRules"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonalRules"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/personal/today": {
+      "get": {
+        "tags": [
+          "personal_http"
+        ],
+        "operationId": "today",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DailySummary"
                 }
               }
             }
@@ -905,6 +1072,33 @@
           }
         }
       },
+      "DailySummary": {
+        "type": "object",
+        "required": [
+          "sessions",
+          "completed",
+          "failedTests",
+          "observedSeconds"
+        ],
+        "properties": {
+          "completed": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "failedTests": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "observedSeconds": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sessions": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "DiagnosticCheck": {
         "type": "object",
         "required": [
@@ -1148,6 +1342,23 @@
           }
         }
       },
+      "PersonalRules": {
+        "type": "object",
+        "required": [
+          "completionMinMinutes",
+          "waitingReminderMinutes"
+        ],
+        "properties": {
+          "completionMinMinutes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "waitingReminderMinutes": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "Preferences": {
         "type": "object",
         "required": [
@@ -1182,6 +1393,59 @@
           },
           "theme": {
             "type": "string"
+          }
+        }
+      },
+      "ProjectProfile": {
+        "type": "object",
+        "required": [
+          "projectName",
+          "displayName",
+          "icon",
+          "accent",
+          "notifyCompletion",
+          "notifyPermission",
+          "notifyPreview",
+          "notifyFinalFailure"
+        ],
+        "properties": {
+          "accent": {
+            "type": "string"
+          },
+          "completionMinMinutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "notifyCompletion": {
+            "type": "boolean"
+          },
+          "notifyFinalFailure": {
+            "type": "boolean"
+          },
+          "notifyPermission": {
+            "type": "boolean"
+          },
+          "notifyPreview": {
+            "type": "boolean"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "waitingReminderMinutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
           }
         }
       },
@@ -1237,6 +1501,42 @@
           "unreadCount": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "ReadyStatus": {
+        "type": "object",
+        "required": [
+          "enabled",
+          "autoStart",
+          "state",
+          "recoveryCount",
+          "trayAvailable"
+        ],
+        "properties": {
+          "autoStart": {
+            "type": "boolean"
+          },
+          "checkedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "recoveryCount": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "state": {
+            "type": "string"
+          },
+          "trayAvailable": {
+            "type": "boolean"
           }
         }
       },

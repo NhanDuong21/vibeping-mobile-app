@@ -31,18 +31,30 @@ struct StageRow {
 
 impl ActivityStore {
     pub async fn list_sessions(&self, cursor: Option<&str>, limit: u8) -> Result<EventFeed> {
+        self.list_sessions_for_project(cursor, limit, None).await
+    }
+
+    pub async fn list_sessions_for_project(
+        &self,
+        cursor: Option<&str>,
+        limit: u8,
+        project: Option<&str>,
+    ) -> Result<EventFeed> {
         if !(1..=50).contains(&limit) {
             bail!("ACTIVITY_LIMIT_INVALID");
         }
         let (at, id) = session_cursor(cursor)?;
         let rows = sqlx::query_as::<_, SessionRow>(
-            "SELECT * FROM work_session_feed WHERE ? IS NULL OR occurred_at < ? OR \
-             (occurred_at = ? AND id < ?) ORDER BY occurred_at DESC, id DESC LIMIT ?",
+            "SELECT f.* FROM work_session_feed f JOIN activity_events e ON e.id = f.event_id \
+             WHERE (? IS NULL OR f.occurred_at < ? OR (f.occurred_at = ? AND f.id < ?)) \
+             AND (? IS NULL OR e.project_name = ?) ORDER BY f.occurred_at DESC, f.id DESC LIMIT ?",
         )
         .bind(at)
         .bind(at)
         .bind(at)
         .bind(id)
+        .bind(project)
+        .bind(project)
         .bind(i64::from(limit) + 1)
         .fetch_all(&self.pool)
         .await?;

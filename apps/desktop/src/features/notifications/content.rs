@@ -136,6 +136,9 @@ pub fn event_words(event_type: &str) -> (&'static str, &'static str) {
         "codex.turn.started" => ("Codex đã bắt đầu", "Đang xử lý yêu cầu"),
         "codex.turn.completed" => ("Codex đã xong việc", "Mở Codex trên laptop để xem kết quả"),
         "codex.attention.permission_required" => ("Codex đang chờ bạn", "Cần xác nhận để tiếp tục"),
+        "codex.attention.waiting_reminder" => {
+            ("Codex vẫn đang chờ bạn", "Nhắc lại một lần để bạn quay lại")
+        }
         "codex.test.failed" => (
             "Kiểm thử mã nguồn chưa đạt",
             "Lần kiểm thử Codex ghi nhận chưa đạt; xem lại trên laptop",

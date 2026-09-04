@@ -1,4 +1,5 @@
 import { MotionSettings } from './motion-settings';
+import { PersonalSettings } from '../../personal';
 import { SegmentedControl } from '../../../core/forms/ui/segmented-control';
 import { SignalMotion } from '../../../core/motion/signal-motion';
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
@@ -11,6 +12,7 @@ import { NotificationPrivacy } from './notification-privacy';
 @Component({
   selector: 'app-settings-page',
   imports: [
+    PersonalSettings,
     MotionSettings,
     SegmentedControl,
     SignalMotion,

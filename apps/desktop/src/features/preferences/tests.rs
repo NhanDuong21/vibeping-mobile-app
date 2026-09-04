@@ -124,6 +124,10 @@ async fn notification_toggles_and_private_mode_change_real_delivery() {
     value.notifications.completion = true;
     value.privacy_mode = "private".into();
     preferences.save(&value).await.unwrap();
+    sqlx::query("UPDATE personal_rules SET completion_min_minutes = 0")
+        .execute(&pool)
+        .await
+        .unwrap();
     complete_turn(&pool, "private").await;
     let body: String = sqlx::query_scalar("SELECT body FROM notification_jobs LIMIT 1")
         .fetch_one(&pool)

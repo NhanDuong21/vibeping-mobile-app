@@ -1,44 +1,49 @@
-VibePing 1.1.0 — hướng dẫn cá nhân
+﻿VibePing 1.1.1 — Personal + Always ready
 ========================================
 
 Yêu cầu
-- Windows x64 và Tailscale đang kết nối trên laptop.
-- iPhone dùng cùng tailnet và đã thêm VibePing vào Màn hình chính.
-- Không bật Tailscale Funnel. VibePing chỉ dùng Tailscale Serve riêng tư.
+- Windows x64 và Tailscale kết nối trên laptop, iPhone trong cùng tailnet.
+- Chỉ dùng Tailscale Serve riêng tư. Không bật Funnel.
+- Giải nén toàn bộ gói vào thư mục ổn định, không chạy từ trong ZIP.
 
 Bắt đầu
-1. Mở "Start VibePing.bat" bằng thao tác của bạn.
-2. Ghi lại mã ghép nối nếu cửa sổ hiển thị mã.
-3. Kết nối Tailscale trên iPhone rồi mở biểu tượng VibePing hiện có.
-4. Nhập mã một lần nếu ứng dụng yêu cầu.
-5. Nếu đang dùng bản cũ, mở Hoạt động, chờ "Có bản VibePing mới" phiên bản 1.1.0 rồi bấm "Cập nhật". Nếu chưa thấy, đưa app về nền rồi mở lại. Không xóa biểu tượng.
+1. Mở "Start VibePing.bat" để chạy thủ công.
+2. Ghi lại mã ghép nối nếu được hiển thị; nhập trên iPhone khi được yêu cầu.
+3. Mở biểu tượng VibePing đã thêm vào Màn hình chính.
+4. Khi thấy "Có bản VibePing mới" phiên bản 1.1.1, bấm "Cập nhật". Không xóa biểu tượng hoặc đăng ký thông báo lại.
 
-Điều khiển
-- "Start VibePing.bat": khởi động nền, hiện trạng thái và địa chỉ riêng.
-- "Stop VibePing.bat": dừng an toàn, không xóa dữ liệu hay dừng Tailscale.
-- "Restart VibePing.bat": dừng và khởi động lại an toàn.
-- "Open VibePing.bat": mở địa chỉ .ts.net ổn định bằng trình duyệt mặc định.
+Sẵn sàng trên Windows
+- "Bat San sang.bat" (Bật Sẵn sàng): bật khay mèo, chạy khi đăng nhập và tự khôi phục máy chủ.
+- Tìm mèo VibePing trong khay hệ thống hoặc nhóm biểu tượng ẩn. Nhấp phải để mở app, khởi động, dừng hoặc thay lựa chọn đăng nhập.
+- Khi bấm Dừng, máy chủ không tự bật lại. Bạn có thể chọn Khởi động, hoặc đợi lần đăng nhập Windows tiếp theo nếu đã bật lựa chọn đó.
+- "Tat San sang.bat" (Tắt Sẵn sàng): tắt khay, khôi phục và chạy khi đăng nhập. Máy chủ giữ trạng thái hiện tại.
+- Giữ vibeping.exe và vibeping-ready.exe cạnh nhau. Không cần cài Node.js, pnpm, Rust hay Cargo.
 
-Codex
-- Chạy "vibeping.exe integrations codex status" để xem trạng thái.
-- Sau cài đặt hoặc sửa tích hợp, mở Codex và chạy /hooks để tự kiểm tra, tin cậy các hook VibePing.
-- VibePing không đọc tệp thông tin đăng nhập Codex.
+Điều khiển thủ công
+- "Start VibePing.bat": khởi động nền và kiểm tra sẵn sàng.
+- "Stop VibePing.bat": dừng an toàn, giữ dữ liệu và Tailscale.
+- "Restart VibePing.bat": dừng và khởi động lại.
+- "Open VibePing.bat": mở địa chỉ riêng bằng trình duyệt mặc định.
+
+Cá nhân hóa trên iPhone
+- Cài đặt > Dự án của bạn: tên, biểu tượng, màu nhấn, loại thông báo và lịch sử riêng.
+- Mặc định báo hoàn tất từ 2 phút, nhắc chờ một lần sau 5 phút. Có thể đổi chung hoặc theo dự án.
+- Công tắc thông báo chung và giờ yên tĩnh vẫn áp dụng. Không biết giờ bắt đầu thì vẫn báo hoàn tất.
+- Hoạt động giữ timeline, kết quả cuối Codex và có tổng kết Hôm nay.
 
 Khôi phục
-- Nếu thông báo bị tắt: mở Cài đặt iPhone > Thông báo > VibePing.
-- Nếu đăng ký cũ: trong VibePing mở Cài đặt và chọn đăng ký lại thông báo.
-- Nếu hạn mức chưa có: kiểm tra Codex đã đăng nhập rồi chọn làm mới trong Hạn mức Codex.
-- Sao lưu khi VibePing đã dừng: "vibeping.exe backup".
-- Khôi phục bản sao khi đã dừng: "vibeping.exe restore --file <duong-dan> --confirm".
+- Mất kết nối: kiểm tra Tailscale và biểu tượng khay trên laptop.
+- Thông báo iPhone bị tắt: mở Cài đặt iPhone > Thông báo > VibePing.
+- Sau khi cài hoặc sửa tích hợp Codex: chạy /hooks trong Codex và kiểm tra các hook VibePing.
+- Sao lưu sau khi dừng VibePing: "vibeping.exe backup".
+- Khôi phục sau khi dừng: "vibeping.exe restore --file <duong-dan> --confirm".
 
-Gỡ VibePing
-1. Mở "Stop VibePing.bat".
-2. Chạy "vibeping.exe integrations codex remove" nếu muốn gỡ tích hợp Codex.
-3. Xóa thư mục gói release.
-4. Chỉ xóa %LOCALAPPDATA%\VibePing khi bạn chủ động muốn xóa toàn bộ lịch sử, danh tính gửi và đăng ký điện thoại.
-5. Không cần và không nên dừng hoặc gỡ Tailscale chỉ để gỡ VibePing.
+Chuyển thư mục hoặc gỡ VibePing
+1. Mở "Tat San sang.bat", rồi "Stop VibePing.bat". Đợi khay biến mất.
+2. Nếu gỡ app, chạy "vibeping.exe integrations codex remove" khi muốn gỡ tích hợp.
+3. Chuyển hoặc xóa thư mục gói; nếu chuyển, bật Sẵn sàng từ thư mục mới và sửa tích hợp Codex theo đường dẫn mới.
+4. Chỉ xóa %LOCALAPPDATA%\VibePing khi chủ động muốn xóa toàn bộ dữ liệu.
 
-Giới hạn
-- Đây là release candidate cá nhân, chưa phải stable 1.0.0.
-- Kiểm thử iPhone thật và giai đoạn dùng thử bảy ngày vẫn đang chờ bạn hoàn tất.
-- VibePing không tự khởi động cùng Windows, không có điều khiển từ xa và không dùng hạ tầng công khai.
+Kiểm tra sử dụng thực tế
+- Sau cài đặt, kiểm tra một lần đăng xuất/đăng nhập Windows và một thông báo trên iPhone đã khóa.
+- VibePing cần laptop đang thức và Tailscale kết nối; không điều khiển Codex từ điện thoại.

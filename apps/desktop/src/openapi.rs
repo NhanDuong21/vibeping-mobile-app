@@ -18,6 +18,7 @@ use crate::features::{
         dto::{PairingClaimRequest, PairingClaimResponse, PairingStatusResponse},
         http as pairing_http,
     },
+    personal::http as personal_http,
     preferences::{NotificationPreferences, Preferences, QuietHours, http as preferences_http},
     system::{
         dto::{BootstrapResponse, ConnectionSnapshot, ErrorEnvelope, HealthResponse},
@@ -28,9 +29,15 @@ use crate::features::{
 
 #[derive(OpenApi)]
 #[openapi(
-    info(title = "VibePing API", version = "1.1.0"),
+    info(title = "VibePing API", version = "1.1.1"),
     paths(
         http::health,
+        crate::features::always_ready::http::status,
+        personal_http::rules,
+        personal_http::today,
+        personal_http::save_rules,
+        personal_http::projects,
+        personal_http::save_project,
         http::bootstrap,
         http::stream,
         computer_http::computer_status,

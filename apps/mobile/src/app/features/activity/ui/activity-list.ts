@@ -1,6 +1,7 @@
 import { SignalMotion } from '../../../core/motion/signal-motion';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { ProjectIdentity } from '../../personal';
 import { relativeTime } from '../../../core/formatting/time';
 import {
   activityLabel,
@@ -13,7 +14,7 @@ import { WorkSessionCard } from './work-session-card';
 
 @Component({
   selector: 'app-activity-list',
-  imports: [SignalMotion, RouterLink, WorkSessionCard],
+  imports: [SignalMotion, RouterLink, WorkSessionCard, ProjectIdentity],
   templateUrl: './activity-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -5,8 +5,18 @@ use sqlx::SqlitePool;
 use super::{NotificationStore, sender};
 
 pub async fn run(pool: SqlitePool, data_dir: PathBuf) {
-    let store = NotificationStore::new(pool);
+    let store = NotificationStore::new(pool.clone());
+    let mut last_reminder_check = tokio::time::Instant::now() - Duration::from_secs(15);
     loop {
+        if last_reminder_check.elapsed() >= Duration::from_secs(15) {
+            if crate::features::personal::reminders::enqueue_due(&pool, chrono::Utc::now())
+                .await
+                .is_err()
+            {
+                tracing::warn!("Chưa kiểm tra được lời nhắc đang chờ");
+            }
+            last_reminder_check = tokio::time::Instant::now();
+        }
         match store.claim_due().await {
             Ok(Some(job)) if job.expires_at <= chrono::Utc::now() => {
                 let _ = store.finish(&job, "expired", None).await;

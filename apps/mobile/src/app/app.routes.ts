@@ -41,6 +41,14 @@ export const routes: Routes = [
       import('./features/settings/ui/settings-page').then((module) => module.SettingsPage),
   },
   {
+    path: 'settings/projects',
+    loadComponent: () => import('./features/personal/ui/projects-page').then((m) => m.ProjectsPage),
+  },
+  {
+    path: 'settings/projects/:project',
+    loadComponent: () => import('./features/personal/ui/project-page').then((m) => m.ProjectPage),
+  },
+  {
     path: 'settings/notifications',
     redirectTo: 'settings',
     pathMatch: 'full',

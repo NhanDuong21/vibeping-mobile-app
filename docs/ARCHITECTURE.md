@@ -105,6 +105,14 @@ Feature internals remain private. `main.rs` composes adapters and lifecycle only
 
 ## Availability and recovery
 
+### Personal and Always ready (1.1.1)
+
+The Personal feature owns project profiles and notification rules in SQLite. A profile is keyed by the screened project folder name already retained by the attention feature; equal basenames intentionally share a profile. Global switches remain master controls. Completion duration, one waiting reminder per turn/subscription, current waiting state, quiet hours and privacy are rechecked before a queued job is leased. Reminder jobs share the original event and use a separate deduplication key; they do not create duplicate activity. Successful completion filtering never removes the recorded session or its final answer.
+
+Project history filters in the session repository before pagination. The daily summary clips retained, observed session intervals to the requested local day and merges overlaps. Angular's feature stores coordinate API/cache reconciliation, editable profile drafts and truthful freshness; pages only bind them. Windows readiness refreshes on foreground, page return and every thirty seconds while visible, with old-check wording after a failed or stale read. The phone exposes a read-only readiness projection, never Windows lifecycle commands.
+
+The explicitly enabled Windows companion has its own single-instance lock and hidden tray. A GUI-subsystem launcher runs from one owned HKCU Run value after sign-in. Ten-second health checks use the existing authenticated local lifecycle path; recovery backs off and serializes with Start/Stop, never killing a PID. Explicit Stop disables runtime intent for the current sign-in. Disabling the companion removes its startup entry and tray while preserving the host's current state. See [ADR 011](adr/011-personal-and-always-ready.md).
+
 The PWA renders cached state immediately but labels it as saved data until a fresh snapshot arrives. The Windows process survives phone/network interruption through persisted state and queued work. Tailscale or HTTPS failure produces a private-connection recovery message, never a public fallback.
 
 The background process is created without inheriting console or pipe handles, so `start` returns while the host remains alive and no permanent console window appears. Status trusts a live authenticated application health response rather than a PID file alone. Explicit stop records disabled user intent before requesting bounded graceful shutdown; crash recovery preserves enabled intent and stale metadata is never treated as proof that the process is running.

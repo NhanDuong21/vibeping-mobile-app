@@ -3,7 +3,7 @@ use chrono::Utc;
 use sqlx::{Sqlite, SqlitePool, Transaction};
 
 use super::event_store::{EventCopy, event_for, insert_event, remember_task};
-use crate::features::preferences::policy;
+use crate::features::personal::delivery;
 
 use super::model::{ActivityEvent, ActivitySnapshot, CodexIngress, CodexSignal};
 use super::turn_state::prepare_turn;
@@ -33,7 +33,17 @@ impl ActivityStore {
         }
         remember_task(&mut transaction, ingress).await?;
         super::session_stages::record(&mut transaction, ingress).await?;
-        let policy = policy::load(&mut transaction).await?;
+        let (mut policy, rules) =
+            delivery::policy_for(&mut transaction, &ingress.project_name).await?;
+        if ingress.signal == CodexSignal::Completed {
+            policy.notify_completion &= delivery::allows_completion(
+                &mut transaction,
+                &ingress.turn_key,
+                ingress.occurred_at,
+                rules.completion_min_minutes,
+            )
+            .await?;
+        }
         let event = match ingress.signal {
             CodexSignal::Started => event_for(ingress, "codex.turn.started"),
             CodexSignal::Progressed => {

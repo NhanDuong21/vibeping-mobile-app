@@ -3,17 +3,7 @@
 >
   <header class="mx-auto flex w-full max-w-lg items-center justify-between py-2">
     <div class="flex items-center gap-2.5">
-      <img
-        appSignalMotion="mascot"
-        src="/assets/logo-icon-192.png"
-        srcset="/assets/logo-icon-192.png 192w, /assets/logo-icon-512.png 512w"
-        sizes="40px"
-        width="40"
-        height="40"
-        class="size-10 shrink-0 object-contain"
-        alt=""
-        aria-hidden="true"
-      />
+      <app-mascot-companion [kind]="activity.readiness().kind" [reaction]="activity.newEventId()" [startedAt]="activity.current()?.startedAt" [now]="activity.now()" />
       <div>
         <p class="text-[0.9375rem] font-bold tracking-[-0.02em]">VibePing</p>
         <p class="text-xs text-vibe-muted dark:text-vibe-sage">Tín hiệu riêng tư</p>
@@ -109,5 +99,6 @@
     <div class="mt-6">
       <app-activity-list />
     </div>
+    <app-today-summary [revision]="activity.events()" [now]="activity.now()" />
   </main>
 </app-pull-to-refresh>

@@ -1,4 +1,5 @@
 import { SignalMotion } from '../../../core/motion/signal-motion';
+import { ProjectIdentity } from '../../personal';
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import type { ActivityEventDetailDto } from '../../../core/api/api-client';
@@ -17,7 +18,7 @@ import { sessionDuration, sessionStatus } from '../application/work-session-pres
 
 @Component({
   selector: 'app-event-detail-page',
-  imports: [SignalMotion, RouterLink, PullToRefresh, ResultBody],
+  imports: [SignalMotion, RouterLink, PullToRefresh, ResultBody, ProjectIdentity],
   templateUrl: './event-detail-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

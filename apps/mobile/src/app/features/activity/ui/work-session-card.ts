@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { ProjectIdentity } from '../../personal';
 import type { ActivityEventDto } from '../../../core/api/api-client';
 import { clock } from '../../../core/formatting/time';
 import { SignalMotion } from '../../../core/motion/signal-motion';
@@ -12,7 +13,7 @@ import { sessionDuration, sessionStatus } from '../application/work-session-pres
 
 @Component({
   selector: 'app-work-session-card',
-  imports: [RouterLink, SignalMotion],
+  imports: [RouterLink, SignalMotion, ProjectIdentity],
   templateUrl: './work-session-card.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

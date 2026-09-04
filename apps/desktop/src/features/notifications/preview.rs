@@ -44,7 +44,14 @@ impl NotificationStore {
         } else {
             "sample"
         };
-        let event = recent.unwrap_or_else(sample);
+        let mut event = recent.unwrap_or_else(sample);
+        let mut transaction = self.pool.begin().await?;
+        event.project_name = crate::features::personal::delivery::display_name(
+            &mut transaction,
+            &event.project_name,
+        )
+        .await?;
+        transaction.commit().await?;
         Ok(NotificationPreview {
             private: event.copy("private"),
             project: event.copy("project"),
@@ -59,7 +66,7 @@ pub(super) async fn copy_for_job(
     job_id: &str,
 ) -> Result<Option<super::dto::NotificationCopy>> {
     let event = sqlx::query_as::<_, NotificationEvent>(
-        "SELECT e.event_type, e.project_name, e.notification_context FROM notification_jobs j \
+        "SELECT CASE WHEN j.is_waiting_reminder = 1 THEN 'codex.attention.waiting_reminder' ELSE e.event_type END AS event_type, e.project_name, e.notification_context FROM notification_jobs j \
          JOIN activity_events e ON e.id = j.event_id WHERE j.id = ?",
     )
     .bind(job_id)
@@ -68,7 +75,10 @@ pub(super) async fn copy_for_job(
     let privacy: String = sqlx::query_scalar("SELECT privacy_mode FROM preferences WHERE id = 1")
         .fetch_one(&mut **transaction)
         .await?;
-    if let Some(event) = event {
+    if let Some(mut event) = event {
+        event.project_name =
+            crate::features::personal::delivery::display_name(transaction, &event.project_name)
+                .await?;
         return Ok(Some(event.copy(&privacy)));
     }
     let kind: String = sqlx::query_scalar("SELECT kind FROM notification_jobs WHERE id = ?")

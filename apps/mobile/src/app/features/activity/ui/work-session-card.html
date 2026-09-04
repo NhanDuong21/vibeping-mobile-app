@@ -15,7 +15,7 @@
         } @else {
           <p class="break-words text-base font-bold leading-6">{{ title() }}</p>
         }
-        <p class="mt-1 break-words text-xs leading-5 text-vibe-muted dark:text-vibe-sage">{{ project() }}</p>
+        <p class="mt-1 break-words text-xs leading-5 text-vibe-muted dark:text-vibe-sage"><app-project-identity [name]="event().projectName" /></p>
       </div>
       @if (!event().isRead) {
         <span class="mt-2 size-2 shrink-0 rounded-full bg-vibe-coral" aria-label="Chưa đọc"></span>

@@ -1,8 +1,10 @@
+pub mod always_ready;
 pub mod codex_attention;
 pub mod computer;
 pub mod lifecycle;
 pub mod notifications;
 pub mod pairing;
+pub mod personal;
 pub mod preferences;
 pub mod recovery;
 pub mod system;
