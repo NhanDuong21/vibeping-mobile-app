@@ -247,3 +247,28 @@ async fn protocol_handles_notifications_malformed_output_crash_and_timeout() {
             .contains("EXITED")
     );
 }
+
+#[tokio::test]
+async fn reader_accepts_a_slow_response_inside_its_configured_timeout() {
+    let (client_read, mut server_write) = duplex(4096);
+    let (_server_read, client_write) = duplex(4096);
+    let reply = tokio::spawn(async move {
+        tokio::time::sleep(Duration::from_millis(80)).await;
+        server_write
+            .write_all(b"{\"id\":1,\"result\":{\"ok\":true}}\n")
+            .await
+            .unwrap();
+    });
+    let mut client = JsonLineClient::new(client_read, client_write, Duration::from_secs(1));
+    assert_eq!(client.request(1, "read", None).await.unwrap()["ok"], true);
+    reply.await.unwrap();
+}
+
+#[tokio::test]
+async fn reader_still_times_out_if_codex_never_replies() {
+    let (client_read, _server_write) = duplex(4096);
+    let (_server_read, client_write) = duplex(4096);
+    let mut client = JsonLineClient::new(client_read, client_write, Duration::from_millis(20));
+    let error = client.request(1, "read", None).await.unwrap_err();
+    assert_eq!(error.to_string(), "APP_SERVER_TIMEOUT");
+}

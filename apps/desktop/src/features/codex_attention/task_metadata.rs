@@ -37,7 +37,9 @@ pub async fn task_label(
     let executable = installer::metadata_executable().ok()??;
     // Best effort metadata must not block hooks (5 seconds) or change the work's lifecycle.
     timeout(Duration::from_secs(2), async {
-        let mut server = CodexAppServer::start(&executable).await.ok()?;
+        let mut server = CodexAppServer::start(&executable, Duration::from_secs(12))
+            .await
+            .ok()?;
         let response = server
             .request(
                 "thread/read",

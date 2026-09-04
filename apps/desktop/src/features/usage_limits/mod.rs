@@ -2,6 +2,7 @@ mod app_server;
 pub mod http;
 mod model;
 mod normalize;
+mod refresh_schedule;
 mod store;
 pub mod supervisor;
 

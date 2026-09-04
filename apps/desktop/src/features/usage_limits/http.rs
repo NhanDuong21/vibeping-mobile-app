@@ -12,7 +12,7 @@ use crate::{
     infrastructure::web::error::ApiError,
 };
 
-use super::{RefreshRequest, UsageLimitStore, UsageLimitsSnapshot};
+use super::{RefreshRequest, UsageLimitStore, UsageLimitsSnapshot, app_server::READ_TIMEOUT};
 
 #[utoipa::path(
     get,
@@ -51,7 +51,7 @@ pub async fn refresh_limits(
         .send(request)
         .await
         .map_err(|_| ApiError::unavailable("USAGE_REFRESH_UNAVAILABLE"))?;
-    let succeeded = timeout(Duration::from_secs(15), completion)
+    let succeeded = timeout(READ_TIMEOUT + Duration::from_secs(5), completion)
         .await
         .ok()
         .and_then(Result::ok)

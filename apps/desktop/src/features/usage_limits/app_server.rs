@@ -2,7 +2,10 @@ use crate::infrastructure::codex_app_server::CodexAppServer;
 use anyhow::{Context, Result, bail};
 use serde::Deserialize;
 use serde_json::{Value, json};
-use std::path::Path;
+use std::{path::Path, time::Duration};
+
+// Real Codex allowance reads can take over 12 seconds on a slow connection.
+pub(super) const READ_TIMEOUT: Duration = Duration::from_secs(30);
 
 pub struct AppServerSession {
     server: CodexAppServer,
@@ -17,7 +20,7 @@ struct AccountReadResponse {
 
 impl AppServerSession {
     pub async fn start(executable: &Path) -> Result<Self> {
-        let mut server = CodexAppServer::start(executable).await?;
+        let mut server = CodexAppServer::start(executable, READ_TIMEOUT).await?;
         parse_account(
             server
                 .request("account/read", Some(json!({ "refreshToken": false })))

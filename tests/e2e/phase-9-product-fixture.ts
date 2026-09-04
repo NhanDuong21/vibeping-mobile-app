@@ -186,6 +186,16 @@ export async function measurableFindings(
   page: Page,
   surface: string,
 ): Promise<string[]> {
+  // Audit the settled surface, not text halfway through an entrance/route fade.
+  // Infinite live-signal effects must keep running and never block the audit.
+  await page.evaluate(async () => {
+    const entering = document
+      .getAnimations()
+      .filter((animation) =>
+        Number.isFinite(Number(animation.effect?.getComputedTiming().endTime)),
+      );
+    await Promise.allSettled(entering.map((animation) => animation.finished));
+  });
   const accessibility = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa"])
     .analyze();

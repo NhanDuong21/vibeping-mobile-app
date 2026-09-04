@@ -3,7 +3,7 @@ param([switch] $SkipBuild)
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$version = '1.0.0-rc.6'
+$version = '1.0.0-rc.7'
 $packageName = "VibePing-Windows-x64-v$version"
 $artifactRoot = Join-Path $repoRoot 'artifacts'
 $packageDirectory = Join-Path $artifactRoot $packageName

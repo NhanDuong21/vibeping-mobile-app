@@ -43,10 +43,7 @@ export class UsageLimitsStore {
     this.#started = true;
     void this.restoreCached();
     this.#load();
-    this.#stream = this.#eventSourceFactory('/api/v1/stream');
-    this.#stream.addEventListener('allowance', (event) => this.receiveEvent(event));
-    this.#stream.onerror = () => this.markDisconnected();
-    this.#stream.onopen = () => this.#load();
+    this.#connectStream();
     globalThis.addEventListener?.('online', this.#reconnect);
     globalThis.addEventListener?.('offline', this.#offline);
     globalThis.document?.addEventListener('visibilitychange', this.#foreground);
@@ -123,7 +120,7 @@ export class UsageLimitsStore {
 
   lastReadLabel(): string {
     const readAt = this.#snapshot()?.readAt;
-    return readAt ? formatRecordedTime(new Date(readAt)) : 'Chưa ghi nhận thời điểm đọc';
+    return readAt ? formatRecordedTime(new Date(readAt), true) : 'Chưa ghi nhận thời điểm đọc';
   }
 
   async refresh(): Promise<void> {
@@ -184,17 +181,44 @@ export class UsageLimitsStore {
       });
   }
 
-  readonly #reconnect = (): void => this.#load();
-  readonly #offline = (): void => this.markDisconnected();
+  #connectStream(): void {
+    this.#stream?.close();
+    this.#stream = undefined;
+    if (document.visibilityState === 'hidden' || navigator.onLine === false) return;
+    const stream = this.#eventSourceFactory('/api/v1/stream');
+    this.#stream = stream;
+    stream.addEventListener('allowance', (event) => {
+      if (this.#stream === stream) this.receiveEvent(event);
+    });
+    stream.onerror = () => {
+      if (this.#stream === stream) this.markDisconnected();
+    };
+    stream.onopen = () => {
+      if (this.#stream === stream) this.#load();
+    };
+  }
+
+  readonly #reconnect = (): void => {
+    this.#connectStream();
+    if (document.visibilityState !== 'hidden') this.#load();
+  };
+  readonly #offline = (): void => {
+    this.#stream?.close();
+    this.#stream = undefined;
+    this.markDisconnected();
+  };
   readonly #foreground = (): void => {
-    if (globalThis.document?.visibilityState !== 'hidden') this.#load();
+    this.#connectStream();
+    if (document.visibilityState !== 'hidden') this.#load();
+    else this.#request?.unsubscribe();
   };
 }
 
-function formatRecordedTime(value: Date): string {
+function formatRecordedTime(value: Date, includeSeconds = false): string {
   return new Intl.DateTimeFormat('vi-VN', {
     hour: '2-digit',
     minute: '2-digit',
+    second: includeSeconds ? '2-digit' : undefined,
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',

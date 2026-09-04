@@ -1,9 +1,9 @@
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use anyhow::Result;
 use tokio::{
     sync::{broadcast, mpsc, oneshot},
-    time::{interval, sleep},
+    time::{MissedTickBehavior, interval, sleep},
 };
 
 use crate::features::{
@@ -11,9 +11,9 @@ use crate::features::{
     usage_limits::{app_server::AppServerSession, normalize::normalize_response},
 };
 
-use super::{UsageLimitStore, model::UsageLimitsSnapshot};
+use super::{UsageLimitStore, model::UsageLimitsSnapshot, refresh_schedule::RefreshSchedule};
 
-const POLL_INTERVAL: Duration = Duration::from_secs(10 * 60);
+const SCHEDULE_TICK: Duration = Duration::from_secs(1);
 const RESTART_DELAYS: [u64; 4] = [1, 5, 20, 60];
 
 pub struct RefreshRequest {
@@ -51,13 +51,13 @@ pub async fn run(
     loop {
         match AppServerSession::start(&executable).await {
             Ok(session) => {
-                failures = 0;
                 if run_session(
                     session,
                     &store,
                     &mut refresh,
                     &usage_events,
                     &activity_events,
+                    &mut failures,
                 )
                 .await
                 .is_err()
@@ -87,34 +87,54 @@ async fn run_session(
     refresh: &mut mpsc::Receiver<RefreshRequest>,
     usage_events: &broadcast::Sender<String>,
     activity_events: &broadcast::Sender<String>,
+    failures: &mut usize,
 ) -> Result<()> {
     refresh_once(&mut session, store, usage_events, activity_events).await?;
-    let mut polling = interval(POLL_INTERVAL);
-    polling.tick().await;
+    *failures = 0;
+    let mut schedule = RefreshSchedule::new(Instant::now());
+    let mut polling = interval(SCHEDULE_TICK);
+    polling.set_missed_tick_behavior(MissedTickBehavior::Skip);
     loop {
+        let mut completion = None;
         tokio::select! {
             notification = session.next_notification() => {
                 if notification? {
-                    refresh_once(&mut session, store, usage_events, activity_events).await?;
+                    schedule.request();
                 }
             },
             request = refresh.recv() => {
                 let Some(request) = request else { return Ok(()); };
-                let mut completions = Vec::new();
-                if let Some(completion) = request.completion { completions.push(completion); }
-                while let Ok(request) = refresh.try_recv() {
-                    if let Some(completion) = request.completion { completions.push(completion); }
+                if request.completion.is_some() && schedule.is_recent(Instant::now()) {
+                    complete_request(request, true);
+                    continue;
                 }
-                let succeeded = refresh_once(
-                    &mut session, store, usage_events, activity_events,
-                ).await.is_ok();
-                for completion in completions { let _ = completion.send(succeeded); }
-                if !succeeded { anyhow::bail!("CODEX_ALLOWANCE_REFRESH_FAILED"); }
+                completion = request.completion;
+                schedule.request();
             },
-            _ = polling.tick() => {
-                refresh_once(&mut session, store, usage_events, activity_events).await?;
-            }
+            _ = polling.tick() => {}
         }
+        if !schedule.is_due(Instant::now(), usage_events.receiver_count() > 0) {
+            continue;
+        }
+        let result = refresh_once(&mut session, store, usage_events, activity_events).await;
+        complete_request(RefreshRequest { completion }, result.is_ok());
+        // Requests that arrived during this read share its result instead of starting another.
+        complete_queued(refresh, result.is_ok());
+        result?;
+        schedule.completed(Instant::now());
+        *failures = 0;
+    }
+}
+
+fn complete_request(request: RefreshRequest, succeeded: bool) {
+    if let Some(completion) = request.completion {
+        let _ = completion.send(succeeded);
+    }
+}
+
+fn complete_queued(refresh: &mut mpsc::Receiver<RefreshRequest>, succeeded: bool) {
+    while let Ok(request) = refresh.try_recv() {
+        complete_request(request, succeeded);
     }
 }
 
@@ -172,12 +192,14 @@ mod tests {
             sender.send(request).await.unwrap();
             completions.push(completion);
         }
-        let first = receiver.recv().await.unwrap();
-        let mut batch = usize::from(first.completion.is_some());
-        while let Ok(request) = receiver.try_recv() {
-            batch += usize::from(request.completion.is_some());
+        complete_queued(&mut receiver, true);
+        for completion in completions {
+            assert!(completion.await.unwrap());
         }
-        assert_eq!(batch, 3);
-        assert_eq!(completions.len(), 3);
+        assert!(receiver.try_recv().is_err());
+        let (request, completion) = RefreshRequest::interactive();
+        sender.send(request).await.unwrap();
+        complete_queued(&mut receiver, false);
+        assert!(!completion.await.unwrap());
     }
 }

@@ -13,7 +13,7 @@ pub struct CodexAppServer {
 }
 
 impl CodexAppServer {
-    pub async fn start(executable: &Path) -> Result<Self> {
+    pub async fn start(executable: &Path, request_timeout: Duration) -> Result<Self> {
         let mut command = Command::new(executable);
         command
             .arg("app-server")
@@ -27,7 +27,7 @@ impl CodexAppServer {
         let stdout = child.stdout.take().context("APP_SERVER_STDOUT_MISSING")?;
         let mut session = Self {
             _child: child,
-            client: JsonLineClient::new(stdout, stdin, Duration::from_secs(12)),
+            client: JsonLineClient::new(stdout, stdin, request_timeout),
             next_id: 1,
         };
         session.request("initialize", Some(json!({
