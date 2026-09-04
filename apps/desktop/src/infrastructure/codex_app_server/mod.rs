@@ -14,6 +14,18 @@ pub struct CodexAppServer {
 
 impl CodexAppServer {
     pub async fn start(executable: &Path, request_timeout: Duration) -> Result<Self> {
+        Self::connect(executable, request_timeout, false).await
+    }
+
+    pub async fn start_experimental(executable: &Path, request_timeout: Duration) -> Result<Self> {
+        Self::connect(executable, request_timeout, true).await
+    }
+
+    async fn connect(
+        executable: &Path,
+        request_timeout: Duration,
+        experimental: bool,
+    ) -> Result<Self> {
         let mut command = Command::new(executable);
         command
             .arg("app-server")
@@ -31,7 +43,8 @@ impl CodexAppServer {
             next_id: 1,
         };
         session.request("initialize", Some(json!({
-            "clientInfo": { "name": "vibeping", "title": "VibePing", "version": env!("CARGO_PKG_VERSION") }
+            "clientInfo": { "name": "vibeping", "title": "VibePing", "version": env!("CARGO_PKG_VERSION") },
+            "capabilities": { "experimentalApi": experimental }
         }))).await?;
         session.client.notify("initialized", None).await?;
         Ok(session)

@@ -11,6 +11,8 @@ pub struct CodexIngress {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub task_label: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub thread_identity: Option<super::ThreadIdentity>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub result: Option<super::CodexResult>,
     pub signal: CodexSignal,
     pub occurred_at: DateTime<Utc>,

@@ -27,6 +27,14 @@ impl ActivityStore {
         if ingress.signal != CodexSignal::Completed {
             record_hook_signal(&mut transaction, ingress).await?;
         }
+        if let Some(identity) = &ingress.thread_identity {
+            super::thread_identity_store::remember(
+                &mut transaction,
+                &ingress.session_key,
+                identity,
+            )
+            .await?;
+        }
         if !prepare_turn(&mut transaction, ingress).await? {
             transaction.commit().await?;
             return Ok(None);

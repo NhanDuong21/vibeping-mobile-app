@@ -32,6 +32,41 @@ function session(id: string, eventIds: string[]): CachedEvent {
 }
 
 describe('RC8 session cache migration', () => {
+  it('reconciles already-grouped child works into their verified parent without losing cached answers', () => {
+    const main = session('main', ['main']);
+    main.session!.thread = {
+      id: 'root',
+      title: 'Công việc chính',
+      turnCount: 2,
+      turnNumber: 1,
+      turnIds: ['main', 'child'],
+      latestTurnId: 'main',
+      firstSignalAt: old.occurredAt,
+      updatedAt: old.occurredAt,
+      failedTestCount: 0,
+      isRead: true,
+    };
+    const child = session('child', ['child']);
+    child.session!.thread = {
+      ...main.session!.thread,
+      id: 'old-child',
+      latestTurnId: 'child',
+      turnIds: ['child'],
+      turnNumber: 1,
+      turnCount: 1,
+    };
+    child.result = old.result;
+    const merged = mergeSessionFeed([child, session('unrelated', ['unrelated'])], [main], []);
+    expect(
+      groupThreads(merged.events)
+        .map((e) => e.id)
+        .sort(),
+    ).toEqual(['main', 'unrelated']);
+    const retained = merged.events.find((e) => e.id === 'child')!;
+    expect(retained.session!.thread!.id).toBe('root');
+    expect(retained.result).toEqual(old.result);
+    expect(groupThreads(JSON.parse(JSON.stringify(merged.events)))).toHaveLength(2);
+  });
   it('upgrades per-turn caches into exact threads without losing viewed results or joining by project', () => {
     const saved = ['one', 'two', 'three', 'unrelated'].map((id) => ({
       ...session(id, [id]),

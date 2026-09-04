@@ -9,7 +9,7 @@ use tokio::{
 };
 
 use crate::features::{
-    codex_attention::{ActivityStore, CodexIngress, CodexSignal},
+    codex_attention::{self, ActivityStore, CodexIngress, CodexSignal},
     notifications::{VapidIdentity, migration, worker},
     preferences::PreferenceStore,
     usage_limits::{self, RefreshRequest, UsageLimitStore},
@@ -75,6 +75,10 @@ pub async fn run_with_shutdown(
     let worker_database = state.database.clone();
     let worker_data_dir = state.data_dir.clone();
     let notification_worker = tokio::spawn(worker::run(worker_database, worker_data_dir));
+    let identity_worker = tokio::spawn(codex_attention::reconcile_threads(
+        ActivityStore::new(state.database.clone()),
+        state.activity_events.clone(),
+    ));
     let usage_worker = tokio::spawn(usage_limits::supervisor::run(
         UsageLimitStore::new(state.database.clone()),
         state.take_usage_refresh().await,
@@ -129,6 +133,7 @@ pub async fn run_with_shutdown(
         .await
         .context("VibePing đã dừng ngoài dự kiến");
     notification_worker.abort();
+    identity_worker.abort();
     usage_worker.abort();
     activity_worker.abort();
     database.close().await;

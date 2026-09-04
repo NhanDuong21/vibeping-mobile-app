@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { combineLatest } from 'rxjs';
 import { exactDateTime } from '../../../core/formatting/time';
@@ -18,11 +18,28 @@ import { RequestPanel } from './request-panel';
 })
 export class ThreadDetailPage {
   readonly #route = inject(ActivatedRoute);
+  readonly #router = inject(Router);
   protected readonly thread = inject(ThreadDetailStore);
   protected readonly activity = inject(ActivityStore);
   protected readonly title = threadTitle;
   protected readonly exactTime = exactDateTime;
   constructor() {
+    effect(() => {
+      const canonical = this.thread.canonicalId();
+      const requested = this.#route.snapshot.paramMap.get('id');
+      if (
+        canonical &&
+        requested &&
+        canonical !== requested &&
+        this.thread.state() === 'ready' &&
+        this.#router.url.split('?')[0] === `/activity/sessions/${requested}`
+      ) {
+        void this.#router.navigate(['/activity/sessions', canonical], {
+          queryParamsHandling: 'preserve',
+          replaceUrl: true,
+        });
+      }
+    });
     combineLatest([this.#route.paramMap, this.#route.queryParamMap])
       .pipe(takeUntilDestroyed())
       .subscribe(([params, query]) => {

@@ -48,6 +48,16 @@ export function turn(id: string, threadId: string, number = 1): ActivityEventDto
 }
 
 describe('Thread hierarchy', () => {
+  it('keeps the parent request primary when a delegated request has a newer ordinal', () => {
+    const main = turn('main', 'root', 1);
+    const child = turn('child', 'root', 4);
+    main.session!.thread!.turnCount = 4;
+    child.session!.thread!.latestTurnId = 'main';
+    main.session!.state = 'running';
+    main.session!.completedAt = null;
+    expect(groupThreads([child, main])[0].id).toBe('main');
+    expect(groupThreads([main, child])[0].id).toBe('main');
+  });
   it('keeps one latest turn per exact thread across pages and reconnects, even in the same project', () => {
     const one = turn('one', 'a', 1);
     const two = turn('two', 'a', 2);

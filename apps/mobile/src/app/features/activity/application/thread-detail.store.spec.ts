@@ -7,6 +7,42 @@ import { ActivityStore } from './activity.store';
 import { ThreadDetailStore } from './thread-detail.store';
 
 describe('Thread detail data', () => {
+  function request(id: string, number: number): ActivityEventDto {
+    const at = '2026-09-04T12:00:00Z';
+    return {
+      id,
+      title: 'Công việc',
+      summary: 'Kết quả',
+      projectName: 'fixture',
+      occurredAt: at,
+      isRead: true,
+      eventType: 'codex.turn.completed',
+      session: {
+        eventIds: [id],
+        state: 'completed',
+        startedAt: at,
+        completedAt: at,
+        updatedAt: at,
+        failedTestCount: 0,
+        timeline: [],
+        thread: {
+          id: 'root',
+          title: 'Công việc chính',
+          turnCount: 20,
+          turnNumber: number,
+          latestTurnId: 'main',
+          previousTurnId: null,
+          nextTurnId: null,
+          startedAt: null,
+          turnIds: ['main', 'child'],
+          firstSignalAt: at,
+          updatedAt: at,
+          failedTestCount: 0,
+          isRead: true,
+        },
+      },
+    };
+  }
   function setup() {
     const events = signal<ActivityEventDto[]>([]);
     const api = { threadTurns: vi.fn() };
@@ -51,6 +87,42 @@ describe('Thread detail data', () => {
     api.threadTurns.mockReturnValue(throwError(() => new Error('offline')));
     await store.refresh();
     expect(store.state()).toBe('missing');
+  });
+
+  it('follows an old child work link and keeps the parent result first across cache and pagination', async () => {
+    const { store, api, cache, readDetail } = setup();
+    const main = request('main', 1);
+    const child = request('child', 20);
+    const old = request('child', 1);
+    old.session!.thread = {
+      ...old.session!.thread!,
+      id: 'old-child',
+      latestTurnId: 'child',
+      turnCount: 1,
+      turnIds: ['child'],
+    };
+    cache.read.mockResolvedValue({ events: [old], nextCursor: null, unreadCount: 0 });
+    api.threadTurns.mockReturnValue(
+      of({ events: [main, child], nextCursor: '20', unreadCount: 0 }),
+    );
+    const target = request('target', 5);
+    readDetail.mockResolvedValue({ event: target, cached: false });
+    await store.open('old-child', 'target');
+    expect(store.latest()?.id).toBe('main');
+    expect(store.target()).toBe('target');
+    expect(store.turns().every((e) => e.session?.thread?.id === 'root')).toBe(true);
+    expect(readDetail).toHaveBeenCalledWith('target');
+    await store.loadMore();
+    expect(api.threadTurns).toHaveBeenCalledWith('root', '20');
+    const persisted = cache.write.mock.calls.at(-1)!;
+    expect(persisted[0]).toBe('thread:root');
+    expect(persisted[1].events[0].id).toBe('main');
+    cache.read.mockResolvedValue(persisted[1]);
+    api.threadTurns.mockReturnValue(throwError(() => new Error('offline')));
+    await store.open('elsewhere');
+    await store.open('root');
+    expect(store.state()).toBe('cached');
+    expect(store.latest()?.id).toBe('main');
   });
 
   it('serializes older-page loads and does not advance the cursor after failure', async () => {

@@ -51,6 +51,7 @@ fn signal(turn: &str, kind: CodexSignal, minute: i64) -> CodexIngress {
         turn_key: turn.into(),
         project_name: "sample-project".into(),
         task_label: Some("Sửa bộ lọc hoạt động".into()),
+        thread_identity: None,
         result: None,
         signal: kind,
         occurred_at: Utc::now() - Duration::minutes(30) + Duration::minutes(minute),

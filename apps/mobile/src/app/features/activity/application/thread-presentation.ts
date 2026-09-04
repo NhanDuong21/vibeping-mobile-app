@@ -26,10 +26,15 @@ export function groupThreads(events: ActivityEventDto[]): ActivityEventDto[] {
     const previous = threads.get(key);
     const number = event.session?.thread?.turnNumber ?? 0;
     const previousNumber = previous?.session?.thread?.turnNumber ?? 0;
+    const primary = event.id === event.session?.thread?.latestTurnId;
+    const previousPrimary = previous?.id === previous?.session?.thread?.latestTurnId;
     if (
       !previous ||
-      number > previousNumber ||
-      (number === previousNumber && Date.parse(event.occurredAt) > Date.parse(previous.occurredAt))
+      (primary && !previousPrimary) ||
+      (primary === previousPrimary &&
+        (number > previousNumber ||
+          (number === previousNumber &&
+            Date.parse(event.occurredAt) > Date.parse(previous.occurredAt))))
     ) {
       threads.set(key, event);
     }

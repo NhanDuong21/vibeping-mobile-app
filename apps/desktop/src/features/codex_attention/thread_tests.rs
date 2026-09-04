@@ -8,6 +8,7 @@ fn signal(thread: &str, turn: &str, kind: CodexSignal, minute: i64) -> CodexIngr
         turn_key: format!("{thread}:{turn}"),
         project_name: "same-repository".into(),
         task_label: Some("Hoàn thiện hoạt động".into()),
+        thread_identity: None,
         result: None,
         signal: kind,
         occurred_at: Utc.with_ymd_and_hms(2026, 9, 4, 1, 0, 0).unwrap() + Duration::minutes(minute),

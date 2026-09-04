@@ -5,6 +5,7 @@ import { MobileSnapshotStorage } from '../../../core/cache/mobile-snapshot-stora
 import { isCachedEvent } from '../data/activity-cache';
 import { ActivityStore } from './activity.store';
 import { mergeEvents } from './activity-reconciliation';
+import { mergeSessionFeed } from './session-cache-migration';
 
 @Injectable({ providedIn: 'root' })
 export class ThreadDetailStore {
@@ -19,6 +20,7 @@ export class ThreadDetailStore {
   #expanded = false;
   #sequence = 0;
   readonly state = this.#state.asReadonly();
+  readonly canonicalId = this.#id.asReadonly();
   readonly loadingMore = this.#loadingMore.asReadonly();
   readonly hasMore = computed(() => Boolean(this.#cursor()));
   readonly turns = computed(() =>
@@ -34,7 +36,12 @@ export class ThreadDetailStore {
         ),
     ).sort((a, b) => (b.session?.thread?.turnNumber ?? 0) - (a.session?.thread?.turnNumber ?? 0)),
   );
-  readonly latest = computed(() => this.turns()[0] ?? null);
+  readonly latest = computed(
+    () =>
+      this.turns().find((event) => event.id === event.session?.thread?.latestTurnId) ??
+      this.turns()[0] ??
+      null,
+  );
   readonly previous = computed(() =>
     this.turns().filter((event) => event.id !== this.latest()?.id),
   );
@@ -60,7 +67,7 @@ export class ThreadDetailStore {
     this.#target.set(request);
     if (id === this.#id()) {
       await this.refresh();
-      await this.#includeTarget(id, request);
+      await this.#includeTarget(this.#id(), request);
       return;
     }
     this.#sequence++;
@@ -76,15 +83,14 @@ export class ThreadDetailStore {
       if (isThreadCache(cached, id)) {
         const recent = cached.events.slice(0, 10);
         this.#turns.set(recent);
-        const oldest = recent.at(-1)?.session?.thread?.turnNumber ?? 1;
-        this.#cursor.set(oldest > 1 ? String(oldest) : null);
+        this.#cursor.set(cacheCursor(recent));
         this.#state.set('cached');
       }
     } catch {
       /* Server is authoritative; a missing cache does not block reading. */
     }
     await this.refresh();
-    await this.#includeTarget(id, request);
+    await this.#includeTarget(this.#id(), request);
   }
 
   async refresh(): Promise<void> {
@@ -94,10 +100,12 @@ export class ThreadDetailStore {
     try {
       const feed = await firstValueFrom(this.#api.threadTurns(id).pipe(timeout(10_000)));
       if (sequence !== this.#sequence) return;
-      this.#turns.set(mergeEvents(this.#turns(), feed.events));
+      const canonical = feed.events[0]?.session?.thread?.id ?? id;
+      this.#id.set(canonical);
+      this.#turns.set(mergeSessionFeed(this.#turns(), feed.events, []).events);
       if (!this.#expanded) this.#cursor.set(feed.nextCursor ?? null);
       this.#state.set(this.turns().length ? 'ready' : 'missing');
-      await this.#persist(id);
+      await this.#persist(canonical);
     } catch {
       if (sequence === this.#sequence) this.#state.set(this.turns().length ? 'cached' : 'missing');
     }
@@ -111,7 +119,7 @@ export class ThreadDetailStore {
     try {
       const feed = await firstValueFrom(this.#api.threadTurns(id, cursor).pipe(timeout(10_000)));
       if (id !== this.#id()) return;
-      this.#turns.set(mergeEvents(this.#turns(), feed.events));
+      this.#turns.set(mergeSessionFeed(this.#turns(), feed.events, []).events);
       this.#cursor.set(feed.nextCursor ?? null);
       this.#expanded = true;
       this.#state.set('ready');
@@ -124,7 +132,13 @@ export class ThreadDetailStore {
   }
 
   async #includeTarget(id: string, request: string | null): Promise<void> {
-    if (!request || id !== this.#id() || this.turns().some((event) => event.id === request)) return;
+    if (
+      !request ||
+      request !== this.#target() ||
+      id !== this.#id() ||
+      this.turns().some((event) => event.id === request)
+    )
+      return;
     const read = await this.#activity.readDetail(request);
     if (id !== this.#id() || request !== this.#target()) return;
     if (read.event?.session?.thread?.id === id)
@@ -133,17 +147,25 @@ export class ThreadDetailStore {
 
   async #persist(id: string): Promise<void> {
     try {
-      const events = this.turns().slice(0, 100);
-      const oldest = events.at(-1)?.session?.thread?.turnNumber ?? 1;
+      const events = [this.latest(), ...this.previous()]
+        .filter((event) => event !== null)
+        .slice(0, 100);
       await this.#storage.write(`thread:${id}`, {
         events,
-        nextCursor: oldest > 1 ? String(oldest) : null,
+        nextCursor: cacheCursor(events),
         unreadCount: 0,
       });
     } catch {
       /* Cache is optional. */
     }
   }
+}
+
+function cacheCursor(events: ActivityEventDto[]): string | null {
+  const thread = events[0]?.session?.thread;
+  if (!thread || thread.turnCount <= events.length) return null;
+  const older = events.filter((event) => event.id !== thread.latestTurnId);
+  return String(older.at(-1)?.session?.thread?.turnNumber ?? '9223372036854775807');
 }
 
 function isThreadCache(value: unknown, id: string): value is EventFeedDto {

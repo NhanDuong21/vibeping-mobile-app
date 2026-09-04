@@ -17,8 +17,13 @@ mod session_stages;
 mod store;
 mod task_metadata;
 mod thread_feed;
+mod thread_identity;
+mod thread_identity_store;
+mod thread_reconciliation;
 mod turn_state;
 pub use thread_feed::ThreadContext;
+pub use thread_identity::ThreadIdentity;
+pub use thread_reconciliation::run as reconcile_threads;
 
 pub use classifier::normalize;
 pub(crate) use installer::runtime_executable;
@@ -43,3 +48,6 @@ mod session_tests;
 
 #[cfg(test)]
 mod thread_tests;
+
+#[cfg(test)]
+mod thread_identity_tests;

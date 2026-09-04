@@ -85,6 +85,7 @@ async fn ingest(source: &str, bytes: &[u8], data_dir: Option<PathBuf>) -> Result
         {
             payload.task_label = metadata.label;
             payload.result = payload.result.or(metadata.result);
+            payload.thread_identity = metadata.identity;
         }
         let _ = deliver_ingress(payload, data_dir).await?;
     }

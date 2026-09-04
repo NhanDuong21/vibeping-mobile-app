@@ -207,6 +207,7 @@ async fn complete_turn(pool: &sqlx::SqlitePool, turn: &str) {
                 turn_key: turn.into(),
                 project_name: "Dự án riêng".into(),
                 task_label: None,
+                thread_identity: None,
                 result: None,
                 signal,
                 occurred_at: Utc::now(),

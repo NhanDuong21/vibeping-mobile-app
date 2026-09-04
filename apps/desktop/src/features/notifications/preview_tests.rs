@@ -28,6 +28,7 @@ async fn latest_real_activity_replaces_sample_and_task_survives_database_reopen(
         turn_key: "turn".into(),
         project_name: "project".into(),
         task_label: Some("Sửa màn Cài đặt".into()),
+        thread_identity: None,
         result: None,
         signal: CodexSignal::Started,
         occurred_at: Utc::now(),
@@ -73,6 +74,7 @@ async fn queued_and_retry_jobs_use_latest_privacy_and_match_preview() {
         turn_key: "turn".into(),
         project_name: "project".into(),
         task_label: Some("Sửa màn Cài đặt".into()),
+        thread_identity: None,
         result: crate::features::codex_attention::CodexResult::from_text(
             "Đã sửa bộ lọc hoạt động.\nKiểm thử đã qua.",
         ),

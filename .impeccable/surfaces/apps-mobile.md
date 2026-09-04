@@ -19,7 +19,7 @@ THESIS: A trustworthy private signal line, not a miniature developer dashboard.
 
 OWN-WORLD: Tinted off-white or green-black field, mint signal, green-gray metadata, sparse rules, 12–16 px corners only where a container is necessary.
 
-STORY: In 1.3, glance at one Công việc per Codex thread and open its original timeline and final answer directly. The latest Yêu cầu is expanded; older requests expand in place. A single request has no hierarchy labels. New prompts update that work; distinct threads never merge by project. Notification links expand their exact request.
+STORY: In 1.3.1, glance at one Công việc per Codex conversation, including explicitly verified delegated-agent descendants, and open its original timeline and final answer directly. The latest main Yêu cầu is expanded; older requests expand in place. A single request has no hierarchy labels. New prompts update that work; independent chats and user-created forks never merge by project or shared session metadata. Retained results and old phone caches reconcile to verified conversation membership. Notification links expand their exact request.
 
 FIRST VIEWPORT: Compact masthead with the existing cat. A prominent work card appears only for active work or an actionable state; idle uses a small status block. Allowance rows and compact work lists follow, with project, request count, status/time and one readable sentence. Internal review output stays inside the full result. No aggregate thread duration or repeated row CTA. Project profiles, Settings and daily recap retain the incumbent form.
 

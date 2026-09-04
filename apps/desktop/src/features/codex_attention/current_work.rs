@@ -25,6 +25,8 @@ impl ActivityStore {
         let row = sqlx::query_as::<_, ObservedWork>(
             "SELECT work_session_id, project_name, state, last_test_state, preview_ready, started_at, updated_at \
              FROM codex_turns t WHERE start_observed = 1 AND state IN ('running', 'waiting') \
+             AND NOT EXISTS (SELECT 1 FROM codex_thread_identity i \
+                 WHERE i.thread_key = t.session_key AND i.root_key <> t.session_key) \
              AND NOT EXISTS (SELECT 1 FROM codex_turns newer \
                  WHERE newer.session_key = t.session_key AND newer.start_observed = 1 \
                  AND (newer.started_at > t.started_at OR \

@@ -12,6 +12,7 @@ fn ingress(turn: &str, signal: CodexSignal) -> CodexIngress {
         turn_key: turn.into(),
         project_name: "vibeping".into(),
         task_label: None,
+        thread_identity: None,
         result: None,
         signal,
         occurred_at: Utc::now(),

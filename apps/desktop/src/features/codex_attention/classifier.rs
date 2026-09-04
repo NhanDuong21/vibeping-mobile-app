@@ -34,6 +34,7 @@ pub fn normalize(source: &str, bytes: &[u8]) -> Result<Option<CodexIngress>> {
         turn_key: digest(&format!("{session}:{turn}")),
         project_name: project_name(cwd),
         task_label: None,
+        thread_identity: None,
         result: (signal == CodexSignal::Completed)
             .then(|| super::result_content::from_notify(&value))
             .flatten(),
@@ -125,7 +126,7 @@ fn project_name(cwd: &str) -> String {
         .collect()
 }
 
-fn digest(value: &str) -> String {
+pub(super) fn digest(value: &str) -> String {
     Sha256::digest(value.as_bytes())
         .iter()
         .map(|byte| format!("{byte:02x}"))

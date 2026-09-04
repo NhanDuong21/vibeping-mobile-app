@@ -19,6 +19,7 @@ fn signal(turn: &str, kind: CodexSignal, at: DateTime<Utc>) -> CodexIngress {
         turn_key: turn.into(),
         project_name: "VibePing".into(),
         task_label: None,
+        thread_identity: None,
         result: None,
         signal: kind,
         occurred_at: at,

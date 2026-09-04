@@ -79,6 +79,7 @@ impl ActivityStore {
         limit: u8,
     ) -> Result<EventFeed> {
         validate_limit(limit)?;
+        let thread = self.conversation_key(thread).await?;
         let before = match cursor {
             Some(value) => value
                 .parse::<i64>()
@@ -88,21 +89,34 @@ impl ActivityStore {
             None => i64::MAX,
         };
         let ids: Vec<(String, i64)> = sqlx::query_as(
-            "SELECT id, turn_number FROM work_thread_turns WHERE thread_id = ? AND turn_number < ? \
-             ORDER BY turn_number DESC LIMIT ?",
+            "SELECT id, turn_number FROM work_thread_turns WHERE thread_id = ? \
+             AND (? OR (turn_number < ? AND id <> (SELECT latest_turn_id FROM work_thread_feed WHERE id = ?))) \
+             ORDER BY (id = (SELECT latest_turn_id FROM work_thread_feed WHERE id = ?)) DESC, turn_number DESC LIMIT ?",
         )
-        .bind(thread)
+        .bind(&thread)
+        .bind(cursor.is_none())
         .bind(before)
+        .bind(&thread)
+        .bind(&thread)
         .bind(i64::from(limit) + 1)
         .fetch_all(&self.pool)
         .await?;
         let has_more = ids.len() > usize::from(limit);
         let mut events = Vec::new();
         let mut next_cursor = None;
-        for (id, number) in ids.into_iter().take(usize::from(limit)) {
+        for (index, (id, number)) in ids.into_iter().take(usize::from(limit)).enumerate() {
             if let Some(detail) = self.session_detail(&id).await? {
                 events.push(detail.event);
-                next_cursor = has_more.then(|| number.to_string());
+                next_cursor = has_more.then(|| {
+                    // A one-item first page may contain the older-started root
+                    // request. Its ordinal must not skip newer child requests.
+                    if cursor.is_none() && index == 0 {
+                        i64::MAX
+                    } else {
+                        number
+                    }
+                    .to_string()
+                });
             }
         }
         Ok(EventFeed {
