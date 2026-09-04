@@ -27,4 +27,6 @@ FORM: Established Quiet signal world; precise supplied composition, so no concep
 
 1.1.1 interaction boundary: project identity changes only after a confirmed save; failed edits stay available to retry. Reduced motion, hidden pages and offscreen mascot loops stop motion. The Windows section reports the actual local companion; no phone-side Start/Stop control or new tab.
 
+Detail motion refinement: one compact three-bar signal beside the working state, on a 2.4-second transform/opacity rhythm. It belongs only to the selected fresh running session, stops on waiting/completion/offline/stale data, and does not move the text or timeline. Balanced and Minimal keep the static mark; system reduced motion, hidden documents and offscreen content stop the loop. The full timeline and retained final answer keep their existing positions and behavior.
+
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance.

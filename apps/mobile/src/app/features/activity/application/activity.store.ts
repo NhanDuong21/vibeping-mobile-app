@@ -14,7 +14,7 @@ import { ActivityCache, type CachedActivity } from '../data/activity-cache';
 import { isCurrentWork, localUnread } from './activity-reconciliation';
 import { readinessView, type ReadinessSourceState, type ReadinessView } from './readiness';
 import { isLiveMotionEvent } from './event-motion';
-import { sessionRevision } from './work-session-presentation';
+import { sessionIsWorking, sessionRevision } from './work-session-presentation';
 import { mergeSessionFeed, type CachedEvent } from './session-cache-migration';
 
 type ActivityState = ReadinessSourceState;
@@ -86,6 +86,9 @@ export class ActivityStore {
   );
   readonly motionActive = computed(
     () => this.readiness().kind === 'working' && this.#live.visible(),
+  );
+  readonly detailWorking = computed(() =>
+    sessionIsWorking(this.selected(), this.now(), this.isStale() || this.state() !== 'ready'),
   );
 
   constructor() {

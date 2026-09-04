@@ -1,6 +1,8 @@
-# VibePing — Personal + Always ready 1.1.1
+# VibePing — Nhịp tín hiệu 1.1.2
 
 VibePing is a personal-production tool that notifies one user's iPhone when Codex finishes, needs attention, leaves final tests failing, has a preview ready, or approaches a usage allowance. Version 1.1.1 adds project profiles, personal notification rules, a living mascot, a small daily summary and an opted-in Windows companion. The persistent sessions, live cards, timelines and final Codex answers from 1.1 remain intact.
+
+Version 1.1.2 adds a quiet three-bar signal beside the selected working session in Activity Detail. It follows fresh session evidence and respects motion preferences, visibility and offline state.
 
 Gate 0 preserves the proven standards-based iPhone Web Push evidence from the stable private Tailscale Serve origin. Gate 1 preserves the proven signed-in Codex allowance path through the official App Server protocol. The self-contained Rust/SQLite release candidate now serves the Angular/Ionic PWA at that same private origin; the Gate 0 source, state, and rollback path remain preserved.
 
@@ -55,7 +57,7 @@ pnpm run package:windows
 pnpm run e2e:release
 ```
 
-The ignored output is `artifacts/VibePing-Windows-x64-v1.1.1/`, its ZIP, and its SHA-256 file. The nine-file package needs no Node.js, pnpm, Rust, or Cargo installation on the user machine. See [1.1.1 release notes](docs/release-1.1.1.md) for Personal, Always ready, retained Sessions and Codex results. The phase ledger below records the original V1 foundation; physical iPhone acceptance remains separate from automated release checks.
+The ignored output is `artifacts/VibePing-Windows-x64-v1.1.2/`, its ZIP, and its SHA-256 file. The nine-file package needs no Node.js, pnpm, Rust, or Cargo installation on the user machine. See [1.1.2 release notes](docs/release-1.1.2.md) for the detail signal and update instructions; Personal, Always ready, Sessions and Codex results remain available. The phase ledger below records the original V1 foundation; physical iPhone acceptance remains separate from automated release checks.
 
 Control the production process explicitly, or opt into Windows sign-in startup with `Bat San sang.bat` in the packaged release:
 

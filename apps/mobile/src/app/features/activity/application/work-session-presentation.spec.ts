@@ -1,6 +1,6 @@
 import type { ActivityEventDto } from '../../../core/api/api-client';
 import { mergeEvents } from './activity-reconciliation';
-import { sessionDuration, sessionStatus } from './work-session-presentation';
+import { sessionDuration, sessionIsWorking, sessionStatus } from './work-session-presentation';
 
 const event: ActivityEventDto = {
   id: 'session',
@@ -22,6 +22,29 @@ const event: ActivityEventDto = {
 };
 
 describe('Work session presentation', () => {
+  it('shows work motion only for the selected fresh running session', () => {
+    const now = new Date('2026-09-04T06:11:00Z');
+    expect(sessionIsWorking(event, now)).toBe(true);
+    expect(sessionIsWorking(event, now, true)).toBe(false);
+    expect(sessionIsWorking(null, now)).toBe(false);
+    expect(sessionIsWorking({ ...event, session: null }, now)).toBe(false);
+    for (const state of ['waiting', 'completed', 'failed', 'stopped', 'unconfirmed']) {
+      expect(sessionIsWorking({ ...event, session: { ...event.session!, state } }, now)).toBe(
+        false,
+      );
+    }
+    for (const updatedAt of ['invalid', '2026-09-04T06:09:00Z', '2026-09-04T06:12:00Z']) {
+      expect(sessionIsWorking({ ...event, session: { ...event.session!, updatedAt } }, now)).toBe(
+        false,
+      );
+    }
+    expect(
+      sessionIsWorking(
+        { ...event, session: { ...event.session!, completedAt: now.toISOString() } },
+        now,
+      ),
+    ).toBe(false);
+  });
   it('stops elapsed time and removes live claims when signals become stale or offline', () => {
     const now = new Date('2026-09-04T06:11:00Z');
     expect(sessionStatus(event, now)).toBe('Đang làm việc');

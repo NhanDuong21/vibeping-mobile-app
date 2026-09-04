@@ -1,14 +1,14 @@
-# Cài và vận hành VibePing 1.1.1
+# Cài và vận hành VibePing 1.1.2
 
 Giải nén toàn bộ ZIP Windows x64 vào một thư mục ổn định. Laptop và iPhone dùng cùng tailnet; giữ Tailscale Serve riêng tư, không bật Funnel. Máy dùng app không cần Node.js, pnpm, Rust hay Cargo.
 
 ## Khởi động và cập nhật
 
-Nếu đang dùng bản cũ, dừng VibePing và tạo bản sao lưu trước. Chép toàn bộ tệp trong gói mới vào đúng thư mục đang cài, giữ nguyên đường dẫn để tích hợp Codex vẫn tìm được app. Giữ dữ liệu cục bộ hiện có; không xóa dữ liệu ghép nối hay thông báo.
+Nếu đang dùng bản cũ, mở **Tat San sang.bat** rồi **Stop VibePing.bat**, đợi khay biến mất và tạo bản sao lưu bằng `vibeping.exe backup`. Chép toàn bộ tệp trong gói mới vào đúng thư mục đang cài, giữ nguyên đường dẫn để tích hợp Codex vẫn tìm được app. Giữ dữ liệu cục bộ hiện có; không xóa dữ liệu ghép nối hay thông báo. Nếu trước đó dùng Sẵn sàng, mở lại **Bat San sang.bat** sau khi chép xong.
 
 1. Mở **Start VibePing.bat** để chạy thủ công. Nhập mã ghép nối trên iPhone nếu được yêu cầu.
 2. Hoặc mở **Bat San sang.bat** để bật khay mèo, tự chạy khi đăng nhập Windows và khôi phục host.
-3. Trên iPhone mở biểu tượng VibePing đã thêm vào Màn hình chính. Khi thấy **Phiên bản 1.1.1**, bấm **Cập nhật**. Không xóa biểu tượng hoặc đăng ký lại thông báo.
+3. Trên iPhone mở biểu tượng VibePing đã thêm vào Màn hình chính. Khi thấy **Phiên bản 1.1.2**, bấm **Cập nhật**. Không xóa biểu tượng hoặc đăng ký lại thông báo.
 
 ## Khay Windows
 

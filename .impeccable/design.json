@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-04T11:11:45.314Z",
+  "generatedAt": "2026-09-04T11:41:50Z",
   "title": "Design System: VibePing",
   "extensions": {
     "colorMeta": {
@@ -345,6 +345,11 @@
       {
         "name": "The Observed Time Rule",
         "body": "Show recorded stages and timestamps only. The prominent active card shows the three most recent stages in a compact time-and-label list. Duration uses a recorded start; missing starts remain explicit. When an unfinished session becomes stale or loses a current signal, freeze duration at the last observed signal and label the saved or unconfirmed state in text. Live motion must stop with that loss of freshness. Completion fixes duration at the recorded finish.",
+        "section": "components"
+      },
+      {
+        "name": "The Fresh Detail Signal Rule",
+        "body": "Beside the detail's working state, show one decorative three-bar signal (24 px) only for the selected running session with fresh evidence under 120 seconds old. Full uses a gentle scaleY/opacity loop (2.4 seconds); Balanced, Minimal and system reduced motion keep the static mark. Cancel the loop when hidden or offscreen. Remove the mark for waiting, terminal, offline or stale states. Keep the status text still and authoritative, with the timeline and retained final answer in their existing reading order.",
         "section": "components"
       }
     ],

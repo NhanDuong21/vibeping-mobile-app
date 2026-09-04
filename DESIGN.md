@@ -205,6 +205,8 @@ The prominent session uses the existing bordered surface with 16 px corners and 
 
 Detail presents the full retained timeline before the final Codex answer. Use an ordered list with tabular timestamps, a thin mint connecting line, small decorative mint dots, and plain Vietnamese stage labels. The line conveys sequence, never progress percentage. Keep the existing readable answer surface and place the privacy explanation in a collapsed disclosure after the result and metadata.
 
+**The Fresh Detail Signal Rule.** Beside the detail's working state, show one decorative three-bar signal (24 px) only for the selected running session with fresh evidence under 120 seconds old. Full uses a gentle scaleY/opacity loop (2.4 seconds); Balanced, Minimal and system reduced motion keep the static mark. Cancel the loop when hidden or offscreen. Remove the mark for waiting, terminal, offline or stale states. Keep the status text still and authoritative, with the timeline and retained final answer in their existing reading order.
+
 ### Daily recap
 
 “Hôm nay” is four quiet definition-list rows below Activity: “Phiên đã theo dõi”, “Công việc hoàn tất”, “Lần kiểm thử chưa đạt” and “Thời gian ghi nhận”. Muted labels sit opposite right-aligned bold tabular values, with 12 px row gaps. It has no chart, score or dashboard card grid.

@@ -1,7 +1,7 @@
 # Build status
 
-- **Current personal release:** 1.1.1 Personal + Always ready, following 1.1.0 Sessions; see `docs/release-1.1.1.md`.
-- **Release scope:** project profiles, personalized notification rules, one waiting reminder, a small daily summary, state-aware mascot, opt-in Windows sign-in startup, tray and host recovery. Existing sessions, timelines and final answers remain intact.
+- **Current personal release:** 1.1.2 Nhịp tín hiệu, following 1.1.1 Personal + Always ready and 1.1.0 Sessions; see `docs/release-1.1.2.md`.
+- **Release scope:** a small working signal in Activity Detail that follows fresh session state, motion preferences and visibility. Personal, Always ready, sessions, timelines and final answers remain intact. Validation is recorded in `docs/validation/ACTIVITY_DETAIL_MOTION.md`.
 - The ledger below is historical. Physical iPhone and soak acceptance remain human checks.
 
 - **Campaign branch:** `codex/vibeping-v1-rc1`

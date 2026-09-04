@@ -14,11 +14,19 @@ import {
 } from '../application/activity-presentation';
 import { ActivityStore } from '../application/activity.store';
 import { ResultBody } from './result-body';
+import { SessionWorkingSignal } from './session-working-signal';
 import { sessionDuration, sessionStatus } from '../application/work-session-presentation';
 
 @Component({
   selector: 'app-event-detail-page',
-  imports: [SignalMotion, RouterLink, PullToRefresh, ResultBody, ProjectIdentity],
+  imports: [
+    SignalMotion,
+    RouterLink,
+    PullToRefresh,
+    ResultBody,
+    ProjectIdentity,
+    SessionWorkingSignal,
+  ],
   templateUrl: './event-detail-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

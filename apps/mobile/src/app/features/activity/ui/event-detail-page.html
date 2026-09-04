@@ -33,7 +33,10 @@
         {{ event.session ? taskTitle(event) : label(event) }}
       </h1>
       <div class="mt-6 border-y border-vibe-rule py-5 dark:border-vibe-rule-dark">
-        <p class="break-words text-lg font-bold leading-6">{{ event.session ? sessionStatus(event, activity.now(), activity.isStale()) : taskTitle(event) }}</p>
+        <div class="flex items-center gap-2.5">
+          @if (activity.detailWorking()) { <app-session-working-signal /> }
+          <p class="min-w-0 break-words text-lg font-bold leading-6">{{ event.session ? sessionStatus(event, activity.now(), activity.isStale()) : taskTitle(event) }}</p>
+        </div>
         @if (event.session) {
           <p class="mt-1.5 text-sm text-vibe-muted dark:text-vibe-sage">{{ sessionDuration(event, activity.now(), activity.isStale()) }}</p>
           @if (event.session.failedTestCount) {

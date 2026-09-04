@@ -1,5 +1,16 @@
 import type { ActivityEventDto } from '../../../core/api/api-client';
 
+export function sessionIsWorking(
+  event: ActivityEventDto | null,
+  now: Date,
+  stale = false,
+): boolean {
+  const session = event?.session;
+  if (!session || stale || session.state !== 'running' || session.completedAt) return false;
+  const age = now.getTime() - Date.parse(session.updatedAt);
+  return Number.isFinite(age) && age >= -30_000 && age < 120_000;
+}
+
 export function sessionStatus(event: ActivityEventDto, now: Date, stale = false): string {
   const session = event.session;
   if (!session) return '';
