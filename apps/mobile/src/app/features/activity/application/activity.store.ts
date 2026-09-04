@@ -18,6 +18,7 @@ import { isLiveMotionEvent } from './event-motion';
 type ActivityState = ReadinessSourceState;
 type DetailState = 'idle' | 'loading' | 'ready' | 'missing';
 type ReadAllState = 'idle' | 'saving' | 'saved' | 'failed';
+type CachedEvent = ActivityEventDto & Partial<Pick<ActivityEventDetailDto, 'result' | 'timeline'>>;
 const STALE_AFTER_MS = 10 * 60 * 1000;
 
 @Injectable({ providedIn: 'root' })
@@ -28,7 +29,7 @@ export class ActivityStore {
   readonly #live = inject(ActivityLiveConnection);
   readonly #state = signal<ActivityState>('loading');
   readonly #bootstrap = signal<BootstrapDto | null>(null);
-  readonly #events = signal<ActivityEventDto[]>([]);
+  readonly #events = signal<CachedEvent[]>([]);
   readonly #nextCursor = signal<string | null>(null);
   readonly #unreadCount = signal(0);
   readonly #savedAt = signal<Date | null>(null);
@@ -43,6 +44,7 @@ export class ActivityStore {
   #started = false;
   #syncSequence = 0;
   #workRevision = 0;
+  #detailSequence = 0;
 
   readonly state = this.#state.asReadonly();
   readonly current = computed(() => this.#bootstrap()?.currentWork ?? null);
@@ -141,22 +143,25 @@ export class ActivityStore {
   }
 
   async loadDetail(id: string): Promise<void> {
+    const sequence = ++this.#detailSequence;
     this.#detailState.set('loading');
     const cached = this.#events().find((event) => event.id === id) ?? null;
-    this.#selected.set(cached ? { ...cached, timeline: [] } : null);
+    this.#selected.set(cached ? { ...cached, timeline: cached.timeline ?? [] } : null);
     if (cached) {
       this.#detailState.set('ready');
       await this.#markReadLocally(id);
     }
     try {
-      const remote = await firstValueFrom(this.#api.event(id));
+      const remote = await firstValueFrom(this.#api.event(id).pipe(timeout(10_000)));
+      if (sequence !== this.#detailSequence) return;
       const event = this.#selected()?.isRead ? { ...remote, isRead: true } : remote;
       this.#selected.set(event);
       this.#events.set(mergeEvents(this.#events(), [event]));
       this.#detailState.set('ready');
       if (!cached) await this.#markReadLocally(id);
+      await this.#persist();
     } catch {
-      if (!cached) this.#detailState.set('missing');
+      if (sequence === this.#detailSequence && !cached) this.#detailState.set('missing');
     }
   }
 
@@ -187,6 +192,17 @@ export class ActivityStore {
       this.#bootstrap.set({ ...bootstrap, currentWork });
       this.#pendingWork = undefined;
       this.#events.set(mergeEvents(this.#events(), feed.events));
+      const selected = this.#selected();
+      if (
+        selected &&
+        feed.events.some(
+          (event) =>
+            event.id === selected.id &&
+            event.resultExcerpt &&
+            event.resultExcerpt !== selected.resultExcerpt,
+        )
+      )
+        void this.loadDetail(selected.id);
       this.#nextCursor.set(feed.nextCursor ?? null);
       this.#unreadCount.set(
         this.#pendingReadAll
@@ -211,6 +227,7 @@ export class ActivityStore {
         if (event.id && event.occurredAt) {
           const before = this.#events().length;
           this.#events.set(mergeEvents(this.#events(), [event]));
+          if (this.#selected()?.id === event.id) void this.loadDetail(event.id);
           if (!event.isRead && this.#events().length > before) {
             this.#unreadCount.update((count) => count + 1);
             if (isLiveMotionEvent(event, this.#live.visible(), Date.now()))

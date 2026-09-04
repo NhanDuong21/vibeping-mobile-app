@@ -20,7 +20,7 @@ export function activityLabel(event: ActivityEventDto): string {
     'codex.attention.permission_required': 'Codex đang chờ bạn',
     'codex.preview.ready': 'Bản xem trước đã sẵn sàng',
     'codex.test.failed': 'Kiểm thử mã nguồn chưa đạt',
-    'codex.turn.completed': 'Công việc đã hoàn tất',
+    'codex.turn.completed': event.resultExcerpt ? 'Codex đã có kết quả' : 'Công việc đã hoàn tất',
     'codex.allowance.low': 'Hạn mức Codex sắp thấp',
     'codex.allowance.critical': 'Hạn mức Codex gần hết',
     'codex.allowance.exhausted': 'Hạn mức Codex đã hết',
@@ -55,6 +55,7 @@ export function activityProject(event: ActivityEventDto): string {
 }
 
 export function activityDescription(event: ActivityEventDto): string {
+  if (event.resultExcerpt && event.eventType === 'codex.turn.completed') return '';
   const summary = cleanVisibleText(event.summary).slice(0, 240);
   const descriptions: Record<string, string> = {
     'codex.turn.started': 'VibePing đã bắt đầu theo dõi công việc này.',
@@ -64,7 +65,7 @@ export function activityDescription(event: ActivityEventDto): string {
     'codex.test.failed':
       'Khi lượt làm việc này kết thúc, lần kiểm thử mã nguồn gần nhất VibePing ghi nhận báo chưa đạt. Đây là kết quả tại thời điểm thông báo; mở Codex trên laptop để xem chi tiết và các lần kiểm thử sau đó.',
     'codex.turn.completed':
-      'Codex đã kết thúc lượt trả lời này. Mở Codex trên laptop để xem kết quả.',
+      'Codex đã kết thúc lượt trả lời này nhưng VibePing chưa có nội dung kết quả. Mở Codex trên laptop để xem.',
   };
   const fallback = descriptions[event.eventType];
   if (fallback) return fallback;

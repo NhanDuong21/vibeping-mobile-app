@@ -10,7 +10,7 @@ mod store;
 mod vapid;
 pub mod worker;
 
-pub use content::{NotificationContext, event_words, notification_copy, safe_label};
+pub use content::{NotificationContext, event_words, notification_copy, safe_label, safe_summary};
 pub use store::NotificationStore;
 pub use vapid::VapidIdentity;
 pub(crate) use vapid::vapid_path;

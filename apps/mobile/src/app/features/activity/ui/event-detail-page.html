@@ -44,6 +44,23 @@
         }
       </div>
 
+      @if (event.result; as result) {
+        <section class="mt-7" aria-labelledby="result-heading">
+          <h2 id="result-heading" class="text-[1.375rem] font-bold tracking-[-0.025em]">
+            Kết quả Codex
+          </h2>
+          <p class="mt-1.5 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
+            Câu trả lời cuối của lượt làm việc này.
+          </p>
+          <app-result-body [text]="result.text" />
+          @if (result.truncated) {
+            <p class="mt-4 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
+              Câu trả lời dài nên VibePing chỉ lưu phần đầu. Mở Codex trên laptop để đọc đầy đủ.
+            </p>
+          }
+        </section>
+      }
+
       @if (event.timeline.length) {
         <section class="mt-7" aria-labelledby="timeline-heading">
           <h2 id="timeline-heading" class="text-[1.375rem] font-bold tracking-[-0.025em]">
@@ -88,7 +105,8 @@
       <section class="mt-6" aria-labelledby="privacy-note-heading">
         <h2 id="privacy-note-heading" class="text-base font-bold">Quyền riêng tư</h2>
         <p class="mt-2 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
-          VibePing không lưu toàn bộ prompt, đầu ra Codex hoặc đường dẫn đầy đủ.
+          VibePing lưu câu trả lời cuối trên laptop và bản đã xem trên điện thoại. Prompt và nhật ký
+          chạy công cụ không được lưu. Bạn có thể ẩn đoạn trích trên Màn hình khóa trong Cài đặt.
         </p>
       </section>
     } @else if (activity.detailState() === 'missing') {

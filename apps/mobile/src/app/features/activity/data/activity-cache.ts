@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import type { ActivityEventDto, BootstrapDto } from '../../../core/api/api-client';
+import type { ActivityEventDetailDto, BootstrapDto } from '../../../core/api/api-client';
 import {
   MobileSnapshotStorage,
   MOBILE_CACHE_VERSION,
@@ -13,7 +13,8 @@ export interface CachedActivity {
   currentWork: BootstrapDto['currentWork'];
   usageLimits: BootstrapDto['usageLimits'];
   unreadCount: number;
-  events: ActivityEventDto[];
+  events: (Omit<ActivityEventDetailDto, 'timeline'> &
+    Partial<Pick<ActivityEventDetailDto, 'timeline'>>)[];
   nextCursor: string | null;
   pendingReadIds: string[];
   pendingReadAll: boolean;
@@ -66,7 +67,7 @@ export function isCachedActivity(value: unknown): value is CachedActivity {
 
 function isCachedEvent(value: unknown): boolean {
   if (!value || typeof value !== 'object') return false;
-  const event = value as Partial<ActivityEventDto>;
+  const event = value as Partial<ActivityEventDetailDto>;
   return (
     typeof event.id === 'string' &&
     typeof event.eventType === 'string' &&
@@ -75,6 +76,20 @@ function isCachedEvent(value: unknown): boolean {
     typeof event.projectName === 'string' &&
     typeof event.occurredAt === 'string' &&
     !Number.isNaN(Date.parse(event.occurredAt)) &&
-    typeof event.isRead === 'boolean'
+    typeof event.isRead === 'boolean' &&
+    (event.resultExcerpt == null || typeof event.resultExcerpt === 'string') &&
+    (event.result == null ||
+      (typeof event.result.text === 'string' &&
+        [...event.result.text].length <= 8_000 &&
+        typeof event.result.truncated === 'boolean')) &&
+    (event.timeline === undefined ||
+      (Array.isArray(event.timeline) &&
+        event.timeline.every(
+          (stage) =>
+            stage &&
+            typeof stage.eventType === 'string' &&
+            typeof stage.occurredAt === 'string' &&
+            Number.isFinite(Date.parse(stage.occurredAt)),
+        )))
   );
 }

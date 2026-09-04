@@ -362,6 +362,10 @@ test("system theme, reduced motion, and keyboard focus retain usable feedback", 
   ).toBe("none");
 
   await page.goto("/activity?input=keyboard");
+  await expect(page.locator("app-activity-list")).toBeVisible();
+  await expect(
+    page.getByRole("navigation", { name: "Điều hướng chính" }),
+  ).toBeVisible();
   const interactiveTags = ["A", "BUTTON", "INPUT", "SELECT", "SUMMARY"];
   for (let attempt = 0; attempt < 5; attempt += 1) {
     await page.keyboard.press("Tab");

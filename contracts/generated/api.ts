@@ -354,10 +354,12 @@ export interface components {
             /** Format: date-time */
             occurredAt: string;
             projectName: string;
+            resultExcerpt?: string | null;
             summary: string;
             title: string;
         };
         ActivityEventDetail: components["schemas"]["ActivityEvent"] & {
+            result?: null | components["schemas"]["CodexResult"];
             timeline: components["schemas"]["ActivityTimelineStage"][];
         };
         ActivitySnapshot: {
@@ -383,6 +385,10 @@ export interface components {
             endpoint: string;
             expirationTime?: unknown;
             keys: components["schemas"]["SubscriptionKeys"];
+        };
+        CodexResult: {
+            text: string;
+            truncated: boolean;
         };
         ComputerStatus: {
             allowanceReader: string;

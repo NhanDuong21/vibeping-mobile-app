@@ -8,6 +8,8 @@ use super::dto::NotificationCopy;
 pub enum NotificationContext {
     Activity {
         task_label: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        result_excerpt: Option<String>,
     },
     Allowance {
         label: String,
@@ -18,6 +20,14 @@ pub enum NotificationContext {
 
 /// Only short, plain task metadata is eligible for a Lock Screen. Never pass a transcript here.
 pub fn safe_label(value: &str) -> Option<String> {
+    safe_text(value, 80)
+}
+
+pub fn safe_summary(value: &str) -> Option<String> {
+    safe_text(value, 160)
+}
+
+fn safe_text(value: &str, limit: usize) -> Option<String> {
     if value.chars().any(|c| c.is_control() || matches!(c, '\u{200b}'..='\u{200f}' | '\u{202a}'..='\u{202e}' | '\u{2060}'..='\u{206f}')) {
         return None;
     }
@@ -50,8 +60,11 @@ pub fn safe_label(value: &str) -> Option<String> {
     {
         return None;
     }
-    Some(if text.chars().count() > 80 {
-        format!("{}…", text.chars().take(79).collect::<String>().trim_end())
+    Some(if text.chars().count() > limit {
+        format!(
+            "{}…",
+            text.chars().take(limit - 1).collect::<String>().trim_end()
+        )
     } else {
         text
     })
@@ -93,13 +106,23 @@ pub fn notification_copy(
         copy.body = reset_body(label, *resets_at, now);
         return copy;
     }
+    let result = match context {
+        Some(NotificationContext::Activity {
+            result_excerpt: Some(value),
+            ..
+        }) if matches!(event_type, "codex.turn.completed" | "codex.test.failed") => {
+            safe_summary(value)
+        }
+        _ => None,
+    };
     let task = match context {
         Some(NotificationContext::Activity {
             task_label: Some(value),
+            ..
         }) => safe_label(value),
         _ => None,
     };
-    let detail = task.as_deref().unwrap_or(fallback);
+    let detail = result.as_deref().or(task.as_deref()).unwrap_or(fallback);
     copy.body = if detail.to_lowercase().contains(&project.to_lowercase()) {
         detail.into()
     } else {

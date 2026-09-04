@@ -10,6 +10,8 @@ pub struct CodexIngress {
     pub project_name: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub task_label: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub result: Option<super::CodexResult>,
     pub signal: CodexSignal,
     pub occurred_at: DateTime<Utc>,
 }
@@ -34,6 +36,8 @@ pub struct ActivityEvent {
     pub event_type: String,
     pub title: String,
     pub summary: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub result_excerpt: Option<String>,
     pub project_name: String,
     pub occurred_at: DateTime<Utc>,
     pub is_read: bool,
@@ -64,6 +68,8 @@ pub struct ActivityEventDetail {
     #[serde(flatten)]
     pub event: ActivityEvent,
     pub timeline: Vec<ActivityTimelineStage>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub result: Option<super::CodexResult>,
 }
 
 #[derive(Clone, Debug, Serialize, ToSchema)]

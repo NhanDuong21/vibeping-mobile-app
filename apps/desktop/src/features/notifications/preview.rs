@@ -84,6 +84,7 @@ fn sample() -> NotificationEvent {
         project_name: "vibeping-mobile-app".into(),
         notification_context: serde_json::to_string(&NotificationContext::Activity {
             task_label: Some("Hoàn thiện màn Hoạt động".into()),
+            result_excerpt: None,
         })
         .ok(),
     }

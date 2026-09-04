@@ -12,10 +12,11 @@ import {
   timelineLabel,
 } from '../application/activity-presentation';
 import { ActivityStore } from '../application/activity.store';
+import { ResultBody } from './result-body';
 
 @Component({
   selector: 'app-event-detail-page',
-  imports: [SignalMotion, RouterLink, PullToRefresh],
+  imports: [SignalMotion, RouterLink, PullToRefresh, ResultBody],
   templateUrl: './event-detail-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

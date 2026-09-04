@@ -34,6 +34,9 @@ pub fn normalize(source: &str, bytes: &[u8]) -> Result<Option<CodexIngress>> {
         turn_key: digest(&format!("{session}:{turn}")),
         project_name: project_name(cwd),
         task_label: None,
+        result: (signal == CodexSignal::Completed)
+            .then(|| super::result_content::from_notify(&value))
+            .flatten(),
         signal,
         occurred_at: Utc::now(),
     }))

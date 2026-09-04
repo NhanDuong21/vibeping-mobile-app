@@ -7,7 +7,8 @@ export function mergeEvents(
   const merged = new Map(current.map((event) => [event.id, event]));
   for (const event of incoming) {
     const previous = merged.get(event.id);
-    merged.set(event.id, previous?.isRead ? { ...event, isRead: true } : event);
+    const updated = { ...previous, ...event };
+    merged.set(event.id, previous?.isRead ? { ...updated, isRead: true } : updated);
   }
   return [...merged.values()].sort(
     (left, right) =>

@@ -10,6 +10,9 @@ struct EventDetailRow {
     event_type: String,
     title: String,
     summary: String,
+    result_excerpt: Option<String>,
+    result_text: Option<String>,
+    result_truncated: bool,
     project_name: String,
     occurred_at: DateTime<Utc>,
     is_read: bool,
@@ -19,7 +22,8 @@ struct EventDetailRow {
 impl ActivityStore {
     pub async fn event_detail(&self, id: &str) -> Result<Option<ActivityEventDetail>> {
         let row = sqlx::query_as::<_, EventDetailRow>(
-            "SELECT id, event_type, title, summary, project_name, occurred_at, is_read, turn_key \
+            "SELECT id, event_type, title, summary, project_name, occurred_at, is_read, turn_key, \
+             result_excerpt, result_text, result_truncated \
              FROM activity_events WHERE id = ?",
         )
         .bind(id)
@@ -39,11 +43,16 @@ impl ActivityStore {
                 event_type: row.event_type,
                 title: row.title,
                 summary: row.summary,
+                result_excerpt: row.result_excerpt,
                 project_name: row.project_name,
                 occurred_at: row.occurred_at,
                 is_read: row.is_read,
             },
             timeline,
+            result: row.result_text.map(|text| super::CodexResult {
+                text,
+                truncated: row.result_truncated,
+            }),
         }))
     }
 

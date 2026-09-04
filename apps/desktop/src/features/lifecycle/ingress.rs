@@ -75,6 +75,7 @@ mod tests {
             turn_key: "turn".into(),
             project_name: "project".into(),
             task_label: None,
+            result: None,
             signal: CodexSignal::Started,
             occurred_at: Utc::now(),
         }

@@ -169,7 +169,7 @@
                   }
                 </div>
                 <p class="mt-1 line-clamp-2 break-words text-[0.9375rem] leading-5">
-                  {{ taskTitle(event) }}
+                  {{ event.resultExcerpt || taskTitle(event) }}
                 </p>
                 <p class="mt-1 break-words text-xs leading-5 text-vibe-muted dark:text-vibe-sage">
                   {{ project(event) }} · {{ time(event.occurredAt) }}
@@ -207,7 +207,7 @@
     </div>
   } @else {
     <p class="py-6 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
-      Chưa có hoạt động nào. VibePing chỉ lưu tín hiệu cần thiết, không lưu prompt hay đầu ra Codex.
+      Chưa có hoạt động nào. Khi Codex trả lời xong, kết quả sẽ xuất hiện ở đây.
     </p>
   }
 </section>

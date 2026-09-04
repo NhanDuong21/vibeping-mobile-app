@@ -75,8 +75,17 @@ pub async fn execute(args: CodexIntegrationArgs) -> Result<String> {
 
 async fn ingest(source: &str, bytes: &[u8], data_dir: Option<PathBuf>) -> Result<()> {
     if let Some(mut payload) = normalize(source, bytes)? {
-        payload.task_label =
-            super::task_metadata::task_label(bytes, payload.signal, data_dir.clone()).await;
+        if let Some(metadata) = super::task_metadata::read(
+            bytes,
+            payload.signal,
+            payload.result.is_none(),
+            data_dir.clone(),
+        )
+        .await
+        {
+            payload.task_label = metadata.label;
+            payload.result = payload.result.or(metadata.result);
+        }
         let _ = deliver_ingress(payload, data_dir).await?;
     }
     Ok(())

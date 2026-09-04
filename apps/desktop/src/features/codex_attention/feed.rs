@@ -22,7 +22,7 @@ impl ActivityStore {
                 bail!("ACTIVITY_CURSOR_INVALID")
             }
             sqlx::query_as::<_, ActivityEvent>(
-                "SELECT id, event_type, title, summary, project_name, occurred_at, is_read \
+                "SELECT id, event_type, title, summary, result_excerpt, project_name, occurred_at, is_read \
                  FROM activity_events WHERE \
                  occurred_at < (SELECT occurred_at FROM activity_events WHERE id = ?) OR \
                  (occurred_at = (SELECT occurred_at FROM activity_events WHERE id = ?) AND id < ?) \
@@ -36,7 +36,7 @@ impl ActivityStore {
             .await
         } else {
             sqlx::query_as::<_, ActivityEvent>(
-                "SELECT id, event_type, title, summary, project_name, occurred_at, is_read \
+                "SELECT id, event_type, title, summary, result_excerpt, project_name, occurred_at, is_read \
                  FROM activity_events ORDER BY occurred_at DESC, id DESC LIMIT ?",
             )
             .bind(i64::from(limit) + 1)

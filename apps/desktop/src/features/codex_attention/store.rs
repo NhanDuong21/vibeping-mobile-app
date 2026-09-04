@@ -74,7 +74,7 @@ impl ActivityStore {
     pub async fn snapshot(&self) -> Result<ActivitySnapshot> {
         let current_work = self.current_work().await?;
         let events = sqlx::query_as::<_, ActivityEvent>(
-            "SELECT id, event_type, title, summary, project_name, occurred_at, is_read \
+            "SELECT id, event_type, title, summary, result_excerpt, project_name, occurred_at, is_read \
              FROM activity_events ORDER BY occurred_at DESC, id DESC LIMIT 50",
         )
         .fetch_all(&self.pool)

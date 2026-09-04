@@ -258,6 +258,7 @@ async fn insert_alert_event(
     }
     enqueue_pushes(transaction, &id, &dedupe, event_type, &copy, stage, policy).await?;
     Ok(Some(ActivityEvent {
+        result_excerpt: None,
         id,
         event_type: event_type.into(),
         title: title.into(),

@@ -1,4 +1,4 @@
-use super::{CodexSignal, installer};
+use super::{CodexResult, CodexSignal, installer, result_content};
 use crate::{
     RuntimeConfig,
     features::{lifecycle::RuntimePaths, notifications::safe_label},
@@ -8,11 +8,17 @@ use serde_json::{Value, json};
 use std::{path::PathBuf, time::Duration};
 use tokio::time::timeout;
 
-pub async fn task_label(
+pub struct TaskMetadata {
+    pub label: Option<String>,
+    pub result: Option<CodexResult>,
+}
+
+pub async fn read(
     bytes: &[u8],
     signal: CodexSignal,
+    needs_result: bool,
     data_dir: Option<PathBuf>,
-) -> Option<String> {
+) -> Option<TaskMetadata> {
     if !matches!(
         signal,
         CodexSignal::Started
@@ -34,9 +40,13 @@ pub async fn task_label(
     if id.is_empty() || id.len() > 256 || id.chars().any(char::is_control) {
         return None;
     }
-    let executable = installer::metadata_executable().ok()??;
+    let turn_id = ["turn_id", "turn-id"]
+        .iter()
+        .find_map(|key| value.get(key)?.as_str());
+    let include_result = signal == CodexSignal::Completed && needs_result && turn_id.is_some();
     // Best effort metadata must not block hooks (5 seconds) or change the work's lifecycle.
     timeout(Duration::from_secs(2), async {
+        let executable = installer::runtime_executable().ok()?;
         let mut server = CodexAppServer::start(&executable, Duration::from_secs(12))
             .await
             .ok()?;
@@ -44,12 +54,17 @@ pub async fn task_label(
             .request(
                 "thread/read",
                 Some(json!({
-                    "threadId": id, "includeTurns": false
+                    "threadId": id, "includeTurns": include_result
                 })),
             )
             .await
             .ok()?;
-        label_from_response(&response)
+        Some(TaskMetadata {
+            label: label_from_response(&response),
+            result: include_result
+                .then(|| result_content::from_thread(&response, turn_id?))
+                .flatten(),
+        })
     })
     .await
     .ok()
@@ -89,9 +104,10 @@ mod tests {
         paths.ensure().unwrap();
         paths.write_intent(false).unwrap();
         assert!(
-            task_label(
+            read(
                 br#"{"session_id":"fake"}"#,
                 CodexSignal::Completed,
+                true,
                 Some(temp.path().into())
             )
             .await

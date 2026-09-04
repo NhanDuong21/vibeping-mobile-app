@@ -38,7 +38,7 @@ describe('activity presentation', () => {
     const richer = { ...event, summary: 'Hoàn thiện trải nghiệm Hoạt động' };
     expect(activityTaskTitle(richer)).toBe('Hoàn thiện trải nghiệm Hoạt động');
     expect(activityDescription(richer)).toBe(
-      'Codex đã kết thúc lượt trả lời này. Mở Codex trên laptop để xem kết quả.',
+      'Codex đã kết thúc lượt trả lời này nhưng VibePing chưa có nội dung kết quả. Mở Codex trên laptop để xem.',
     );
     expect(activityTaskTitle({ ...event, summary: event.projectName })).toBe(
       'Công việc trong Codex',
@@ -54,7 +54,7 @@ describe('activity presentation', () => {
     expect(activityTaskTitle(unsafe)).toBe('Công việc trong Codex');
     expect(activityProject(unsafe)).toBe('vibeping-mobile-app');
     expect(activityDescription(unsafe)).toBe(
-      'Codex đã kết thúc lượt trả lời này. Mở Codex trên laptop để xem kết quả.',
+      'Codex đã kết thúc lượt trả lời này nhưng VibePing chưa có nội dung kết quả. Mở Codex trên laptop để xem.',
     );
   });
 

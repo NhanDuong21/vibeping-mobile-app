@@ -28,6 +28,7 @@ async fn latest_real_activity_replaces_sample_and_task_survives_database_reopen(
         turn_key: "turn".into(),
         project_name: "project".into(),
         task_label: Some("Sửa màn Cài đặt".into()),
+        result: None,
         signal: CodexSignal::Started,
         occurred_at: Utc::now(),
     };
@@ -72,6 +73,9 @@ async fn queued_and_retry_jobs_use_latest_privacy_and_match_preview() {
         turn_key: "turn".into(),
         project_name: "project".into(),
         task_label: Some("Sửa màn Cài đặt".into()),
+        result: crate::features::codex_attention::CodexResult::from_text(
+            "Đã sửa bộ lọc hoạt động.\nKiểm thử đã qua.",
+        ),
         signal: CodexSignal::Completed,
         occurred_at: Utc::now(),
     };
@@ -83,7 +87,7 @@ async fn queued_and_retry_jobs_use_latest_privacy_and_match_preview() {
         .fetch_one(&pool)
         .await
         .unwrap();
-    assert_eq!(body, "Sửa màn Cài đặt · project");
+    assert_eq!(body, "Đã sửa bộ lọc hoạt động. · project");
     for mode in ["private", "project", "standard"] {
         prefs.privacy_mode = mode.into();
         preferences.save(&prefs).await.unwrap();

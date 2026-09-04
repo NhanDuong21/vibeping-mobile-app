@@ -1,4 +1,4 @@
-use super::{ActivityEvent, CodexIngress};
+use super::{ActivityEvent, CodexIngress, CodexSignal};
 use crate::features::{
     notifications::{
         NotificationContext, dto::NotificationCopy, event_words, notification_copy, safe_label,
@@ -64,7 +64,16 @@ pub(super) async fn insert_event(
             .await?;
     let task = task.as_deref().and_then(safe_label);
     let summary = task.as_deref().unwrap_or(value.summary).to_owned();
-    let context = NotificationContext::Activity { task_label: task };
+    let result = ingress
+        .result
+        .as_ref()
+        .filter(|_| ingress.signal == CodexSignal::Completed)
+        .and_then(super::CodexResult::bounded);
+    let result_excerpt = result.as_ref().and_then(super::CodexResult::excerpt);
+    let context = NotificationContext::Activity {
+        task_label: task,
+        result_excerpt: result_excerpt.clone(),
+    };
     let copy = notification_copy(
         value.event_type,
         &ingress.project_name,
@@ -76,8 +85,8 @@ pub(super) async fn insert_event(
     let dedupe = format!("{}:{}", ingress.turn_key, value.event_type);
     let inserted = sqlx::query(
         "INSERT OR IGNORE INTO activity_events \
-         (id, dedupe_key, event_type, title, summary, project_name, turn_key, occurred_at, created_at, notification_context) \
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+         (id, dedupe_key, event_type, title, summary, project_name, turn_key, occurred_at, created_at, notification_context, \
+          result_excerpt, result_text, result_truncated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
     )
     .bind(&id)
     .bind(&dedupe)
@@ -89,11 +98,20 @@ pub(super) async fn insert_event(
     .bind(ingress.occurred_at)
     .bind(Utc::now())
     .bind(serde_json::to_string(&context)?)
+    .bind(&result_excerpt)
+    .bind(result.as_ref().map(|value| &value.text))
+    .bind(result.as_ref().is_some_and(|value| value.truncated))
     .execute(&mut **transaction)
     .await
     .context("Không lưu được hoạt động Codex")?;
     if inserted.rows_affected() == 0 {
-        return Ok(None);
+        return super::result_store::enrich_existing(
+            transaction,
+            &dedupe,
+            result.as_ref(),
+            &context,
+        )
+        .await;
     }
     if value.push {
         enqueue_pushes(transaction, &id, &dedupe, &copy, value, policy).await?;
@@ -103,6 +121,7 @@ pub(super) async fn insert_event(
         event_type: value.event_type.into(),
         title: value.title.into(),
         summary,
+        result_excerpt,
         project_name: ingress.project_name.clone(),
         occurred_at: ingress.occurred_at,
         is_read: false,

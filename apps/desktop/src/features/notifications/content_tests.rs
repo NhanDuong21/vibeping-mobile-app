@@ -36,6 +36,7 @@ fn each_signal_has_a_useful_title_and_three_distinct_privacy_levels() {
     ] {
         let context = NotificationContext::Activity {
             task_label: Some("Hoàn thiện màn Hoạt động".into()),
+            result_excerpt: None,
         };
         let copies = ["private", "project", "standard"].map(|mode| {
             notification_copy(
@@ -77,6 +78,7 @@ fn missing_or_unsafe_metadata_falls_back_without_fabricating_work() {
     ] {
         let context = NotificationContext::Activity {
             task_label: task.map(str::to_owned),
+            result_excerpt: None,
         };
         let copy = notification_copy(
             "codex.attention.permission_required",
@@ -102,6 +104,7 @@ fn missing_or_unsafe_metadata_falls_back_without_fabricating_work() {
 fn project_appears_only_once_and_fallback_names_where_to_view_results() {
     let context = NotificationContext::Activity {
         task_label: Some("Sửa VibePing".into()),
+        result_excerpt: None,
     };
     let copy = notification_copy(
         "codex.turn.completed",
