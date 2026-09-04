@@ -1,6 +1,20 @@
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
+#[derive(Clone, Debug, PartialEq, Serialize, ToSchema)]
+pub struct NotificationCopy {
+    pub title: String,
+    pub body: String,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct NotificationPreview {
+    pub private: NotificationCopy,
+    pub project: NotificationCopy,
+    pub standard: NotificationCopy,
+    pub source: &'static str,
+}
+
 #[derive(Debug, Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct PublicKeyResponse {

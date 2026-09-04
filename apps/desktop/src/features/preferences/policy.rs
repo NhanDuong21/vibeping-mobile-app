@@ -35,14 +35,6 @@ impl DeliveryPolicy {
         Some(now + Duration::minutes(i64::from(until_end)))
     }
 
-    pub fn push_body(&self, project: &str, summary: &str) -> String {
-        match self.privacy_mode.as_str() {
-            "private" => "Mở VibePing để xem chi tiết.".into(),
-            "project" => format!("{project} · Mở VibePing để xem chi tiết."),
-            _ => format!("{project} · {summary}"),
-        }
-    }
-
     fn event_enabled(&self, event_type: &str) -> bool {
         match event_type {
             "codex.turn.completed" => self.notify_completion,

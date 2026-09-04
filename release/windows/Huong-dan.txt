@@ -1,4 +1,4 @@
-VibePing 1.0.0-rc.3 — hướng dẫn cá nhân
+VibePing 1.0.0-rc.4 — hướng dẫn cá nhân
 ========================================
 
 Yêu cầu

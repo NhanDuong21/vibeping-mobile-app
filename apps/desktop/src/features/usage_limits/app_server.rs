@@ -1,21 +1,11 @@
-use std::{path::Path, process::Stdio, time::Duration};
-
+use crate::infrastructure::codex_app_server::CodexAppServer;
 use anyhow::{Context, Result, bail};
 use serde::Deserialize;
 use serde_json::{Value, json};
-use tokio::{
-    io::AsyncReadExt,
-    process::{Child, ChildStdin, Command},
-};
-
-use super::protocol::JsonLineClient;
-
-type Client = JsonLineClient<ChildStdin>;
+use std::path::Path;
 
 pub struct AppServerSession {
-    _child: Child,
-    client: Client,
-    next_id: u64,
+    server: CodexAppServer,
 }
 
 #[derive(Debug, Deserialize)]
@@ -27,67 +17,22 @@ struct AccountReadResponse {
 
 impl AppServerSession {
     pub async fn start(executable: &Path) -> Result<Self> {
-        let mut command = Command::new(executable);
-        command
-            .arg("app-server")
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .kill_on_drop(true);
-        hide_window(&mut command);
-        let mut child = command.spawn().context("CODEX_APP_SERVER_NOT_FOUND")?;
-        let stdin = child.stdin.take().context("APP_SERVER_STDIN_MISSING")?;
-        let stdout = child.stdout.take().context("APP_SERVER_STDOUT_MISSING")?;
-        let mut stderr = child.stderr.take().context("APP_SERVER_STDERR_MISSING")?;
-        tokio::spawn(async move {
-            let mut discard = Vec::new();
-            let _ = (&mut stderr).take(65_536).read_to_end(&mut discard).await;
-        });
-        let mut session = Self {
-            _child: child,
-            client: JsonLineClient::new(stdout, stdin, Duration::from_secs(12)),
-            next_id: 1,
-        };
-        session.initialize().await?;
-        session.require_supported_account().await?;
-        Ok(session)
+        let mut server = CodexAppServer::start(executable).await?;
+        parse_account(
+            server
+                .request("account/read", Some(json!({ "refreshToken": false })))
+                .await?,
+        )?;
+        Ok(Self { server })
     }
 
     pub async fn read_limits(&mut self) -> Result<Value> {
-        self.request("account/rateLimits/read", None).await
+        self.server.request("account/rateLimits/read", None).await
     }
 
     pub async fn next_notification(&mut self) -> Result<bool> {
-        let message = self.client.read_message().await?;
+        let message = self.server.read_message().await?;
         Ok(message.get("method").and_then(Value::as_str) == Some("account/rateLimits/updated"))
-    }
-
-    async fn initialize(&mut self) -> Result<()> {
-        self.request(
-            "initialize",
-            Some(json!({
-                "clientInfo": {
-                    "name": "vibeping",
-                    "title": "VibePing",
-                    "version": env!("CARGO_PKG_VERSION")
-                }
-            })),
-        )
-        .await?;
-        self.client.notify("initialized", None).await
-    }
-
-    async fn require_supported_account(&mut self) -> Result<()> {
-        let value = self
-            .request("account/read", Some(json!({ "refreshToken": false })))
-            .await?;
-        parse_account(value)
-    }
-
-    async fn request(&mut self, method: &str, params: Option<Value>) -> Result<Value> {
-        let id = self.next_id;
-        self.next_id += 1;
-        self.client.request(id, method, params).await
     }
 }
 
@@ -109,16 +54,6 @@ fn parse_account(value: Value) -> Result<()> {
     }
     Ok(())
 }
-
-#[cfg(windows)]
-fn hide_window(command: &mut Command) {
-    use std::os::windows::process::CommandExt;
-    use windows_sys::Win32::System::Threading::CREATE_NO_WINDOW;
-    command.as_std_mut().creation_flags(CREATE_NO_WINDOW);
-}
-
-#[cfg(not(windows))]
-fn hide_window(_command: &mut Command) {}
 
 #[cfg(test)]
 mod tests {

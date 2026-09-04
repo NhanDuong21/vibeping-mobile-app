@@ -55,7 +55,7 @@ pnpm run package:windows
 pnpm run e2e:release
 ```
 
-The ignored output is `artifacts/VibePing-Windows-x64-v1.0.0-rc.3/`, its ZIP, and its SHA-256 file. The six-file package needs no Node.js, pnpm, Rust, or Cargo installation on the user machine. See [RC3 release notes](docs/release-1.0.0-rc.3.md) for last-known Codex limits when disconnected and iPhone update behavior.
+The ignored output is `artifacts/VibePing-Windows-x64-v1.0.0-rc.4/`, its ZIP, and its SHA-256 file. The six-file package needs no Node.js, pnpm, Rust, or Cargo installation on the user machine. See [RC4 release notes](docs/release-1.0.0-rc.4.md) for useful Lock Screen notifications, distinct privacy modes, and the iPhone update.
 
 Control the production process explicitly (there is no auto-start):
 

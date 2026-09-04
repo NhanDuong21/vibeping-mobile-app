@@ -8,6 +8,8 @@ pub struct CodexIngress {
     pub session_key: String,
     pub turn_key: String,
     pub project_name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub task_label: Option<String>,
     pub signal: CodexSignal,
     pub occurred_at: DateTime<Utc>,
 }

@@ -141,7 +141,7 @@ async fn notification_toggles_and_private_mode_change_real_delivery() {
     .fetch_one(&pool)
     .await
     .unwrap();
-    assert_eq!(project_body, "Dự án riêng · Mở VibePing để xem chi tiết.");
+    assert_eq!(project_body, "Dự án riêng");
 }
 
 #[tokio::test]
@@ -202,6 +202,7 @@ async fn complete_turn(pool: &sqlx::SqlitePool, turn: &str) {
                 session_key: "session".into(),
                 turn_key: turn.into(),
                 project_name: "Dự án riêng".into(),
+                task_label: None,
                 signal,
                 occurred_at: Utc::now(),
             })

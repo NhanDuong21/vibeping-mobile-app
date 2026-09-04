@@ -164,6 +164,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/notifications/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["preview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/pairing/claim": {
         parameters: {
             query?: never;
@@ -424,12 +440,22 @@ export interface components {
             status: string;
             version: string;
         };
+        NotificationCopy: {
+            body: string;
+            title: string;
+        };
         NotificationPreferences: {
             allowance: boolean;
             completion: boolean;
             finalFailure: boolean;
             permission: boolean;
             preview: boolean;
+        };
+        NotificationPreview: {
+            private: components["schemas"]["NotificationCopy"];
+            project: components["schemas"]["NotificationCopy"];
+            source: string;
+            standard: components["schemas"]["NotificationCopy"];
         };
         PairingClaimRequest: {
             code: string;
@@ -751,6 +777,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+        };
+    };
+    preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Latest notification in each privacy mode */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationPreview"];
                 };
             };
         };

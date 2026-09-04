@@ -67,6 +67,10 @@ pub fn router(state: Arc<ApplicationState>) -> Router {
             delete(notifications::http::unsubscribe),
         )
         .route("/api/v1/push/test", post(notifications::http::test_push))
+        .route(
+            "/api/v1/notifications/preview",
+            get(notifications::preview_http::preview),
+        )
         .fallback(assets::serve)
         .layer(DefaultBodyLimit::max(32 * 1024))
         .layer(axum::middleware::from_fn(headers::apply))

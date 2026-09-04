@@ -7,7 +7,8 @@ use tokio::io::{AsyncWriteExt, duplex};
 use crate::features::preferences::PreferenceStore;
 use crate::infrastructure::database;
 
-use super::{UsageLimitStore, normalize::normalize_response, protocol::JsonLineClient};
+use super::{UsageLimitStore, normalize::normalize_response};
+use crate::infrastructure::codex_app_server::JsonLineClient;
 
 fn response(windows: Value) -> Value {
     json!({

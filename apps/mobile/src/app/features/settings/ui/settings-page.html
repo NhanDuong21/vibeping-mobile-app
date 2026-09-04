@@ -210,67 +210,13 @@
         }
       </section>
 
-      <section
-        class="mt-8 border-t border-vibe-rule pt-6 dark:border-vibe-rule-dark"
-        aria-labelledby="privacy-heading"
-      >
-        <h2 id="privacy-heading" class="text-[1.375rem] font-bold tracking-[-0.025em]">
-          Nội dung trên Màn hình khóa
-        </h2>
-        <div class="mt-3 grid grid-cols-3 gap-2" role="group" aria-label="Mức riêng tư">
-          <button
-            type="button"
-            class="min-h-12 rounded-lg border border-vibe-rule px-2 text-xs font-bold dark:border-vibe-rule-dark"
-            [class]="
-              draft.privacyMode === 'private'
-                ? 'bg-vibe-mint-soft text-vibe-green! dark:bg-vibe-mint dark:text-vibe-ink!'
-                : ''
-            "
-            [attr.aria-pressed]="draft.privacyMode === 'private'"
-            (click)="preferences.setPrivacyMode('private')"
-          >
-            Chỉ báo
-          </button>
-          <button
-            type="button"
-            class="min-h-12 rounded-lg border border-vibe-rule px-2 text-xs font-bold dark:border-vibe-rule-dark"
-            [class]="
-              draft.privacyMode === 'project'
-                ? 'bg-vibe-mint-soft text-vibe-green! dark:bg-vibe-mint dark:text-vibe-ink!'
-                : ''
-            "
-            [attr.aria-pressed]="draft.privacyMode === 'project'"
-            (click)="preferences.setPrivacyMode('project')"
-          >
-            Tên dự án
-          </button>
-          <button
-            type="button"
-            class="min-h-12 rounded-lg border border-vibe-rule px-2 text-xs font-bold dark:border-vibe-rule-dark"
-            [class]="
-              draft.privacyMode === 'standard'
-                ? 'bg-vibe-mint-soft text-vibe-green! dark:bg-vibe-mint dark:text-vibe-ink!'
-                : ''
-            "
-            [attr.aria-pressed]="draft.privacyMode === 'standard'"
-            (click)="preferences.setPrivacyMode('standard')"
-          >
-            Hiện tóm tắt
-          </button>
-        </div>
-        <div
-          class="mt-3 rounded-xl border border-vibe-rule bg-vibe-surface px-4 py-3 dark:border-vibe-rule-dark dark:bg-vibe-surface-dark"
-          aria-label="Xem trước thông báo"
-        >
-          <p class="text-xs font-bold">VibePing</p>
-          <p class="mt-1 text-sm leading-5">{{ previewLine(draft.privacyMode) }}</p>
-          @if (draft.privacyMode === 'standard') {
-            <p class="mt-0.5 text-xs text-vibe-muted dark:text-vibe-sage">
-              Codex đã hoàn tất thay đổi trên laptop.
-            </p>
-          }
-        </div>
-      </section>
+      <app-notification-privacy
+        [mode]="draft.privacyMode"
+        [preview]="notificationPreview.snapshot()"
+        [state]="notificationPreview.state()"
+        (changed)="preferences.setPrivacyMode($event)"
+        (retry)="notificationPreview.load()"
+      />
 
       <section
         class="mt-8 border-t border-vibe-rule pt-6 dark:border-vibe-rule-dark"

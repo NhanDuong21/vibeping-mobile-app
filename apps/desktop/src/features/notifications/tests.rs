@@ -12,7 +12,7 @@ const P256DH: &str =
     "BLn9b-VR0ca83knDNZ32dCHGyjJp-1riX9ZTN40MqV8K_LpQmLqxC_DoHvqvFXO_nGdAB4W9dogZb_sM-uV4JbY";
 const AUTH: &str = "_ordMnz7uTCmrpBTeUV4Bw";
 
-async fn fixture() -> (tempfile::TempDir, NotificationStore, sqlx::SqlitePool) {
+pub(super) async fn fixture() -> (tempfile::TempDir, NotificationStore, sqlx::SqlitePool) {
     let temp = tempdir().unwrap();
     let pool = database::connect(&temp.path().join("notifications.sqlite3"))
         .await
@@ -21,7 +21,7 @@ async fn fixture() -> (tempfile::TempDir, NotificationStore, sqlx::SqlitePool) {
     (temp, store, pool)
 }
 
-fn registration(installation_id: String) -> SubscriptionRegistrationRequest {
+pub(super) fn registration(installation_id: String) -> SubscriptionRegistrationRequest {
     SubscriptionRegistrationRequest {
         installation_id,
         display_mode: "standalone".into(),

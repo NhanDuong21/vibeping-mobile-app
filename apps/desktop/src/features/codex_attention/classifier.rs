@@ -33,6 +33,7 @@ pub fn normalize(source: &str, bytes: &[u8]) -> Result<Option<CodexIngress>> {
         session_key: digest(session),
         turn_key: digest(&format!("{session}:{turn}")),
         project_name: project_name(cwd),
+        task_label: None,
         signal,
         occurred_at: Utc::now(),
     }))

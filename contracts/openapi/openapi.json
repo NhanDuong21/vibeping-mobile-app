@@ -7,7 +7,7 @@
       "name": "MIT OR Apache-2.0",
       "identifier": "MIT OR Apache-2.0"
     },
-    "version": "1.0.0-rc.3"
+    "version": "1.0.0-rc.4"
   },
   "paths": {
     "/api/v1/activity": {
@@ -254,6 +254,26 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/notifications/preview": {
+      "get": {
+        "tags": [
+          "preview_http"
+        ],
+        "operationId": "preview",
+        "responses": {
+          "200": {
+            "description": "Latest notification in each privacy mode",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreview"
                 }
               }
             }
@@ -932,6 +952,21 @@
           }
         }
       },
+      "NotificationCopy": {
+        "type": "object",
+        "required": [
+          "title",
+          "body"
+        ],
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
       "NotificationPreferences": {
         "type": "object",
         "required": [
@@ -956,6 +991,29 @@
           },
           "preview": {
             "type": "boolean"
+          }
+        }
+      },
+      "NotificationPreview": {
+        "type": "object",
+        "required": [
+          "private",
+          "project",
+          "standard",
+          "source"
+        ],
+        "properties": {
+          "private": {
+            "$ref": "#/components/schemas/NotificationCopy"
+          },
+          "project": {
+            "$ref": "#/components/schemas/NotificationCopy"
+          },
+          "source": {
+            "type": "string"
+          },
+          "standard": {
+            "$ref": "#/components/schemas/NotificationCopy"
           }
         }
       },

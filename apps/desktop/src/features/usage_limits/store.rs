@@ -4,6 +4,9 @@ use sqlx::{Sqlite, SqlitePool, Transaction};
 use uuid::Uuid;
 
 use crate::features::codex_attention::ActivityEvent;
+use crate::features::notifications::{
+    NotificationContext, dto::NotificationCopy, notification_copy,
+};
 use crate::features::preferences::policy::{self, DeliveryPolicy};
 
 use super::model::{NormalizedLimits, NormalizedWindow, UsageLimitWindow, UsageLimitsSnapshot};
@@ -222,10 +225,22 @@ async fn insert_alert_event(
     let id = Uuid::new_v4().to_string();
     let dedupe = format!("usage:{}:{}:{stage}", window.window_key, window.resets_at);
     let summary = format!("{} còn {:.0}%.", window.label, window.remaining_percent);
+    let context = NotificationContext::Allowance {
+        label: window.label.clone(),
+        remaining_percent: window.remaining_percent,
+        resets_at: window.resets_at,
+    };
+    let copy = notification_copy(
+        event_type,
+        "Codex",
+        Some(&context),
+        &policy.privacy_mode,
+        occurred_at,
+    );
     let inserted = sqlx::query(
         "INSERT OR IGNORE INTO activity_events \
-         (id, dedupe_key, event_type, title, summary, project_name, occurred_at, created_at) \
-         VALUES (?, ?, ?, ?, ?, 'Codex', ?, ?)",
+         (id, dedupe_key, event_type, title, summary, project_name, occurred_at, created_at, notification_context) \
+         VALUES (?, ?, ?, ?, ?, 'Codex', ?, ?, ?)",
     )
     .bind(&id)
     .bind(&dedupe)
@@ -234,13 +249,14 @@ async fn insert_alert_event(
     .bind(&summary)
     .bind(occurred_at)
     .bind(Utc::now())
+    .bind(serde_json::to_string(&context)?)
     .execute(&mut **transaction)
     .await
     .context("Không lưu được hoạt động hạn mức")?;
     if inserted.rows_affected() == 0 {
         return Ok(None);
     }
-    enqueue_pushes(transaction, &id, &dedupe, event_type, title, stage, policy).await?;
+    enqueue_pushes(transaction, &id, &dedupe, event_type, &copy, stage, policy).await?;
     Ok(Some(ActivityEvent {
         id,
         event_type: event_type.into(),
@@ -257,7 +273,7 @@ async fn enqueue_pushes(
     event_id: &str,
     dedupe: &str,
     event_type: &str,
-    title: &str,
+    copy: &NotificationCopy,
     stage: &str,
     policy: &DeliveryPolicy,
 ) -> Result<()> {
@@ -276,13 +292,14 @@ async fn enqueue_pushes(
             "INSERT OR IGNORE INTO notification_jobs \
              (id, subscription_id, dedupe_key, kind, title, body, target_url, tag, state, \
               attempt_count, next_attempt_at, expires_at, created_at, event_id) \
-             VALUES (?, ?, ?, 'allowance', ?, 'Mở VibePing để xem chi tiết.', '/usage-limits', \
+             VALUES (?, ?, ?, 'allowance', ?, ?, '/usage-limits', \
               ?, 'pending', 0, ?, ?, ?, ?)",
         )
         .bind(Uuid::new_v4().to_string())
         .bind(subscription)
         .bind(dedupe)
-        .bind(title)
+        .bind(&copy.title)
+        .bind(&copy.body)
         .bind(format!("vibeping-{event_type}"))
         .bind(send_at)
         .bind(Utc::now() + Duration::hours(if stage == "exhausted" { 12 } else { 8 }))

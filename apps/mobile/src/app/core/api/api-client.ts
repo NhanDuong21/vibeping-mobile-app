@@ -21,6 +21,8 @@ export type UsageLimitsSnapshotDto = components['schemas']['UsageLimitsSnapshot'
 export type ComputerStatusDto = components['schemas']['ComputerStatus'];
 export type PreferencesDto = components['schemas']['Preferences'];
 export type DiagnosticsDto = components['schemas']['DiagnosticsReport'];
+export type NotificationPreviewDto = components['schemas']['NotificationPreview'];
+export type NotificationCopyDto = components['schemas']['NotificationCopy'];
 
 @Injectable({ providedIn: 'root' })
 export class ApiClient {
@@ -78,6 +80,10 @@ export class ApiClient {
 
   preferences(): Observable<PreferencesDto> {
     return this.#http.get<PreferencesDto>('/api/v1/preferences');
+  }
+
+  notificationPreview(): Observable<NotificationPreviewDto> {
+    return this.#http.get<NotificationPreviewDto>('/api/v1/notifications/preview');
   }
 
   savePreferences(request: PreferencesDto, csrfToken: string): Observable<PreferencesDto> {

@@ -60,6 +60,7 @@ async fn configured_codex_stays_in_review_until_a_real_hook_signal_arrives() {
             session_key: "session".into(),
             turn_key: "turn".into(),
             project_name: "project".into(),
+            task_label: None,
             signal: CodexSignal::Progressed,
             occurred_at: Utc::now(),
         })

@@ -11,6 +11,7 @@ fn ingress(turn: &str, signal: CodexSignal) -> CodexIngress {
         session_key: "hashed-session".into(),
         turn_key: turn.into(),
         project_name: "vibeping".into(),
+        task_label: None,
         signal,
         occurred_at: Utc::now(),
     }

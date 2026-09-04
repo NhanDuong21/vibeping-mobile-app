@@ -10,7 +10,7 @@ impl NotificationStore {
         let now = Utc::now();
         let lease = now + Duration::seconds(30);
         let mut transaction = self.pool.begin().await.context("Không mở được hàng đợi")?;
-        let job: Option<DeliveryJob> = sqlx::query_as(
+        let mut job: Option<DeliveryJob> = sqlx::query_as(
             "SELECT j.id, p.endpoint, p.p256dh, p.auth, j.title, j.body, j.target_url, j.tag, \
              j.attempt_count, j.expires_at FROM notification_jobs j \
              JOIN push_subscriptions p ON p.id = j.subscription_id \
@@ -23,7 +23,11 @@ impl NotificationStore {
         .fetch_optional(&mut *transaction)
         .await
         .context("Không đọc được hàng đợi")?;
-        if let Some(ref value) = job {
+        if let Some(ref mut value) = job {
+            if let Some(copy) = super::preview::copy_for_job(&mut transaction, &value.id).await? {
+                value.title = copy.title;
+                value.body = copy.body;
+            }
             sqlx::query(
                 "UPDATE notification_jobs SET state = 'leased', lease_until = ? WHERE id = ?",
             )

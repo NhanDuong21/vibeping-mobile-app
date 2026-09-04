@@ -154,6 +154,10 @@ pub(crate) fn runtime_executable() -> Result<PathBuf> {
     Ok(resolve_codex(None)?.path)
 }
 
+pub(super) fn metadata_executable() -> Result<Option<PathBuf>> {
+    Ok(read_state(&local_paths()?)?.map(|state| state.codex_path))
+}
+
 fn resolve_codex(override_path: Option<PathBuf>) -> Result<CodexExecutable> {
     let candidates = match override_path {
         Some(path) => vec![(path, "chỉ định".to_string())],

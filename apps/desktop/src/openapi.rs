@@ -8,11 +8,11 @@ use crate::features::{
     computer::{ComputerStatus, DiagnosticCheck, DiagnosticsReport, http as computer_http},
     notifications::{
         dto::{
-            ActionResponse, BrowserSubscription, PublicKeyResponse, SubscriptionKeys,
-            SubscriptionRegistrationRequest, SubscriptionResponse, TestPushRequest,
-            TestPushResponse,
+            ActionResponse, BrowserSubscription, NotificationCopy, NotificationPreview,
+            PublicKeyResponse, SubscriptionKeys, SubscriptionRegistrationRequest,
+            SubscriptionResponse, TestPushRequest, TestPushResponse,
         },
-        http as notifications_http,
+        http as notifications_http, preview_http,
     },
     pairing::{
         dto::{PairingClaimRequest, PairingClaimResponse, PairingStatusResponse},
@@ -28,7 +28,7 @@ use crate::features::{
 
 #[derive(OpenApi)]
 #[openapi(
-    info(title = "VibePing API", version = "1.0.0-rc.3"),
+    info(title = "VibePing API", version = "1.0.0-rc.4"),
     paths(
         http::health,
         http::bootstrap,
@@ -50,7 +50,8 @@ use crate::features::{
         notifications_http::public_key,
         notifications_http::subscribe,
         notifications_http::unsubscribe,
-        notifications_http::test_push
+        notifications_http::test_push,
+        preview_http::preview
     ),
     components(schemas(
         HealthResponse,
@@ -68,6 +69,8 @@ use crate::features::{
         TestPushRequest,
         TestPushResponse,
         ActionResponse,
+        NotificationCopy,
+        NotificationPreview,
         ActivityEvent,
         ActivityEventDetail,
         ActivityTimelineStage,
