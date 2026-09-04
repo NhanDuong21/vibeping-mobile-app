@@ -27,9 +27,11 @@ Package: `VibePing-Windows-x64-v1.1.1.zip`.
 
 SHA-256: `c98568b1c86aad87236c7b93c612d98437ac8685e3853a0734d3dae9c51a0107`.
 
-The existing 1.1.0 executable and guide were backed up, and its recovery command created a protected data bundle after a graceful stop. Automatic approval review then rejected replacement of the installed executable and also rejected restarting the existing host, returning only `blocked by policy`. Those rejected commands did not execute. The installed binary remains 1.1.0 and the host was stopped at the last confirmed state; installation/startup activation requires the owner's local action. Publishing this tested artifact does not claim that the installed host already runs 1.1.1.
+The existing 1.1.0 executable and guide were backed up, and its recovery command created a protected data bundle after a graceful stop. Installation initially encountered an automatic approval block. Following the owner's explicit authorization, version 1.1.1 was installed at the existing path and started successfully. Local health, private HTTPS health and the service-worker manifest all report 1.1.1.
 
-Read-only SHA-256 checks verified all seven stored final answers (including excerpts and truncation flags), the owner record, two subscription identities and the VAPID identity unchanged. The installed binary matches its 1.1.0 backup. Private Tailscale Serve configuration is unchanged and Funnel remains off. Protected backups and runtime evidence stay outside Git.
+Always ready is enabled on the installed host. Its live status confirms a healthy host, an active tray and sign-in startup enabled. The owned HKCU Run entry was checked against the GUI-subsystem launcher at the stable installation path. This verifies the configured startup target, not a physical Windows sign-out/sign-in.
+
+Read-only SHA-256 checks after startup verified all seven stored final answers (including excerpts and truncation flags), the owner record, two subscription identities and the VAPID identity unchanged. Installed release files match the published 1.1.1 package. Private Tailscale Serve configuration is unchanged and Funnel remains off. Protected backups and runtime evidence stay outside Git.
 
 ## Acceptance boundary
 
