@@ -140,6 +140,7 @@ describe('ActivityStore', () => {
       previewReady: false,
       startedAt: '2026-09-02T00:03:00Z',
       updatedAt: '2026-09-02T00:03:00Z',
+      freshUntil: new Date(Date.now() + 120_000).toISOString(),
     };
 
     listeners.get('work')?.(new MessageEvent('work', { data: JSON.stringify(currentWork) }));

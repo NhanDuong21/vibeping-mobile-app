@@ -172,6 +172,7 @@ async fn stop(paths: RuntimePaths) -> Result<String> {
     if !ipc::wait_until_stopped(&metadata.api_address, Duration::from_secs(12)).await {
         bail!("VibePing chưa dừng an toàn trong thời gian chờ")
     }
+    wait_for_instance_release(&paths).await?;
     paths.clear_metadata()?;
     Ok("VibePing đã dừng an toàn".into())
 }
@@ -180,6 +181,17 @@ async fn restart(options: HostOptions) -> Result<String> {
     let paths = paths_for(options.data_dir.clone())?;
     let _ = stop(paths).await?;
     start(options).await
+}
+
+async fn wait_for_instance_release(paths: &RuntimePaths) -> Result<()> {
+    let deadline = Instant::now() + Duration::from_secs(5);
+    while Instant::now() < deadline {
+        if InstanceLock::acquire(&paths.lock_file()).is_ok() {
+            return Ok(());
+        }
+        sleep(Duration::from_millis(100)).await;
+    }
+    bail!("VibePing chưa đóng xong kết nối; hãy thử dừng lại")
 }
 
 async fn status(paths: RuntimePaths) -> Result<String> {

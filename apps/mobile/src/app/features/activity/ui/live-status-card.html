@@ -15,6 +15,7 @@
         [class.vibe-active-pulse]="activity.motionActive()"
         [class.bg-vibe-amber]="
           activity.readiness().kind === 'checking' ||
+          activity.readiness().kind === 'unconfirmed' ||
           activity.readiness().kind === 'preview' ||
           activity.readiness().kind === 'codexSetup' ||
           activity.readiness().kind === 'codexReview'
@@ -45,7 +46,8 @@
         activity.readiness().kind === 'working' ||
         activity.readiness().kind === 'waiting' ||
         activity.readiness().kind === 'failed' ||
-        activity.readiness().kind === 'preview'
+        activity.readiness().kind === 'preview' ||
+        activity.readiness().kind === 'unconfirmed'
       ) {
         <div class="mt-4 border-t border-vibe-rule pt-4 dark:border-vibe-rule-dark">
           <p class="break-words text-base font-bold leading-6">{{ workTitle() }}</p>
@@ -55,7 +57,9 @@
           <div
             class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-vibe-muted dark:text-vibe-sage"
           >
-            <span>{{ elapsed() }}</span>
+            @if (activity.readiness().kind !== 'unconfirmed') {
+              <span>{{ elapsed() }}</span>
+            }
             <span>Tín hiệu gần nhất · {{ lastSignal() }}</span>
           </div>
         </div>

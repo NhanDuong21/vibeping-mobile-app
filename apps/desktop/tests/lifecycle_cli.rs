@@ -30,13 +30,16 @@ fn lifecycle_recovers_stale_state_and_survives_restart_and_crash() {
     );
     assert_success(run(binary, &data_dir, port, "status"), "VibePing đang chạy");
     assert_success(run(binary, &data_dir, port, "doctor"), "Funnel: đang tắt");
-    let stream = open_sse(port);
+    let mut stream = open_sse(port);
     let stop_binary = binary.to_owned();
     let stop_data = data_dir.clone();
     let stopping = thread::spawn(move || run(&stop_binary, &stop_data, port, "stop"));
-    thread::sleep(Duration::from_millis(300));
-    drop(stream);
     assert_success(stopping.join().unwrap(), "VibePing đã dừng an toàn");
+    let mut remaining = Vec::new();
+    stream
+        .read_to_end(&mut remaining)
+        .expect("server closes SSE without waiting for the phone");
+    drop(stream);
     assert_success(run(binary, &data_dir, port, "stop"), "VibePing đã dừng");
 
     assert_success(

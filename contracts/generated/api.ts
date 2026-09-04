@@ -385,6 +385,8 @@ export interface components {
             privateConnection: string;
         };
         CurrentWork: {
+            /** Format: date-time */
+            freshUntil: string;
             lastTestState: string;
             previewReady: boolean;
             projectName: string;

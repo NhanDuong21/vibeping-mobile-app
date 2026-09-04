@@ -9,6 +9,7 @@ const work: CurrentWorkDto = {
   previewReady: false,
   startedAt: '2026-09-04T00:00:00Z',
   updatedAt: '2026-09-04T00:01:00Z',
+  freshUntil: '2026-09-04T00:03:00Z',
 };
 const completion: ActivityEventDto = {
   id: 'event',
@@ -21,6 +22,35 @@ const completion: ActivityEventDto = {
 };
 
 describe('activity readiness', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-09-04T00:02:00Z'));
+  });
+  afterEach(() => vi.useRealTimers());
+
+  it('never labels expired or unidentified cached work as working or completed', () => {
+    for (const current of [
+      work,
+      { ...work, state: 'waiting' },
+      { ...work, previewReady: true },
+      { ...work, lastTestState: 'failed' },
+      { ...work, freshUntil: '' },
+    ]) {
+      expect(
+        readinessView(
+          'ready',
+          true,
+          connection,
+          current,
+          completion,
+          new Date('2026-09-04T00:03:00Z'),
+        ).kind,
+      ).toBe('unconfirmed');
+    }
+    expect(
+      readinessView('ready', true, connection, { ...work, state: 'unconfirmed' }, null).kind,
+    ).toBe('unconfirmed');
+  });
   it('covers every live state without showing leave-laptop copy early', () => {
     expect(readinessView('ready', true, connection, null, null).kind).toBe('ready');
     expect(readinessView('ready', false, connection, null, null).kind).toBe('checking');

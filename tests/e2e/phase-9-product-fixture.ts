@@ -92,6 +92,7 @@ export async function routeProduct(page: Page): Promise<void> {
           previewReady: false,
           startedAt: "2026-09-02T00:50:00Z",
           updatedAt: "2026-09-02T01:00:00Z",
+          freshUntil: new Date(Date.now() + 120_000).toISOString(),
         },
         usageLimits: usage,
       },

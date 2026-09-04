@@ -8,6 +8,7 @@ export type ReadinessKind =
   | 'failed'
   | 'preview'
   | 'working'
+  | 'unconfirmed'
   | 'checking'
   | 'completed'
   | 'codexSetup'
@@ -39,6 +40,13 @@ export function readinessView(
   ) {
     return READINESS.offline;
   }
+  if (
+    current &&
+    (current.state === 'unconfirmed' ||
+      !Number.isFinite(Date.parse(current.freshUntil)) ||
+      now.getTime() >= Date.parse(current.freshUntil))
+  )
+    return READINESS.unconfirmed;
   if (current?.state === 'waiting') return READINESS.waiting;
   if (current?.lastTestState === 'failed') return READINESS.failed;
   if (current?.previewReady) return READINESS.preview;
@@ -93,6 +101,13 @@ const READINESS: Record<ReadinessKind, ReadinessView> = {
     label: 'Đang làm việc',
     title: 'Codex đang làm việc',
     detail: 'VibePing đang theo dõi tín hiệu thật từ laptop.',
+  },
+  unconfirmed: {
+    kind: 'unconfirmed',
+    label: 'Chưa xác nhận',
+    title: 'Chưa rõ trạng thái Codex',
+    detail:
+      'Chưa có tín hiệu mới. Mở Codex trên laptop để kiểm tra; VibePing chưa xác nhận công việc đã kết thúc.',
   },
   checking: {
     kind: 'checking',

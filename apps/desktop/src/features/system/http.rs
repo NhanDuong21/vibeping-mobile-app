@@ -93,10 +93,14 @@ pub async fn stream(
     let mut activity = state.activity_events.subscribe();
     let mut work = state.work_events.subscribe();
     let mut usage = state.usage_events.subscribe();
+    let mut stopping = state.stopping.subscribe();
     let events = async_stream::stream! {
+        if *stopping.borrow() { return; }
         yield Ok(Event::default().event("connected").data("{\"type\":\"system.connected\"}"));
         loop {
             tokio::select! {
+                biased;
+                _ = stopping.changed() => break,
                 result = activity.recv() => if let Ok(data) = result {
                     yield Ok(Event::default().event("activity").data(data));
                 },

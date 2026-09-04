@@ -29,6 +29,7 @@
         [class.vibe-active-pulse]="activity.motionActive()"
         [class.bg-vibe-amber]="
           activity.readiness().kind === 'checking' ||
+          activity.readiness().kind === 'unconfirmed' ||
           activity.readiness().kind === 'preview' ||
           activity.readiness().kind === 'codexSetup' ||
           activity.readiness().kind === 'codexReview'
@@ -48,12 +49,15 @@
   <main class="mx-auto w-full max-w-lg pb-3 pt-6">
     @if (updates.available()) {
       <section
-        class="mb-5 flex items-center justify-between gap-3 rounded-2xl bg-vibe-ink px-4 py-3 text-vibe-paper dark:bg-vibe-surface-dark"
+        class="mb-5 flex items-center justify-between gap-3 rounded-2xl border border-vibe-rule bg-vibe-surface px-4 py-3 text-vibe-ink dark:border-vibe-rule-dark dark:bg-vibe-surface-dark dark:text-vibe-paper"
         aria-live="polite"
       >
         <div>
           <p class="text-sm font-bold">Có bản VibePing mới</p>
-          <p class="mt-0.5 text-xs text-vibe-sage">
+          @if (updates.version(); as version) {
+            <p class="mt-0.5 break-words text-xs font-semibold">Phiên bản {{ version }}</p>
+          }
+          <p class="mt-0.5 text-xs text-vibe-muted dark:text-vibe-sage">
             Cập nhật nhanh, dữ liệu gần đây vẫn được giữ lại.
           </p>
         </div>

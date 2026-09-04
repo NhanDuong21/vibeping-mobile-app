@@ -103,3 +103,47 @@ fn backup_count(parent: &Path) -> usize {
         .unwrap()
         .count()
 }
+
+#[tokio::test]
+async fn rc1_upgrade_recovers_start_evidence_without_fabricating_completions() {
+    use crate::features::codex_attention::ActivityStore;
+    use chrono::{Duration, Utc};
+
+    let temp = tempdir().unwrap();
+    let path = temp.path().join("rc1.sqlite3");
+    let pool = open_pool(&path).await.unwrap();
+    MIGRATOR.run_to(8, &pool).await.unwrap();
+    let now = Utc::now();
+    for (turn, state, at) in [
+        ("orphan-tool", "running", now + Duration::seconds(2)),
+        ("old-prompt", "running", now),
+        ("latest-prompt", "completed", now + Duration::seconds(1)),
+    ] {
+        sqlx::query("INSERT INTO codex_turns (turn_key, session_key, project_name, state, started_at, updated_at) VALUES (?, 'session', 'VibePing', ?, ?, ?)")
+            .bind(turn).bind(state).bind(at).bind(at).execute(&pool).await.unwrap();
+    }
+    for turn in ["old-prompt", "latest-prompt"] {
+        sqlx::query("INSERT INTO activity_events (id, dedupe_key, event_type, title, summary, project_name, turn_key, occurred_at, created_at) VALUES (?, ?, 'codex.turn.started', 'Bắt đầu', 'Đã nhận tín hiệu', 'VibePing', ?, ?, ?)")
+            .bind(turn).bind(turn).bind(turn).bind(now).bind(now).execute(&pool).await.unwrap();
+    }
+    pool.close().await;
+    let upgraded = connect(&path).await.unwrap();
+    let evidence: Vec<(String, bool)> =
+        sqlx::query_as("SELECT turn_key, start_observed FROM codex_turns ORDER BY turn_key")
+            .fetch_all(&upgraded)
+            .await
+            .unwrap();
+    assert_eq!(
+        evidence,
+        vec![
+            ("latest-prompt".into(), true),
+            ("old-prompt".into(), true),
+            ("orphan-tool".into(), false)
+        ]
+    );
+    let store = ActivityStore::new(upgraded);
+    let snapshot = store.snapshot().await.unwrap();
+    assert!(snapshot.current_work.is_none());
+    assert_eq!(snapshot.events.len(), 2);
+    assert_eq!(backup_count(temp.path()), 1);
+}

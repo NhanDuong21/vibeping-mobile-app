@@ -25,10 +25,12 @@ export function isCurrentWork(value: unknown): value is CurrentWorkDto {
   const current = value as Partial<CurrentWorkDto>;
   return (
     typeof current.projectName === 'string' &&
-    (current.state === 'running' || current.state === 'waiting') &&
+    ['running', 'waiting', 'unconfirmed'].includes(current.state ?? '') &&
     typeof current.lastTestState === 'string' &&
     typeof current.previewReady === 'boolean' &&
     typeof current.startedAt === 'string' &&
-    typeof current.updatedAt === 'string'
+    typeof current.updatedAt === 'string' &&
+    typeof current.freshUntil === 'string' &&
+    Number.isFinite(Date.parse(current.freshUntil))
   );
 }

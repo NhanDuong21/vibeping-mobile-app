@@ -22,9 +22,12 @@ pub fn normalize(source: &str, bytes: &[u8]) -> Result<Option<CodexIngress>> {
     let Some(signal) = signal else {
         return Ok(None);
     };
-    let session =
-        text(&value, &["session_id", "thread-id", "thread_id"]).unwrap_or("unknown-session");
-    let turn = text(&value, &["turn_id", "turn-id"]).unwrap_or("unknown-turn");
+    let Some(session) = identity(&value, &["session_id", "thread-id", "thread_id"]) else {
+        return Ok(None);
+    };
+    let Some(turn) = identity(&value, &["turn_id", "turn-id"]) else {
+        return Ok(None);
+    };
     let cwd = text(&value, &["cwd"]).unwrap_or("Codex");
     Ok(Some(CodexIngress {
         session_key: digest(session),
@@ -43,7 +46,7 @@ fn hook_signal(value: &Value) -> Option<CodexSignal> {
     match text(value, &["hook_event_name"])? {
         "UserPromptSubmit" => Some(CodexSignal::Started),
         "PermissionRequest" => Some(CodexSignal::PermissionRequired),
-        "Stop" => Some(CodexSignal::Stopped),
+        "Stop" | "Interrupt" => Some(CodexSignal::Stopped),
         "PostToolUse" => classify_tool(value),
         _ => None,
     }
@@ -99,6 +102,11 @@ fn response_succeeded(value: &Value) -> bool {
 
 fn text<'a>(value: &'a Value, keys: &[&str]) -> Option<&'a str> {
     keys.iter().find_map(|key| value.get(key)?.as_str())
+}
+
+fn identity<'a>(value: &'a Value, keys: &[&str]) -> Option<&'a str> {
+    text(value, keys)
+        .filter(|id| !id.trim().is_empty() && id.len() <= 256 && !id.chars().any(char::is_control))
 }
 
 fn project_name(cwd: &str) -> String {

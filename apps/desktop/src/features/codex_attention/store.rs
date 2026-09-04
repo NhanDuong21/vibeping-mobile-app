@@ -5,7 +5,8 @@ use uuid::Uuid;
 
 use crate::features::preferences::policy::{self, DeliveryPolicy};
 
-use super::model::{ActivityEvent, ActivitySnapshot, CodexIngress, CodexSignal, CurrentWork};
+use super::model::{ActivityEvent, ActivitySnapshot, CodexIngress, CodexSignal};
+use super::turn_state::prepare_turn;
 
 #[derive(Clone)]
 pub struct ActivityStore {
@@ -26,7 +27,10 @@ impl ActivityStore {
         if ingress.signal != CodexSignal::Completed {
             record_hook_signal(&mut transaction, ingress).await?;
         }
-        ensure_turn(&mut transaction, ingress).await?;
+        if !prepare_turn(&mut transaction, ingress).await? {
+            transaction.commit().await?;
+            return Ok(None);
+        }
         let policy = policy::load(&mut transaction).await?;
         let event = match ingress.signal {
             CodexSignal::Started => event_for(ingress, "codex.turn.started"),
@@ -67,13 +71,7 @@ impl ActivityStore {
     }
 
     pub async fn snapshot(&self) -> Result<ActivitySnapshot> {
-        let current_work = sqlx::query_as::<_, CurrentWork>(
-            "SELECT project_name, state, last_test_state, preview_ready, started_at, updated_at FROM codex_turns \
-             WHERE state IN ('running', 'waiting') ORDER BY updated_at DESC LIMIT 1",
-        )
-        .fetch_optional(&self.pool)
-        .await
-        .context("Không đọc được công việc hiện tại")?;
+        let current_work = self.current_work().await?;
         let events = sqlx::query_as::<_, ActivityEvent>(
             "SELECT id, event_type, title, summary, project_name, occurred_at, is_read \
              FROM activity_events ORDER BY occurred_at DESC, id DESC LIMIT 50",
@@ -102,26 +100,6 @@ async fn record_hook_signal(
     .execute(&mut **transaction)
     .await
     .context("Không lưu được trạng thái kết nối Codex")?;
-    Ok(())
-}
-
-async fn ensure_turn(
-    transaction: &mut Transaction<'_, Sqlite>,
-    value: &CodexIngress,
-) -> Result<()> {
-    sqlx::query(
-        "INSERT INTO codex_turns (turn_key, session_key, project_name, state, started_at, updated_at) \
-         VALUES (?, ?, ?, 'running', ?, ?) ON CONFLICT(turn_key) DO UPDATE SET \
-         project_name = excluded.project_name, updated_at = excluded.updated_at",
-    )
-    .bind(&value.turn_key)
-    .bind(&value.session_key)
-    .bind(&value.project_name)
-    .bind(value.occurred_at)
-    .bind(value.occurred_at)
-    .execute(&mut **transaction)
-    .await
-    .context("Không lưu được lượt Codex")?;
     Ok(())
 }
 
@@ -195,7 +173,8 @@ async fn finish_turn(
         "completed"
     };
     sqlx::query(
-        "UPDATE codex_turns SET state = ?, updated_at = ?, completed_at = ? WHERE turn_key = ?",
+        "UPDATE codex_turns SET state = ?, updated_at = MAX(updated_at, ?), \
+         completed_at = COALESCE(completed_at, ?) WHERE turn_key = ?",
     )
     .bind(state)
     .bind(value.occurred_at)

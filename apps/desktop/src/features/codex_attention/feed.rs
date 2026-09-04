@@ -1,6 +1,6 @@
 use anyhow::{Context, Result, bail};
 
-use super::{ActivityEvent, ActivityStore, CurrentWork, EventFeed, ReadStateResponse};
+use super::{ActivityEvent, ActivityStore, EventFeed, ReadStateResponse};
 
 impl ActivityStore {
     pub async fn has_hook_signal(&self) -> Result<bool> {
@@ -11,16 +11,6 @@ impl ActivityStore {
         .fetch_one(&self.pool)
         .await
         .context("Không kiểm tra được tín hiệu Codex")
-    }
-
-    pub async fn current_work(&self) -> Result<Option<CurrentWork>> {
-        sqlx::query_as(
-            "SELECT project_name, state, last_test_state, preview_ready, started_at, updated_at FROM codex_turns \
-             WHERE state IN ('running', 'waiting') ORDER BY updated_at DESC LIMIT 1",
-        )
-        .fetch_optional(&self.pool)
-        .await
-        .context("Không đọc được công việc hiện tại")
     }
 
     pub async fn list_events(&self, cursor: Option<&str>, limit: u8) -> Result<EventFeed> {

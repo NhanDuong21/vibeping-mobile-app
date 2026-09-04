@@ -42,6 +42,8 @@ export class ActivityStore {
   #clockTimer?: ReturnType<typeof setInterval>;
   #newEventTimer?: ReturnType<typeof setTimeout>;
   #started = false;
+  #syncSequence = 0;
+  #workRevision = 0;
 
   readonly state = this.#state.asReadonly();
   readonly current = computed(() => this.#bootstrap()?.currentWork ?? null);
@@ -58,7 +60,8 @@ export class ActivityStore {
   readonly isStale = computed(() => {
     const saved = this.#savedAt();
     return (
-      this.#state() === 'cached' || Boolean(saved && Date.now() - saved.getTime() > STALE_AFTER_MS)
+      this.#state() === 'cached' ||
+      Boolean(saved && this.#clock().getTime() - saved.getTime() > STALE_AFTER_MS)
     );
   });
   readonly readiness = computed<ReadinessView>(() =>
@@ -87,6 +90,7 @@ export class ActivityStore {
   }
 
   stop(): void {
+    this.#syncSequence++;
     this.#stream?.close();
     this.#stream = undefined;
     this.#streamConnected.set(false);
@@ -156,6 +160,8 @@ export class ActivityStore {
 
   readonly #visibilityChanged = (): void => {
     this.#pageVisible.set(globalThis.document?.visibilityState !== 'hidden');
+    this.#clock.set(new Date());
+    if (this.#pageVisible()) void this.#sync();
   };
 
   async #restoreThenSync(): Promise<void> {
@@ -165,15 +171,20 @@ export class ActivityStore {
   }
 
   async #sync(): Promise<void> {
+    const sequence = ++this.#syncSequence;
+    const workRevision = this.#workRevision;
     try {
       const [bootstrap, feed] = await Promise.all([
         firstValueFrom(this.#api.bootstrap()),
         firstValueFrom(this.#api.events()),
       ]);
+      if (sequence !== this.#syncSequence) return;
       this.#bootstrap.set(
-        this.#pendingWork === undefined
-          ? bootstrap
-          : { ...bootstrap, currentWork: this.#takePendingWork() },
+        workRevision !== this.#workRevision && this.#bootstrap()
+          ? { ...bootstrap, currentWork: this.current() }
+          : this.#pendingWork === undefined
+            ? bootstrap
+            : { ...bootstrap, currentWork: this.#takePendingWork() },
       );
       this.#events.set(mergeEvents(this.#events(), feed.events));
       this.#nextCursor.set(feed.nextCursor ?? null);
@@ -187,6 +198,7 @@ export class ActivityStore {
       await this.#persist();
       await this.#flushReads();
     } catch {
+      if (sequence !== this.#syncSequence) return;
       this.#state.set(this.#events().length || this.#bootstrap() ? 'cached' : 'unavailable');
     }
   }
@@ -235,6 +247,7 @@ export class ActivityStore {
     try {
       const current = JSON.parse(String(raw.data)) as unknown;
       if (current !== null && !isCurrentWork(current)) throw new Error('invalid current work');
+      this.#workRevision++;
       const bootstrap = this.#bootstrap();
       if (!bootstrap) {
         this.#pendingWork = current;

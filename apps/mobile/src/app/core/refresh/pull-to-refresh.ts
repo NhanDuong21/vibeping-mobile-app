@@ -35,7 +35,7 @@ export const PAGE_RELOAD = new InjectionToken<() => void>('PAGE_RELOAD', {
         aria-atomic="true"
       >
         <div
-          class="flex min-h-11 items-center gap-2 rounded-full bg-vibe-ink px-5 text-sm font-bold text-vibe-paper dark:bg-vibe-mint dark:text-vibe-ink"
+          class="flex min-h-11 items-center gap-2 rounded-full border border-vibe-rule bg-vibe-surface px-5 text-sm font-bold text-vibe-ink dark:border-vibe-rule-dark dark:bg-vibe-surface-dark dark:text-vibe-paper"
         >
           <svg
             class="size-4"

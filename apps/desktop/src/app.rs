@@ -5,7 +5,7 @@ use chrono::{DateTime, Utc};
 use sqlx::SqlitePool;
 use tokio::{
     net::TcpListener,
-    sync::{Mutex, broadcast, mpsc},
+    sync::{Mutex, broadcast, mpsc, watch},
 };
 
 use crate::features::{
@@ -26,6 +26,7 @@ pub struct ApplicationState {
     pub work_events: broadcast::Sender<String>,
     pub usage_events: broadcast::Sender<String>,
     pub usage_refresh: mpsc::Sender<RefreshRequest>,
+    pub stopping: watch::Sender<bool>,
     usage_refresh_receiver: Arc<Mutex<Option<mpsc::Receiver<RefreshRequest>>>>,
 }
 
@@ -49,6 +50,7 @@ pub async fn build_state(config: &RuntimeConfig) -> Result<Arc<ApplicationState>
         work_events,
         usage_events,
         usage_refresh,
+        stopping: watch::channel(false).0,
         usage_refresh_receiver: Arc::new(Mutex::new(Some(usage_refresh_receiver))),
     }))
 }
@@ -112,6 +114,7 @@ pub async fn run_with_shutdown(
             }
         }
     });
+    let stopping = state.stopping.clone();
     let router = infrastructure::web::router(state);
     let listener = TcpListener::bind(config.bind_address())
         .await
@@ -119,7 +122,10 @@ pub async fn run_with_shutdown(
     tracing::info!(address = %config.bind_address(), "VibePing đã sẵn sàng");
 
     let result = axum::serve(listener, router)
-        .with_graceful_shutdown(shutdown)
+        .with_graceful_shutdown(async move {
+            shutdown.await;
+            stopping.send_replace(true);
+        })
         .await
         .context("VibePing đã dừng ngoài dự kiến");
     notification_worker.abort();

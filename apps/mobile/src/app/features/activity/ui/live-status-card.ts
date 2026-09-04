@@ -19,6 +19,7 @@ export class LiveStatusCard {
     if (kind === 'waiting') return 'Cần xác nhận để tiếp tục';
     if (kind === 'failed') return 'Lần kiểm thử cuối vẫn còn lỗi';
     if (kind === 'preview') return 'Bản xem trước của công việc hiện tại';
+    if (kind === 'unconfirmed') return 'Công việc ghi nhận gần nhất';
     return 'Công việc hiện tại';
   }
 

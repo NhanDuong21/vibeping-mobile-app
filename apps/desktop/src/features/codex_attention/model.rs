@@ -37,7 +37,7 @@ pub struct ActivityEvent {
     pub is_read: bool,
 }
 
-#[derive(Clone, Debug, Serialize, sqlx::FromRow, ToSchema)]
+#[derive(Clone, Debug, Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct CurrentWork {
     pub project_name: String,
@@ -46,6 +46,7 @@ pub struct CurrentWork {
     pub preview_ready: bool,
     pub started_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    pub fresh_until: DateTime<Utc>,
 }
 
 #[derive(Clone, Debug, Serialize, ToSchema)]
