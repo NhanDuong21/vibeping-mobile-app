@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-04T09:50:45.8663705Z",
+  "title": "VibePing design direction",
+  "extensions": {},
+  "components": [
+    {
+      "name": "Work session summary",
+      "kind": "card",
+      "description": "Open activity-row variant of the persistent session card, with illustrative Vietnamese content. The prominent variant uses the incumbent surface and local app icon. Completion keeps the same identity, observed duration, failed-test count when present, and available answer excerpt.",
+      "html": "<a class=\"ds-session\" href=\"#session-detail\"><p class=\"ds-session-title\">Hoàn thiện màn hình hoạt động</p><p class=\"ds-session-meta ds-session-project\">VibePing</p><p class=\"ds-session-state\"><strong>Đã hoàn tất</strong><span class=\"ds-session-meta\">· 12 phút</span></p><p class=\"ds-session-excerpt\">Đã cập nhật màn hình hoạt động.</p><div class=\"ds-session-footer\"><span class=\"ds-session-meta\">Tín hiệu cuối lúc 10:12</span><span class=\"ds-session-action\">Xem diễn biến và kết quả</span></div></a>",
+      "css": ".ds-session { display:block; min-height:44px; border-radius:12px; padding:16px 0; color:var(--color-vibe-ink, #10251c); font-family:var(--font-sans, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif); text-decoration:none; transition:opacity 150ms; } .ds-session-title { margin:0; overflow-wrap:break-word; font-size:16px; font-weight:700; line-height:24px; } .ds-session-meta { color:var(--color-vibe-muted, #587065); } .ds-session-project { margin:4px 0 0; overflow-wrap:break-word; font-size:12px; line-height:20px; } .ds-session-state { display:flex; flex-wrap:wrap; align-items:baseline; column-gap:8px; row-gap:4px; margin:12px 0 0; font-size:14px; line-height:24px; } .ds-session-state strong { font-weight:700; } .ds-session-excerpt { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; overflow-wrap:break-word; margin:12px 0 0; font-size:14px; line-height:24px; } .ds-session-footer { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; column-gap:16px; row-gap:8px; margin-top:12px; font-size:12px; line-height:20px; } .ds-session-action { color:var(--color-vibe-green, #17643f); font-weight:700; } .ds-session:hover { text-decoration:none; } .ds-session:focus-visible { outline:3px solid var(--color-vibe-mint, #45d395); outline-offset:3px; } .ds-session:active { opacity:0.7; } :host-context(.dark) .ds-session { color:var(--color-vibe-paper, #f3f8f5); } :host-context(.dark) .ds-session-meta { color:var(--color-vibe-sage, #9fb9aa); } :host-context(.dark) .ds-session-action { color:var(--color-vibe-mint, #45d395); } @media (prefers-reduced-motion:reduce) { .ds-session { transition:none; } } :host-context([data-motion='minimal']) .ds-session { transition:none; }"
+    },
+    {
+      "name": "Retained session timeline",
+      "kind": "custom",
+      "description": "Ordered, recorded stages appear before the final answer in detail. Illustrative content shows the timestamp, decorative mint sequence marker, and Vietnamese stage label. The active-card preview uses only the three latest stages; unavailable history is never invented.",
+      "html": "<section class=\"ds-timeline\" aria-labelledby=\"ds-timeline-heading\"><h2 id=\"ds-timeline-heading\" class=\"ds-timeline-heading\">Diễn biến</h2><ol class=\"ds-timeline-list\"><li class=\"ds-timeline-stage\"><time class=\"ds-timeline-time\">10:00</time><span class=\"ds-timeline-dot\" aria-hidden=\"true\"></span><span>Công việc bắt đầu</span></li><li class=\"ds-timeline-stage\"><time class=\"ds-timeline-time\">10:12</time><span class=\"ds-timeline-dot\" aria-hidden=\"true\"></span><span>Công việc hoàn tất</span></li></ol></section>",
+      "css": ".ds-timeline { color:var(--color-vibe-ink, #10251c); font-family:var(--font-sans, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif); } .ds-timeline-heading { margin:0; font-size:22px; font-weight:700; letter-spacing:-0.025em; } .ds-timeline-list { position:relative; margin:16px 0 0; padding:0; list-style:none; } .ds-timeline-list::before { position:absolute; top:20px; bottom:20px; left:68px; width:1px; background:color-mix(in srgb, var(--color-vibe-mint, #45d395) 50%, transparent); content:''; } .ds-timeline-stage { position:relative; display:grid; grid-template-columns:52px 8px minmax(0, 1fr); align-items:center; gap:12px; padding:14px 0; font-size:14px; font-weight:600; line-height:20px; } .ds-timeline-stage + .ds-timeline-stage { margin-top:4px; } .ds-timeline-time { color:var(--color-vibe-muted, #587065); font-variant-numeric:tabular-nums; } .ds-timeline-dot { width:8px; height:8px; border-radius:50%; background:var(--color-vibe-mint, #45d395); box-shadow:0 0 0 4px var(--color-vibe-canvas, #f3f7f4); } :host-context(.dark) .ds-timeline { color:var(--color-vibe-paper, #f3f8f5); } :host-context(.dark) .ds-timeline-time { color:var(--color-vibe-sage, #9fb9aa); } :host-context(.dark) .ds-timeline-dot { box-shadow:0 0 0 4px var(--color-vibe-night, #07140f); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Quiet signal",
+    "overview": "VibePing is an operational utility. The interface should feel calm, precise, and trustworthy when glanced at on a phone. Status and next action outrank decoration. It is not a marketing page, analytics dashboard, chat client, or cyberpunk control panel.",
+    "keyCharacteristics": [],
+    "rules": [
+      {
+        "name": "The Persistent Session Rule",
+        "body": "One Codex request keeps one card identity as it moves from observed work to a completion summary. A later request gets a separate card, even in the same task or project. Keep the task title first, followed by project, plain-language state and observed duration; completion retains failed-test count when present and a short final-answer excerpt when available.",
+        "section": "components"
+      },
+      {
+        "name": "The Observed Time Rule",
+        "body": "Show recorded stages and timestamps only. The prominent active card shows the three most recent stages in a compact time-and-label list. Duration uses a recorded start; missing starts remain explicit. When an unfinished session becomes stale or loses a current signal, freeze duration at the last observed signal and label the saved or unconfirmed state in text. Live motion must stop with that loss of freshness. Completion fixes duration at the recorded finish.",
+        "section": "components"
+      }
+    ],
+    "dos": [],
+    "donts": []
+  }
+}

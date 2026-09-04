@@ -7,7 +7,7 @@
       "name": "MIT OR Apache-2.0",
       "identifier": "MIT OR Apache-2.0"
     },
-    "version": "1.0.0-rc.8"
+    "version": "1.1.0"
   },
   "paths": {
     "/api/v1/activity": {
@@ -134,6 +134,14 @@
               "format": "int32",
               "minimum": 0
             }
+          },
+          {
+            "name": "grouped",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -221,6 +229,15 @@
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "through",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
             }
           }
         ],
@@ -624,6 +641,16 @@
               "null"
             ]
           },
+          "session": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/WorkSession"
+              }
+            ]
+          },
           "summary": {
             "type": "string"
           },
@@ -858,6 +885,12 @@
           },
           "projectName": {
             "type": "string"
+          },
+          "sessionId": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "startedAt": {
             "type": "string",
@@ -1355,6 +1388,55 @@
             "items": {
               "$ref": "#/components/schemas/UsageLimitWindow"
             }
+          }
+        }
+      },
+      "WorkSession": {
+        "type": "object",
+        "required": [
+          "eventIds",
+          "state",
+          "updatedAt",
+          "failedTestCount",
+          "timeline"
+        ],
+        "properties": {
+          "completedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "eventIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "failedTestCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "startedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "state": {
+            "type": "string"
+          },
+          "timeline": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActivityTimelineStage"
+            }
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       }

@@ -12,8 +12,8 @@ pub(super) async fn prepare_turn(
 ) -> Result<bool> {
     sqlx::query(
         "INSERT OR IGNORE INTO codex_turns \
-         (turn_key, session_key, project_name, state, started_at, updated_at, start_observed) \
-         VALUES (?, ?, ?, 'running', ?, ?, ?)",
+         (turn_key, session_key, project_name, state, started_at, updated_at, start_observed, work_session_id) \
+         VALUES (?, ?, ?, 'running', ?, ?, ?, ?)",
     )
     .bind(&value.turn_key)
     .bind(&value.session_key)
@@ -21,6 +21,7 @@ pub(super) async fn prepare_turn(
     .bind(value.occurred_at)
     .bind(value.occurred_at)
     .bind(value.signal == CodexSignal::Started)
+    .bind(uuid::Uuid::new_v4().to_string())
     .execute(&mut **transaction)
     .await
     .context("Không lưu được lượt Codex")?;

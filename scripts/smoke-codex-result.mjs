@@ -82,7 +82,7 @@ try {
   assert.equal(feed.events[0].id, id);
   assert.equal(feed.events[0].result, undefined);
   for (let attempt = 0; attempt < 20 && !events.some(event => event.resultExcerpt); attempt++) await pause(100);
-  assert(events.some(event => event.id === id && event.resultExcerpt === detail.resultExcerpt));
+  assert(events.some(event => event.id === detail.id && event.resultExcerpt === detail.resultExcerpt));
   await ingest({ ...payload, 'last-assistant-message': result });
   assert.equal((await read('/api/v1/events')).events.length, 1);
   abort.abort();

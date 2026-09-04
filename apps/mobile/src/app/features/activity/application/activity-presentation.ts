@@ -92,6 +92,9 @@ export function groupActivityEvents(events: ActivityEventDto[], now = new Date()
 export function timelineLabel(stage: ActivityEventDetailDto['timeline'][number]): string {
   const labels: Record<string, string> = {
     'codex.turn.started': 'Công việc bắt đầu',
+    'codex.turn.resumed': 'Codex tiếp tục xử lý',
+    'codex.turn.stopped': 'Lượt làm việc đã dừng',
+    'codex.test.passed': 'Kiểm thử đã đạt',
     'codex.attention.permission_required': 'Codex chờ bạn',
     'codex.preview.ready': 'Bản xem trước sẵn sàng',
     'codex.test.failed': 'Kiểm thử mã nguồn chưa đạt',

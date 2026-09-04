@@ -58,11 +58,27 @@ impl ActivityStore {
     }
 
     pub async fn mark_read(&self, id: &str) -> Result<Option<ReadStateResponse>> {
-        let updated = sqlx::query("UPDATE activity_events SET is_read = 1 WHERE id = ?")
-            .bind(id)
-            .execute(&self.pool)
-            .await
-            .context("Không đánh dấu được hoạt động")?;
+        self.mark_read_through(id, None).await
+    }
+
+    pub async fn mark_read_through(
+        &self,
+        id: &str,
+        through: Option<chrono::DateTime<chrono::Utc>>,
+    ) -> Result<Option<ReadStateResponse>> {
+        let updated = sqlx::query(
+            "UPDATE activity_events SET is_read = 1 WHERE (id = ? OR turn_key = \
+            (SELECT turn_key FROM codex_turns WHERE work_session_id = ?) OR turn_key = \
+            (SELECT turn_key FROM activity_events WHERE id = ?)) AND (? IS NULL OR occurred_at <= ?)",
+        )
+        .bind(id)
+        .bind(id)
+        .bind(id)
+        .bind(through)
+        .bind(through)
+        .execute(&self.pool)
+        .await
+        .context("Không đánh dấu được hoạt động")?;
         if updated.rows_affected() == 0 {
             return Ok(None);
         }

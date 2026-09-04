@@ -38,7 +38,7 @@ export class ApiClient {
 
   events(cursor?: string): Observable<EventFeedDto> {
     return this.#http.get<EventFeedDto>('/api/v1/events', {
-      params: cursor ? { cursor, limit: 20 } : { limit: 20 },
+      params: cursor ? { cursor, limit: 20, grouped: true } : { limit: 20, grouped: true },
     });
   }
 
@@ -46,12 +46,11 @@ export class ApiClient {
     return this.#http.get<ActivityEventDetailDto>(`/api/v1/events/${encodeURIComponent(id)}`);
   }
 
-  markEventRead(id: string, csrfToken: string): Observable<ReadStateDto> {
-    return this.#http.post<ReadStateDto>(
-      `/api/v1/events/${encodeURIComponent(id)}/read`,
-      null,
-      mutationOptions(csrfToken),
-    );
+  markEventRead(id: string, csrfToken: string, through?: string): Observable<ReadStateDto> {
+    return this.#http.post<ReadStateDto>(`/api/v1/events/${encodeURIComponent(id)}/read`, null, {
+      ...mutationOptions(csrfToken),
+      params: through ? { through } : {},
+    });
   }
 
   markAllEventsRead(csrfToken: string): Observable<ReadStateDto> {

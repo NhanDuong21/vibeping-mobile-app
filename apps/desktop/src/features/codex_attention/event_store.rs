@@ -125,6 +125,7 @@ pub(super) async fn insert_event(
         project_name: ingress.project_name.clone(),
         occurred_at: ingress.occurred_at,
         is_read: false,
+        session: None,
     }))
 }
 

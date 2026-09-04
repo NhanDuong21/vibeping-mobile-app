@@ -13,6 +13,7 @@ import {
 } from '../application/activity-presentation';
 import { ActivityStore } from '../application/activity.store';
 import { ResultBody } from './result-body';
+import { sessionDuration, sessionStatus } from '../application/work-session-presentation';
 
 @Component({
   selector: 'app-event-detail-page',
@@ -26,6 +27,8 @@ export class EventDetailPage implements OnInit {
   protected readonly taskTitle = activityTaskTitle;
   protected readonly project = activityProject;
   protected readonly description = activityDescription;
+  protected readonly sessionDuration = sessionDuration;
+  protected readonly sessionStatus = sessionStatus;
   protected readonly exactTime = exactDateTime;
   protected readonly stageTime = clock;
   protected readonly stageLabel = (stage: ActivityEventDetailDto['timeline'][number]): string =>

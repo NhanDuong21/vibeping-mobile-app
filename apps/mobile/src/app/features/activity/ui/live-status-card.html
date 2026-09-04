@@ -5,7 +5,7 @@
   class="relative overflow-hidden rounded-2xl border border-vibe-rule bg-vibe-surface transition-colors duration-500 ease-out motion-reduce:transition-none dark:border-vibe-rule-dark dark:bg-vibe-surface-dark"
   [class.border-vibe-amber/60]="activity.readiness().kind === 'waiting'"
   [class.border-vibe-coral/60]="activity.readiness().kind === 'failed'"
-  aria-labelledby="live-status-heading"
+  [attr.aria-labelledby]="activity.focusedSession() ? 'session-heading' : 'live-status-heading'"
   aria-live="polite"
 >
   @if (activity.motionActive()) {
@@ -25,6 +25,10 @@
       />
     </svg>
   }
+  @if (activity.focusedSession(); as session) {
+    <app-work-session-card [event]="session" [now]="activity.now()" [stale]="activity.isStale() || activity.readiness().kind === 'offline'"
+      [prominent]="true" [reaction]="activity.newEventId() === session.id ? session.id : null" />
+  } @else {
   <div class="relative p-4">
     <div class="flex items-start gap-3">
       <span
@@ -150,6 +154,7 @@
       </a>
     }
   </div>
+  }
 
   @if (activity.motionActive()) {
     <div class="h-0.5 overflow-hidden bg-vibe-mint/15" aria-hidden="true">

@@ -46,6 +46,18 @@ Lock Screen previews inherit the same theme and use the local app icon with an a
 
 Design mobile-first at 320, 375, 390, and 430 px. Respect iPhone safe areas and dynamic text, prevent horizontal overflow, keep a logical semantic outline, preserve keyboard focus, use live regions sparingly, and never communicate state by color alone.
 
+## Components
+
+### Work session card and timeline
+
+**The Persistent Session Rule.** One Codex request keeps one card identity as it moves from observed work to a completion summary. A later request gets a separate card, even in the same task or project. Keep the task title first, followed by project, plain-language state and observed duration; completion retains failed-test count when present and a short final-answer excerpt when available.
+
+The prominent session uses the existing bordered surface with 16 px corners and 16 px padding, the local app icon, and a 22 px bold title. Earlier sessions use open, rule-separated rows with 16 px bold titles. State and duration use 14 px text; project and last-signal metadata use 12 px muted text. Long titles and metadata wrap, and the entire card remains a focusable detail link with at least a 44 px touch target.
+
+**The Observed Time Rule.** Show recorded stages and timestamps only. The prominent active card shows the three most recent stages in a compact time-and-label list. Duration uses a recorded start; missing starts remain explicit. When an unfinished session becomes stale or loses a current signal, freeze duration at the last observed signal and label the saved or unconfirmed state in text. Live motion must stop with that loss of freshness. Completion fixes duration at the recorded finish.
+
+Detail presents the full retained timeline before the final Codex answer. Use an ordered list with tabular timestamps, a thin mint connecting line, small decorative mint dots, and plain Vietnamese stage labels. The line conveys sequence, never progress percentage. Keep the existing readable answer surface and place the privacy explanation in a collapsed disclosure after the result and metadata.
+
 ## Impeccable workflow
 
 Every user-visible surface uses the project-local Impeccable skill. New work records product truth, shapes the task, establishes or inherits the visual world, then applies the craft floor. Gate 0 specifically uses shape, critique, harden, and adapt, with one bounded screenshot/fix pass and one confirmation pass. Product constraints override generic visual ambition.

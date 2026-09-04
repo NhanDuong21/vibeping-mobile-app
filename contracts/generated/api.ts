@@ -355,6 +355,7 @@ export interface components {
             occurredAt: string;
             projectName: string;
             resultExcerpt?: string | null;
+            session?: null | components["schemas"]["WorkSession"];
             summary: string;
             title: string;
         };
@@ -412,6 +413,7 @@ export interface components {
             lastTestState: string;
             previewReady: boolean;
             projectName: string;
+            sessionId?: string | null;
             /** Format: date-time */
             startedAt: string;
             state: string;
@@ -548,6 +550,19 @@ export interface components {
             state: string;
             windows: components["schemas"]["UsageLimitWindow"][];
         };
+        WorkSession: {
+            /** Format: date-time */
+            completedAt?: string | null;
+            eventIds: string[];
+            /** Format: int64 */
+            failedTestCount: number;
+            /** Format: date-time */
+            startedAt?: string | null;
+            state: string;
+            timeline: components["schemas"]["ActivityTimelineStage"][];
+            /** Format: date-time */
+            updatedAt: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -662,6 +677,7 @@ export interface operations {
             query?: {
                 cursor?: string;
                 limit?: number;
+                grouped?: boolean;
             };
             header?: never;
             path?: never;
@@ -739,7 +755,9 @@ export interface operations {
     };
     read_event: {
         parameters: {
-            query?: never;
+            query?: {
+                through?: string;
+            };
             header?: never;
             path: {
                 /** @description Activity event identifier */

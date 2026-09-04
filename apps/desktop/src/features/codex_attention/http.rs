@@ -24,6 +24,13 @@ use super::{ActivityEventDetail, ActivitySnapshot, ActivityStore, EventFeed, Rea
 pub struct EventListQuery {
     cursor: Option<String>,
     limit: Option<u8>,
+    grouped: Option<bool>,
+}
+
+#[derive(Debug, Deserialize, IntoParams)]
+#[into_params(parameter_in = Query)]
+pub struct EventReadQuery {
+    through: Option<chrono::DateTime<chrono::Utc>>,
 }
 
 #[utoipa::path(
@@ -58,11 +65,17 @@ pub async fn events(
     Query(query): Query<EventListQuery>,
 ) -> Result<Json<EventFeed>, ApiError> {
     authorize_if_claimed(&state, &headers).await?;
-    ActivityStore::new(state.database.clone())
-        .list_events(query.cursor.as_deref(), query.limit.unwrap_or(20))
-        .await
-        .map(Json)
-        .map_err(map_feed_error)
+    let store = ActivityStore::new(state.database.clone());
+    let result = if query.grouped.unwrap_or(false) {
+        store
+            .list_sessions(query.cursor.as_deref(), query.limit.unwrap_or(20))
+            .await
+    } else {
+        store
+            .list_events(query.cursor.as_deref(), query.limit.unwrap_or(20))
+            .await
+    };
+    result.map(Json).map_err(map_feed_error)
 }
 
 #[utoipa::path(
@@ -81,7 +94,7 @@ pub async fn event(
 ) -> Result<Json<ActivityEventDetail>, ApiError> {
     authorize_if_claimed(&state, &headers).await?;
     ActivityStore::new(state.database.clone())
-        .event_detail(&id)
+        .session_detail(&id)
         .await
         .map_err(|_| ApiError::unavailable("ACTIVITY_UNAVAILABLE"))?
         .map(Json)
@@ -91,7 +104,7 @@ pub async fn event(
 #[utoipa::path(
     post,
     path = "/api/v1/events/{id}/read",
-    params(("id" = String, Path, description = "Activity event identifier")),
+    params(("id" = String, Path, description = "Activity event identifier"), EventReadQuery),
     responses(
         (status = 200, description = "Activity event marked read", body = ReadStateResponse),
         (status = 404, description = "Activity event not found")
@@ -101,11 +114,12 @@ pub async fn read_event(
     State(state): State<Arc<ApplicationState>>,
     Path(id): Path<String>,
     headers: HeaderMap,
+    Query(query): Query<EventReadQuery>,
 ) -> Result<Json<ReadStateResponse>, ApiError> {
     require_mutation(&headers, &state.csrf_token)?;
     require_owner(&state, &headers).await?;
     ActivityStore::new(state.database.clone())
-        .mark_read(&id)
+        .mark_read_through(&id, query.through)
         .await
         .map_err(|_| ApiError::unavailable("ACTIVITY_UNAVAILABLE"))?
         .map(Json)

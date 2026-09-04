@@ -32,6 +32,7 @@ impl ActivityStore {
             return Ok(None);
         }
         remember_task(&mut transaction, ingress).await?;
+        super::session_stages::record(&mut transaction, ingress).await?;
         let policy = policy::load(&mut transaction).await?;
         let event = match ingress.signal {
             CodexSignal::Started => event_for(ingress, "codex.turn.started"),

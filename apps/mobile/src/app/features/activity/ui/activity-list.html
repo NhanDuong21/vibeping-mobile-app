@@ -50,6 +50,12 @@
       <h3 class="pt-5 text-xs font-bold text-vibe-muted dark:text-vibe-sage">{{ group.label }}</h3>
       <ol class="divide-y divide-vibe-rule dark:divide-vibe-rule-dark">
         @for (event of group.events; track event.id) {
+          @if (event.session) {
+            <li>
+              <app-work-session-card [event]="event" [now]="activity.now()" [stale]="activity.isStale()"
+                [reaction]="activity.newEventId() === event.id ? event.id : null" />
+            </li>
+          } @else {
           <li
             class="relative before:absolute before:bottom-0 before:left-[1.125rem] before:top-0 before:w-px before:bg-vibe-rule dark:before:bg-vibe-rule-dark"
           >
@@ -177,6 +183,7 @@
               </div>
             </a>
           </li>
+          }
         }
       </ol>
     }

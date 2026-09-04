@@ -11,14 +11,15 @@ import {
 import { ActivityLiveConnection } from '../data/activity-live-connection';
 import { UsageLimitsStore } from '../../usage-limits';
 import { ActivityCache, type CachedActivity } from '../data/activity-cache';
-import { isCurrentWork, localUnread, mergeEvents } from './activity-reconciliation';
+import { isCurrentWork, localUnread } from './activity-reconciliation';
 import { readinessView, type ReadinessSourceState, type ReadinessView } from './readiness';
 import { isLiveMotionEvent } from './event-motion';
+import { sessionRevision } from './work-session-presentation';
+import { mergeSessionFeed, type CachedEvent } from './session-cache-migration';
 
 type ActivityState = ReadinessSourceState;
 type DetailState = 'idle' | 'loading' | 'ready' | 'missing';
 type ReadAllState = 'idle' | 'saving' | 'saved' | 'failed';
-type CachedEvent = ActivityEventDto & Partial<Pick<ActivityEventDetailDto, 'result' | 'timeline'>>;
 const STALE_AFTER_MS = 10 * 60 * 1000;
 
 @Injectable({ providedIn: 'root' })
@@ -30,10 +31,12 @@ export class ActivityStore {
   readonly #state = signal<ActivityState>('loading');
   readonly #bootstrap = signal<BootstrapDto | null>(null);
   readonly #events = signal<CachedEvent[]>([]);
+  #legacyResults: CachedEvent[] = [];
   readonly #nextCursor = signal<string | null>(null);
   readonly #unreadCount = signal(0);
   readonly #savedAt = signal<Date | null>(null);
   readonly #pendingReadIds = new Set<string>();
+  readonly #pendingReadThrough = new Map<string, string>();
   readonly #detailState = signal<DetailState>('idle');
   readonly #selected = signal<ActivityEventDetailDto | null>(null);
   readonly #readAllState = signal<ReadAllState>('idle');
@@ -51,6 +54,12 @@ export class ActivityStore {
   readonly allowance = this.#usage.snapshot;
   readonly codexNeedsReview = computed(() => this.#bootstrap()?.connection.codex === 'needsReview');
   readonly events = this.#events.asReadonly();
+  readonly focusedSession = computed(() => {
+    const id = this.current()?.sessionId;
+    return id
+      ? (this.#events().find((event) => event.id === id && event.session) ?? null)
+      : (this.#events().find((event) => event.session) ?? null);
+  });
   readonly unreadCount = this.#unreadCount.asReadonly();
   readonly hasMore = computed(() => Boolean(this.#nextCursor()));
   readonly selected = this.#selected.asReadonly();
@@ -121,7 +130,7 @@ export class ActivityStore {
     if (!cursor) return;
     try {
       const feed = await firstValueFrom(this.#api.events(cursor));
-      this.#events.set(mergeEvents(this.#events(), feed.events));
+      this.#mergeFeed(feed.events);
       this.#nextCursor.set(feed.nextCursor ?? null);
       this.#unreadCount.set(feed.unreadCount);
       await this.#persist();
@@ -136,6 +145,7 @@ export class ActivityStore {
     this.#unreadCount.set(0);
     this.#pendingReadAll = true;
     this.#pendingReadIds.clear();
+    this.#pendingReadThrough.clear();
     this.#readAllState.set('saving');
     await this.#persist();
     const saved = await this.#flushReads();
@@ -145,20 +155,23 @@ export class ActivityStore {
   async loadDetail(id: string): Promise<void> {
     const sequence = ++this.#detailSequence;
     this.#detailState.set('loading');
-    const cached = this.#events().find((event) => event.id === id) ?? null;
+    const cached =
+      [...this.#events(), ...this.#legacyResults].find(
+        (event) => event.id === id || event.session?.eventIds.includes(id),
+      ) ?? null;
     this.#selected.set(cached ? { ...cached, timeline: cached.timeline ?? [] } : null);
     if (cached) {
       this.#detailState.set('ready');
-      await this.#markReadLocally(id);
+      await this.#markReadLocally(cached.id);
     }
     try {
       const remote = await firstValueFrom(this.#api.event(id).pipe(timeout(10_000)));
       if (sequence !== this.#detailSequence) return;
       const event = this.#selected()?.isRead ? { ...remote, isRead: true } : remote;
       this.#selected.set(event);
-      this.#events.set(mergeEvents(this.#events(), [event]));
+      this.#mergeFeed([event]);
       this.#detailState.set('ready');
-      if (!cached) await this.#markReadLocally(id);
+      if (!cached) await this.#markReadLocally(event.id);
       await this.#persist();
     } catch {
       if (sequence === this.#detailSequence && !cached) this.#detailState.set('missing');
@@ -191,15 +204,15 @@ export class ActivityStore {
           : bootstrap.currentWork;
       this.#bootstrap.set({ ...bootstrap, currentWork });
       this.#pendingWork = undefined;
-      this.#events.set(mergeEvents(this.#events(), feed.events));
+      this.#mergeFeed(feed.events);
       const selected = this.#selected();
       if (
         selected &&
         feed.events.some(
           (event) =>
             event.id === selected.id &&
-            event.resultExcerpt &&
-            event.resultExcerpt !== selected.resultExcerpt,
+            (event.resultExcerpt !== selected.resultExcerpt ||
+              event.session?.updatedAt !== selected.session?.updatedAt),
         )
       )
         void this.loadDetail(selected.id);
@@ -225,13 +238,17 @@ export class ActivityStore {
       try {
         const event = JSON.parse(String(raw.data)) as ActivityEventDto;
         if (event.id && event.occurredAt) {
-          const before = this.#events().length;
-          this.#events.set(mergeEvents(this.#events(), [event]));
+          const previous = this.#events().find((value) => value.id === event.id);
+          this.#mergeFeed([event]);
           if (this.#selected()?.id === event.id) void this.loadDetail(event.id);
-          if (!event.isRead && this.#events().length > before) {
+          const updated = this.#events().find((value) => value.id === event.id);
+          if (!updated?.isRead && (!previous || previous.isRead))
             this.#unreadCount.update((count) => count + 1);
-            if (isLiveMotionEvent(event, this.#live.visible(), Date.now()))
-              this.#showNewEvent(event.id);
+          if (
+            (!previous || sessionRevision(previous) !== sessionRevision(event)) &&
+            isLiveMotionEvent(event, this.#live.visible(), Date.now())
+          ) {
+            this.#showNewEvent(event.id);
           }
           void this.#persist();
         }
@@ -266,13 +283,17 @@ export class ActivityStore {
   }
 
   async #markReadLocally(id: string): Promise<void> {
-    const target = this.#events().find((event) => event.id === id);
+    const target = [...this.#events(), ...this.#legacyResults].find((event) => event.id === id);
     if (!target?.isRead) this.#unreadCount.update((count) => Math.max(0, count - 1));
     this.#events.update((events) =>
       events.map((event) => (event.id === id ? { ...event, isRead: true } : event)),
     );
+    this.#legacyResults = this.#legacyResults.map((event) =>
+      event.id === id ? { ...event, isRead: true } : event,
+    );
     this.#selected.update((event) => (event?.id === id ? { ...event, isRead: true } : event));
     this.#pendingReadIds.add(id);
+    if (target) this.#pendingReadThrough.set(id, target.session?.updatedAt ?? target.occurredAt);
     await this.#persist();
     await this.#flushReads();
   }
@@ -286,8 +307,11 @@ export class ActivityStore {
         this.#pendingReadAll = false;
       } else {
         for (const id of [...this.#pendingReadIds]) {
-          await firstValueFrom(this.#api.markEventRead(id, pairing.csrfToken));
+          const through = this.#pendingReadThrough.get(id);
+          await firstValueFrom(this.#api.markEventRead(id, pairing.csrfToken, through));
+          if (this.#pendingReadThrough.get(id) !== through) continue;
           this.#pendingReadIds.delete(id);
+          this.#pendingReadThrough.delete(id);
         }
       }
       await this.#persist();
@@ -304,6 +328,12 @@ export class ActivityStore {
     this.#newEventTimer = setTimeout(() => this.#newEventId.set(null), 900);
   }
 
+  #mergeFeed(incoming: ActivityEventDto[]): void {
+    const merged = mergeSessionFeed(this.#events(), incoming, this.#legacyResults);
+    this.#events.set(merged.events);
+    this.#legacyResults = merged.legacy;
+  }
+
   #applyCache(cached: CachedActivity): void {
     this.#usage.acceptCached(cached.usageLimits);
     this.#bootstrap.set({
@@ -315,10 +345,14 @@ export class ActivityStore {
       unreadCount: cached.unreadCount,
     });
     this.#events.set(cached.events);
+    this.#legacyResults = cached.legacyResults ?? [];
     this.#nextCursor.set(cached.nextCursor);
     this.#unreadCount.set(cached.unreadCount);
     this.#savedAt.set(new Date(cached.savedAt));
     cached.pendingReadIds.forEach((id) => this.#pendingReadIds.add(id));
+    Object.entries(cached.pendingReadThrough ?? {}).forEach(([id, through]) =>
+      this.#pendingReadThrough.set(id, through),
+    );
     this.#pendingReadAll = cached.pendingReadAll;
     this.#state.set('cached');
   }
@@ -332,8 +366,10 @@ export class ActivityStore {
       usageLimits: this.#usage.snapshot() ?? bootstrap.usageLimits,
       unreadCount: this.#unreadCount(),
       events: this.#events().slice(0, 100),
+      legacyResults: this.#legacyResults,
       nextCursor: this.#nextCursor(),
       pendingReadIds: [...this.#pendingReadIds],
+      pendingReadThrough: Object.fromEntries(this.#pendingReadThrough),
       pendingReadAll: this.#pendingReadAll,
     });
   }

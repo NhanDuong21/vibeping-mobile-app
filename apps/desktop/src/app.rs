@@ -87,13 +87,13 @@ pub async fn run_with_shutdown(
         while let Some(value) = ingress.recv().await {
             let refresh_usage = value.signal == CodexSignal::Completed;
             match store.ingest(&value).await {
-                Ok(event) => {
+                Ok(_) => {
                     if let Ok(current_work) = store.current_work().await
                         && let Ok(json) = serde_json::to_string(&current_work)
                     {
                         let _ = activity_state.work_events.send(json);
                     }
-                    if let Some(event) = event
+                    if let Ok(Some(event)) = store.session_for_turn(&value.turn_key).await
                         && let Ok(json) = serde_json::to_string(&event)
                     {
                         let _ = activity_state.activity_events.send(json);

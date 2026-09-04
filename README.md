@@ -1,6 +1,6 @@
-# VibePing — personal release-candidate build
+# VibePing — Sessions 1.1
 
-VibePing is a personal-production tool that notifies one user's iPhone when Codex finishes, needs attention, leaves final tests failing, has a preview ready, or approaches a usage allowance. This repository is building toward a personal release candidate; it is not a declared stable v1.0 release.
+VibePing is a personal-production tool that notifies one user's iPhone when Codex finishes, needs attention, leaves final tests failing, has a preview ready, or approaches a usage allowance. Version 1.1 groups a request's signals into a persistent work session, with a live card, timeline, completion summary, and the final Codex answer retained from RC8.
 
 Gate 0 preserves the proven standards-based iPhone Web Push evidence from the stable private Tailscale Serve origin. Gate 1 preserves the proven signed-in Codex allowance path through the official App Server protocol. The self-contained Rust/SQLite release candidate now serves the Angular/Ionic PWA at that same private origin; the Gate 0 source, state, and rollback path remain preserved.
 
@@ -47,7 +47,7 @@ Run the production browser suite after building the release executable:
 pnpm run e2e
 ```
 
-Build and package the self-contained Windows x64 release candidate:
+Build and package the self-contained Windows x64 release:
 
 ```powershell
 pnpm run build:release
@@ -55,7 +55,7 @@ pnpm run package:windows
 pnpm run e2e:release
 ```
 
-The ignored output is `artifacts/VibePing-Windows-x64-v1.0.0-rc.8/`, its ZIP, and its SHA-256 file. The six-file package needs no Node.js, pnpm, Rust, or Cargo installation on the user machine. See [RC8 release notes](docs/release-1.0.0-rc.8.md) for Codex task results on iPhone and the PWA update.
+The ignored output is `artifacts/VibePing-Windows-x64-v1.1.0/`, its ZIP, and its SHA-256 file. The six-file package needs no Node.js, pnpm, Rust, or Cargo installation on the user machine. See [1.1 release notes](docs/release-1.1.0.md) for Sessions, retained Codex results, and the PWA update. The phase ledger below records the original V1 foundation; physical iPhone acceptance remains separate from automated release checks.
 
 Control the production process explicitly (there is no auto-start):
 

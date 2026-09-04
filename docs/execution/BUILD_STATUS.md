@@ -1,5 +1,9 @@
 # Build status
 
+- **Current personal release:** 1.1.0 Sessions, following RC8; see `docs/release-1.1.0.md`.
+- **Release scope:** one persistent session per request, grouped activity, timeline, completion summary, lifecycle motion, and preserved final answers. Personal and Always ready are deferred by the owner.
+- The ledger below is historical. Physical iPhone and soak acceptance remain human checks.
+
 - **Campaign branch:** `codex/vibeping-v1-rc1`
 - **Starting commit:** `388c7238eb9278032d140239a2bdd3e3bb7a21d7`
 - **Stable private origin:** discovered at runtime; intentionally not repeated in tracked documentation

@@ -5,10 +5,11 @@ import { activityProject, activityTaskTitle } from '../application/activity-pres
 import { ActivityStore } from '../application/activity.store';
 import { MotionInView, SignalMotion } from '../../../core/motion/signal-motion';
 import { eventMotionCue } from '../application/event-motion';
+import { WorkSessionCard } from './work-session-card';
 
 @Component({
   selector: 'app-live-status-card',
-  imports: [RouterLink, SignalMotion, MotionInView],
+  imports: [RouterLink, SignalMotion, MotionInView, WorkSessionCard],
   templateUrl: './live-status-card.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

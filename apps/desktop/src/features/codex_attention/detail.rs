@@ -47,6 +47,7 @@ impl ActivityStore {
                 project_name: row.project_name,
                 occurred_at: row.occurred_at,
                 is_read: row.is_read,
+                session: None,
             },
             timeline,
             result: row.result_text.map(|text| super::CodexResult {

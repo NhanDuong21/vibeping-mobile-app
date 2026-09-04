@@ -30,10 +30,16 @@
         appSignalMotion="arrive"
         class="text-balance text-[1.75rem] font-bold leading-tight tracking-[-0.035em]"
       >
-        {{ label(event) }}
+        {{ event.session ? taskTitle(event) : label(event) }}
       </h1>
       <div class="mt-6 border-y border-vibe-rule py-5 dark:border-vibe-rule-dark">
-        <p class="break-words text-lg font-bold leading-6">{{ taskTitle(event) }}</p>
+        <p class="break-words text-lg font-bold leading-6">{{ event.session ? sessionStatus(event, activity.now(), activity.isStale()) : taskTitle(event) }}</p>
+        @if (event.session) {
+          <p class="mt-1.5 text-sm text-vibe-muted dark:text-vibe-sage">{{ sessionDuration(event, activity.now(), activity.isStale()) }}</p>
+          @if (event.session.failedTestCount) {
+            <p class="mt-2 text-sm">{{ event.session.failedTestCount }} lần kiểm thử chưa đạt</p>
+          }
+        }
         <p class="mt-1.5 break-words text-sm text-vibe-muted dark:text-vibe-sage">
           {{ project(event) }}
         </p>
@@ -43,23 +49,6 @@
           </p>
         }
       </div>
-
-      @if (event.result; as result) {
-        <section class="mt-7" aria-labelledby="result-heading">
-          <h2 id="result-heading" class="text-[1.375rem] font-bold tracking-[-0.025em]">
-            Kết quả Codex
-          </h2>
-          <p class="mt-1.5 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
-            Câu trả lời cuối của lượt làm việc này.
-          </p>
-          <app-result-body [text]="result.text" />
-          @if (result.truncated) {
-            <p class="mt-4 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
-              Câu trả lời dài nên VibePing chỉ lưu phần đầu. Mở Codex trên laptop để đọc đầy đủ.
-            </p>
-          }
-        </section>
-      }
 
       @if (event.timeline.length) {
         <section class="mt-7" aria-labelledby="timeline-heading">
@@ -93,6 +82,23 @@
         </section>
       }
 
+      @if (event.result; as result) {
+        <section class="mt-7" aria-labelledby="result-heading">
+          <h2 id="result-heading" class="text-[1.375rem] font-bold tracking-[-0.025em]">
+            Kết quả Codex
+          </h2>
+          <p class="mt-1.5 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
+            Câu trả lời cuối của lượt làm việc này.
+          </p>
+          <app-result-body [text]="result.text" />
+          @if (result.truncated) {
+            <p class="mt-4 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
+              Câu trả lời dài nên VibePing chỉ lưu phần đầu. Mở Codex trên laptop để đọc đầy đủ.
+            </p>
+          }
+        </section>
+      }
+
       <dl
         class="mt-7 grid grid-cols-[auto_minmax(0,1fr)] gap-x-5 gap-y-3 border-b border-vibe-rule pb-6 text-sm dark:border-vibe-rule-dark"
       >
@@ -102,13 +108,13 @@
         <dd class="text-right font-semibold">{{ event.isRead ? 'Đã đọc' : 'Chưa đọc' }}</dd>
       </dl>
 
-      <section class="mt-6" aria-labelledby="privacy-note-heading">
-        <h2 id="privacy-note-heading" class="text-base font-bold">Quyền riêng tư</h2>
+      <details class="mt-6">
+        <summary class="min-h-11 content-center cursor-pointer text-sm font-bold">Quyền riêng tư</summary>
         <p class="mt-2 text-sm leading-6 text-vibe-muted dark:text-vibe-sage">
           VibePing lưu câu trả lời cuối trên laptop và bản đã xem trên điện thoại. Prompt và nhật ký
           chạy công cụ không được lưu. Bạn có thể ẩn đoạn trích trên Màn hình khóa trong Cài đặt.
         </p>
-      </section>
+      </details>
     } @else if (activity.detailState() === 'missing') {
       <section class="py-8">
         <h1 class="text-balance text-[1.75rem] font-bold leading-tight tracking-[-0.035em]">

@@ -19,9 +19,9 @@ THESIS: A trustworthy private signal line, not a miniature developer dashboard.
 
 OWN-WORLD: Tinted off-white or green-black field, mint signal, green-gray metadata, sparse rules, 12–16 px corners only where a container is necessary.
 
-STORY: Read current state, scan the latest signal, act only when recovery or attention is required.
+STORY: Follow one Codex request from start to completion, scan its real stages, then read the retained final answer. Each new request is a separate session.
 
-FIRST VIEWPORT: Compact VibePing masthead, dominant operational state, allowance rows, then activity; primary recovery action sits beside the state that needs it.
+FIRST VIEWPORT: Compact masthead, one persistent session card with task, project, state, duration and three latest stages; allowance rows and earlier sessions below. Completion changes that same card into a summary. Detail puts the full timeline before the final answer.
 
 FORM: Established Quiet signal world; precise supplied composition, so no concept tournament. Seed key: brief-pinned-operate.
 

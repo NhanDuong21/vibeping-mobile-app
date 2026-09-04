@@ -9,17 +9,21 @@ import {
   groupActivityEvents,
 } from '../application/activity-presentation';
 import { ActivityStore } from '../application/activity.store';
+import { WorkSessionCard } from './work-session-card';
 
 @Component({
   selector: 'app-activity-list',
-  imports: [SignalMotion, RouterLink],
+  imports: [SignalMotion, RouterLink, WorkSessionCard],
   templateUrl: './activity-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ActivityList {
   protected readonly activity = inject(ActivityStore);
   protected readonly groups = computed(() =>
-    groupActivityEvents(this.activity.events(), this.activity.now()),
+    groupActivityEvents(
+      this.activity.events().filter((event) => event.id !== this.activity.focusedSession()?.id),
+      this.activity.now(),
+    ),
   );
   protected readonly label = activityLabel;
   protected readonly taskTitle = activityTaskTitle;

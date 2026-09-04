@@ -41,11 +41,28 @@ pub struct ActivityEvent {
     pub project_name: String,
     pub occurred_at: DateTime<Utc>,
     pub is_read: bool,
+    #[sqlx(skip)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub session: Option<WorkSession>,
+}
+
+#[derive(Clone, Debug, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct WorkSession {
+    pub event_ids: Vec<String>,
+    pub state: String,
+    pub started_at: Option<DateTime<Utc>>,
+    pub completed_at: Option<DateTime<Utc>>,
+    pub updated_at: DateTime<Utc>,
+    pub failed_test_count: i64,
+    pub timeline: Vec<ActivityTimelineStage>,
 }
 
 #[derive(Clone, Debug, Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct CurrentWork {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub session_id: Option<String>,
     pub project_name: String,
     pub state: String,
     pub last_test_state: String,

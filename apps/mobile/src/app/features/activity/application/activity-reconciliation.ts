@@ -8,7 +8,8 @@ export function mergeEvents(
   for (const event of incoming) {
     const previous = merged.get(event.id);
     const updated = { ...previous, ...event };
-    merged.set(event.id, previous?.isRead ? { ...updated, isRead: true } : updated);
+    const sameRevision = !event.session || previous?.session?.updatedAt === event.session.updatedAt;
+    merged.set(event.id, previous?.isRead && sameRevision ? { ...updated, isRead: true } : updated);
   }
   return [...merged.values()].sort(
     (left, right) =>

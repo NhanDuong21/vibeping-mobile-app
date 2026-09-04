@@ -15,8 +15,10 @@ export interface CachedActivity {
   unreadCount: number;
   events: (Omit<ActivityEventDetailDto, 'timeline'> &
     Partial<Pick<ActivityEventDetailDto, 'timeline'>>)[];
+  legacyResults?: CachedActivity['events'];
   nextCursor: string | null;
   pendingReadIds: string[];
+  pendingReadThrough?: Record<string, string>;
   pendingReadAll: boolean;
 }
 
@@ -57,8 +59,18 @@ export function isCachedActivity(value: unknown): value is CachedActivity {
     Array.isArray(cached.events) &&
     cached.events.length <= 100 &&
     cached.events.every(isCachedEvent) &&
+    (cached.legacyResults === undefined ||
+      (Array.isArray(cached.legacyResults) &&
+        cached.legacyResults.length <= 100 &&
+        cached.legacyResults.every(isCachedEvent))) &&
     Array.isArray(cached.pendingReadIds) &&
     cached.pendingReadIds.every((id) => typeof id === 'string') &&
+    (cached.pendingReadThrough === undefined ||
+      (cached.pendingReadThrough !== null &&
+        typeof cached.pendingReadThrough === 'object' &&
+        Object.values(cached.pendingReadThrough).every(
+          (value) => typeof value === 'string' && Number.isFinite(Date.parse(value)),
+        ))) &&
     typeof cached.pendingReadAll === 'boolean' &&
     (cached.nextCursor === null || typeof cached.nextCursor === 'string') &&
     Boolean(cached.usageLimits && typeof cached.usageLimits === 'object')
@@ -77,6 +89,7 @@ function isCachedEvent(value: unknown): boolean {
     typeof event.occurredAt === 'string' &&
     !Number.isNaN(Date.parse(event.occurredAt)) &&
     typeof event.isRead === 'boolean' &&
+    (event.session == null || isCachedSession(event.session)) &&
     (event.resultExcerpt == null || typeof event.resultExcerpt === 'string') &&
     (event.result == null ||
       (typeof event.result.text === 'string' &&
@@ -91,5 +104,26 @@ function isCachedEvent(value: unknown): boolean {
             typeof stage.occurredAt === 'string' &&
             Number.isFinite(Date.parse(stage.occurredAt)),
         )))
+  );
+}
+
+function isCachedSession(value: NonNullable<ActivityEventDetailDto['session']>): boolean {
+  const date = (input: unknown): boolean =>
+    typeof input === 'string' && Number.isFinite(Date.parse(input));
+  return (
+    typeof value === 'object' &&
+    Array.isArray(value.eventIds) &&
+    value.eventIds.every((id) => typeof id === 'string') &&
+    ['running', 'waiting', 'completed', 'stopped', 'failed', 'unconfirmed'].includes(value.state) &&
+    date(value.updatedAt) &&
+    (value.startedAt === null || date(value.startedAt)) &&
+    (value.completedAt === null || date(value.completedAt)) &&
+    Number.isInteger(value.failedTestCount) &&
+    value.failedTestCount >= 0 &&
+    Array.isArray(value.timeline) &&
+    value.timeline.length <= 3 &&
+    value.timeline.every(
+      (stage) => stage && typeof stage.eventType === 'string' && date(stage.occurredAt),
+    )
   );
 }
