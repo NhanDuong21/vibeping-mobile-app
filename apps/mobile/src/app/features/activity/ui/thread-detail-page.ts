@@ -1,27 +1,18 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { clock, exactDateTime } from '../../../core/formatting/time';
+import { combineLatest } from 'rxjs';
+import { exactDateTime } from '../../../core/formatting/time';
 import { PullToRefresh } from '../../../core/refresh/pull-to-refresh';
 import { ProjectIdentity } from '../../personal';
 import { ActivityStore } from '../application/activity.store';
 import { ThreadDetailStore } from '../application/thread-detail.store';
-import {
-  failureNote,
-  attentionNote,
-  needsAttention,
-  threadSpan,
-  threadStatus,
-  threadTitle,
-  turnTitle,
-} from '../application/thread-presentation';
-import { sessionDuration } from '../application/work-session-presentation';
-import { TurnRow } from './turn-row';
-import { SignalMotion } from '../../../core/motion/signal-motion';
+import { threadTitle } from '../application/thread-presentation';
+import { RequestPanel } from './request-panel';
 
 @Component({
   selector: 'app-thread-detail-page',
-  imports: [RouterLink, PullToRefresh, ProjectIdentity, TurnRow, SignalMotion],
+  imports: [RouterLink, PullToRefresh, ProjectIdentity, RequestPanel],
   templateUrl: './thread-detail-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -30,22 +21,18 @@ export class ThreadDetailPage {
   protected readonly thread = inject(ThreadDetailStore);
   protected readonly activity = inject(ActivityStore);
   protected readonly title = threadTitle;
-  protected readonly turnTitle = turnTitle;
-  protected readonly status = threadStatus;
-  protected readonly span = threadSpan;
-  protected readonly failures = failureNote;
-  protected readonly attention = needsAttention;
-  protected readonly attentionNote = attentionNote;
-  protected readonly duration = sessionDuration;
-  protected readonly clock = clock;
   protected readonly exactTime = exactDateTime;
   constructor() {
-    this.#route.paramMap
+    combineLatest([this.#route.paramMap, this.#route.queryParamMap])
       .pipe(takeUntilDestroyed())
-      .subscribe((params) => void this.thread.open(params.get('id') ?? ''));
+      .subscribe(([params, query]) => {
+        void this.thread.open(params.get('id') ?? '', query.get('request'));
+      });
   }
-
   ionViewWillEnter(): void {
-    void this.thread.open(this.#route.snapshot.paramMap.get('id') ?? '');
+    void this.thread.open(
+      this.#route.snapshot.paramMap.get('id') ?? '',
+      this.#route.snapshot.queryParamMap.get('request'),
+    );
   }
 }

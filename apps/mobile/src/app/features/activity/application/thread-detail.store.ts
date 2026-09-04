@@ -5,7 +5,6 @@ import { MobileSnapshotStorage } from '../../../core/cache/mobile-snapshot-stora
 import { isCachedEvent } from '../data/activity-cache';
 import { ActivityStore } from './activity.store';
 import { mergeEvents } from './activity-reconciliation';
-import { sessionIsWorking } from './work-session-presentation';
 
 @Injectable({ providedIn: 'root' })
 export class ThreadDetailStore {
@@ -36,13 +35,11 @@ export class ThreadDetailStore {
     ).sort((a, b) => (b.session?.thread?.turnNumber ?? 0) - (a.session?.thread?.turnNumber ?? 0)),
   );
   readonly latest = computed(() => this.turns()[0] ?? null);
-  readonly current = computed(() => {
-    const latest = this.latest();
-    return sessionIsWorking(latest, this.#activity.now(), this.#activity.isStale()) ? latest : null;
-  });
   readonly previous = computed(() =>
-    this.turns().filter((event) => event.id !== this.current()?.id),
+    this.turns().filter((event) => event.id !== this.latest()?.id),
   );
+  readonly #target = signal<string | null>(null);
+  readonly target = this.#target.asReadonly();
   readonly #revision = computed(() => {
     const event = this.#activity
       .threads()
@@ -59,9 +56,11 @@ export class ThreadDetailStore {
     });
   }
 
-  async open(id: string): Promise<void> {
+  async open(id: string, request: string | null = null): Promise<void> {
+    this.#target.set(request);
     if (id === this.#id()) {
-      void this.refresh();
+      await this.refresh();
+      await this.#includeTarget(id, request);
       return;
     }
     this.#sequence++;
@@ -85,6 +84,7 @@ export class ThreadDetailStore {
       /* Server is authoritative; a missing cache does not block reading. */
     }
     await this.refresh();
+    await this.#includeTarget(id, request);
   }
 
   async refresh(): Promise<void> {
@@ -121,6 +121,14 @@ export class ThreadDetailStore {
     } finally {
       if (id === this.#id()) this.#loadingMore.set(false);
     }
+  }
+
+  async #includeTarget(id: string, request: string | null): Promise<void> {
+    if (!request || id !== this.#id() || this.turns().some((event) => event.id === request)) return;
+    const read = await this.#activity.readDetail(request);
+    if (id !== this.#id() || request !== this.#target()) return;
+    if (read.event?.session?.thread?.id === id)
+      this.#turns.set(mergeEvents(this.#turns(), [read.event]));
   }
 
   async #persist(id: string): Promise<void> {

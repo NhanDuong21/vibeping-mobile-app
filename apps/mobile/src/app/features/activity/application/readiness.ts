@@ -126,7 +126,7 @@ const READINESS: Record<ReadinessKind, ReadinessView> = {
     kind: 'completed',
     label: 'Vừa hoàn tất',
     title: 'Công việc vừa hoàn tất',
-    detail: 'Codex đã kết thúc lượt trả lời. Mở Codex trên laptop để xem kết quả.',
+    detail: 'Codex đã kết thúc yêu cầu. Mở Codex trên laptop để xem kết quả.',
   },
   codexSetup: {
     kind: 'codexSetup',

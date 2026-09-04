@@ -1,0 +1,25 @@
+<article [attr.data-request-id]="event().id" class="scroll-mt-5 py-5">
+  @if (single()) {
+    <div class="flex items-center gap-2.5">
+      @if (working()) { <app-session-working-signal /> }
+      <p class="text-lg font-bold">{{ status(event(), activity.now(), activity.isStale()) }}@if (event().session?.completedAt; as finish) { lúc {{ clock(finish) }} }</p>
+    </div>
+  } @else {
+    <button type="button" (click)="toggle()" [attr.aria-expanded]="open()" [attr.aria-controls]="'request-' + event().id" class="flex min-h-11 w-full items-start justify-between gap-4 text-left">
+      <span class="min-w-0">
+        <span class="block text-base font-bold">{{ label() }}</span>
+        <span class="mt-1 flex items-center gap-2.5 text-sm text-vibe-muted dark:text-vibe-sage">@if (working()) { <app-session-working-signal /> }<span>{{ exactTime(event().session?.completedAt || event().session?.startedAt || event().occurredAt) }} · {{ status(event(), activity.now(), activity.isStale()) }}</span></span>
+        @if (!open()) { <span class="mt-2 block line-clamp-2 break-words text-sm leading-6">{{ preview(event()) }}</span> }
+      </span>
+      <svg class="mt-1 size-4 shrink-0 transition-transform motion-reduce:transition-none" [class.rotate-180]="open()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+    </button>
+  }
+  <div [id]="'request-' + event().id" [hidden]="!open()">
+    @if (open()) {
+      @if (detail.state() === 'cached') { <p class="mt-4 text-sm text-vibe-muted dark:text-vibe-sage">Đang hiển thị nội dung đã lưu. <button (click)="detail.refresh()" class="min-h-11 font-bold underline">Thử lại</button></p> }
+      @if (detail.event(); as content) { <app-request-content [event]="content" /> }
+      @else if (detail.state() === 'loading') { <p class="py-5 text-sm text-vibe-muted dark:text-vibe-sage" role="status">Đang tải kết quả…</p> }
+      @else { <p class="mt-4 text-sm text-vibe-muted dark:text-vibe-sage">Chưa đọc được nội dung yêu cầu này.</p><button (click)="detail.refresh()" class="min-h-11 text-sm font-bold text-vibe-green dark:text-vibe-mint">Thử lại</button> }
+    }
+  </div>
+</article>

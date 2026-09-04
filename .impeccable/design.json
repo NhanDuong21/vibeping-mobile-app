@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-04T11:41:50Z",
+  "generatedAt": "2026-09-04T15:00:56.643Z",
   "title": "Design System: VibePing",
   "extensions": {
     "colorMeta": {
@@ -222,11 +222,11 @@
       },
       "title": {
         "displayName": "Section title",
-        "purpose": "Settings sections and prominent session titles."
+        "purpose": "Settings sections and prominent work titles."
       },
       "row-title": {
         "displayName": "Row title",
-        "purpose": "Earlier sessions and project list entries."
+        "purpose": "Work rows, request disclosures and project list entries."
       },
       "body": {
         "displayName": "Supporting text",
@@ -249,7 +249,7 @@
       {
         "name": "timeline-marker-ground",
         "value": "0 0 0 4px var(--color-vibe-canvas)",
-        "purpose": "Ground-colored separation around the timeline marker; uses vibe-night in dark mode, not a cast card shadow."
+        "purpose": "Ground-colored separation around the semantic timeline marker; uses vibe-night in dark mode, not a cast card shadow."
       }
     ],
     "motion": [
@@ -297,27 +297,34 @@
   },
   "components": [
     {
-      "name": "Work session summary",
+      "name": "Compact work row",
       "kind": "card",
-      "description": "Open activity-row variant of the persistent session card, with illustrative Vietnamese content. The prominent variant uses the incumbent surface and local app icon. Completion keeps the same identity, observed duration, failed-test count when present, and available answer excerpt.",
-      "html": "<a class=\"ds-session\" href=\"#session-detail\"><p class=\"ds-session-title\">Hoàn thiện màn hình hoạt động</p><p class=\"ds-session-meta ds-session-project\">VibePing</p><p class=\"ds-session-state\"><strong>Đã hoàn tất</strong><span class=\"ds-session-meta\">· 12 phút</span></p><p class=\"ds-session-excerpt\">Đã cập nhật màn hình hoạt động.</p><div class=\"ds-session-footer\"><span class=\"ds-session-meta\">Tín hiệu cuối lúc 10:12</span><span class=\"ds-session-action\">Xem diễn biến và kết quả</span></div></a>",
-      "css": ".ds-session { display:block; min-height:44px; border-radius:12px; padding:16px 0; color:var(--color-vibe-ink, #10251c); font-family:var(--font-sans, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif); text-decoration:none; transition:opacity 150ms; } .ds-session-title { margin:0; overflow-wrap:break-word; font-size:16px; font-weight:700; line-height:24px; } .ds-session-meta { color:var(--color-vibe-muted, #587065); } .ds-session-project { margin:4px 0 0; overflow-wrap:break-word; font-size:12px; line-height:20px; } .ds-session-state { display:flex; flex-wrap:wrap; align-items:baseline; column-gap:8px; row-gap:4px; margin:12px 0 0; font-size:14px; line-height:24px; } .ds-session-state strong { font-weight:700; } .ds-session-excerpt { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; overflow-wrap:break-word; margin:12px 0 0; font-size:14px; line-height:24px; } .ds-session-footer { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; column-gap:16px; row-gap:8px; margin-top:12px; font-size:12px; line-height:20px; } .ds-session-action { color:var(--color-vibe-green, #17643f); font-weight:700; } .ds-session:hover { text-decoration:none; } .ds-session:focus-visible { outline:3px solid var(--color-vibe-mint, #45d395); outline-offset:3px; } .ds-session:active { opacity:0.7; } :host-context(.dark) .ds-session { color:var(--color-vibe-paper, #f3f8f5); } :host-context(.dark) .ds-session-meta { color:var(--color-vibe-sage, #9fb9aa); } :host-context(.dark) .ds-session-action { color:var(--color-vibe-mint, #45d395); } @media (prefers-reduced-motion:reduce) { .ds-session { transition:none; } } :host-context([data-motion='minimal']) .ds-session { transition:none; }"
+      "description": "One thread keeps one work identity across requests. The complete row opens work detail with the latest request expanded. Its illustrative completion state shows project, request count, finish time, a safe result sentence and chevron; there is no aggregate duration or repeated CTA. The separate prominent variant remains reserved for active or actionable work.",
+      "html": "<a class=\"ds-work\" href=\"#work-detail\"><p class=\"ds-work-title\">Hoàn thiện màn hình hoạt động</p><p class=\"ds-work-project\">VibePing</p><p class=\"ds-work-meta\">3 yêu cầu · Hoàn tất lúc 10:12</p><p class=\"ds-work-preview\">Đã cập nhật màn hình hoạt động.</p><svg class=\"ds-work-chevron\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" aria-hidden=\"true\"><path d=\"m9 5 7 7-7 7\"/></svg></a>",
+      "css": ".ds-work { position:relative; display:block; min-height:44px; min-width:0; border-radius:8px; padding:16px 24px 16px 0; color:var(--color-vibe-ink, #10251c); font-family:var(--font-sans, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif); text-decoration:none; transition:background-color 150ms; } .ds-work-title { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; overflow-wrap:break-word; margin:0; font-size:16px; font-weight:700; line-height:24px; } .ds-work-project { margin:4px 0 0; overflow-wrap:break-word; font-size:12px; line-height:20px; color:var(--color-vibe-muted, #587065); } .ds-work-meta { margin:8px 0 0; font-size:14px; line-height:24px; color:var(--color-vibe-muted, #587065); } .ds-work-preview { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; overflow-wrap:break-word; margin:4px 0 0; font-size:14px; line-height:24px; } .ds-work-chevron { position:absolute; right:0; top:50%; width:16px; height:16px; color:var(--color-vibe-muted, #587065); } .ds-work:hover { text-decoration:none; } .ds-work:focus-visible { outline:3px solid var(--color-vibe-mint, #45d395); outline-offset:3px; } .ds-work:active { background:color-mix(in srgb, var(--color-vibe-mint-soft, #d9f8e8) 60%, transparent); } :host-context(.dark) .ds-work { color:var(--color-vibe-paper, #f3f8f5); } :host-context(.dark) .ds-work-project, :host-context(.dark) .ds-work-meta, :host-context(.dark) .ds-work-chevron { color:var(--color-vibe-sage, #9fb9aa); } :host-context(.dark) .ds-work:active { background:color-mix(in srgb, var(--color-vibe-mint, #45d395) 10%, transparent); } @media (prefers-reduced-motion:reduce) { .ds-work { transition:none; } } :host-context([data-motion=\"minimal\"]) .ds-work { transition:none; }"
     },
     {
-      "name": "Retained session timeline",
+      "name": "Retained request timeline",
       "kind": "custom",
-      "description": "Ordered, recorded stages appear before the final answer in detail. Illustrative content shows the timestamp, decorative mint sequence marker, and Vietnamese stage label. The active-card preview uses only the three latest stages; unavailable history is never invented.",
-      "html": "<section class=\"ds-timeline\" aria-labelledby=\"ds-timeline-heading\"><h2 id=\"ds-timeline-heading\" class=\"ds-timeline-heading\">Diễn biến</h2><ol class=\"ds-timeline-list\"><li class=\"ds-timeline-stage\"><time class=\"ds-timeline-time\">10:00</time><span class=\"ds-timeline-dot\" aria-hidden=\"true\"></span><span>Công việc bắt đầu</span></li><li class=\"ds-timeline-stage\"><time class=\"ds-timeline-time\">10:12</time><span class=\"ds-timeline-dot\" aria-hidden=\"true\"></span><span>Công việc hoàn tất</span></li></ol></section>",
-      "css": ".ds-timeline { color:var(--color-vibe-ink, #10251c); font-family:var(--font-sans, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif); } .ds-timeline-heading { margin:0; font-size:22px; font-weight:700; letter-spacing:-0.025em; } .ds-timeline-list { position:relative; margin:16px 0 0; padding:0; list-style:none; } .ds-timeline-list::before { position:absolute; top:20px; bottom:20px; left:68px; width:1px; background:color-mix(in srgb, var(--color-vibe-mint, #45d395) 50%, transparent); content:''; } .ds-timeline-stage { position:relative; display:grid; grid-template-columns:52px 8px minmax(0, 1fr); align-items:center; gap:12px; padding:14px 0; font-size:14px; font-weight:600; line-height:20px; } .ds-timeline-stage + .ds-timeline-stage { margin-top:4px; } .ds-timeline-time { color:var(--color-vibe-muted, #587065); font-variant-numeric:tabular-nums; } .ds-timeline-dot { width:8px; height:8px; border-radius:50%; background:var(--color-vibe-mint, #45d395); box-shadow:0 0 0 4px var(--color-vibe-canvas, #f3f7f4); } :host-context(.dark) .ds-timeline { color:var(--color-vibe-paper, #f3f8f5); } :host-context(.dark) .ds-timeline-time { color:var(--color-vibe-sage, #9fb9aa); } :host-context(.dark) .ds-timeline-dot { box-shadow:0 0 0 4px var(--color-vibe-night, #07140f); }"
+      "description": "Each expanded request retains its recorded stages before the stored final answer. The timeline uses tabular time, semantic SVG markers and a neutral connecting rule. This illustrative start/completion pair does not invent missing history. The prominent work card separately previews only the current request’s latest recorded stage.",
+      "html": "<section class=\"ds-timeline\" aria-labelledby=\"ds-timeline-heading\"><h2 id=\"ds-timeline-heading\" class=\"ds-timeline-heading\">Diễn biến</h2><ol class=\"ds-timeline-list\"><li class=\"ds-timeline-stage\"><time class=\"ds-timeline-time\">10:00</time><span class=\"ds-timeline-marker ds-timeline-start\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"m7 4 13 8-13 8z\"/></svg></span><span>Công việc bắt đầu</span></li><li class=\"ds-timeline-stage\"><time class=\"ds-timeline-time\">10:12</time><span class=\"ds-timeline-marker ds-timeline-complete\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\"><path d=\"m4 12 5 5L20 6\"/></svg></span><span>Công việc hoàn tất</span></li></ol></section>",
+      "css": ".ds-timeline { color:var(--color-vibe-ink, #10251c); font-family:var(--font-sans, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif); } .ds-timeline-heading { margin:0; font-size:22px; font-weight:700; letter-spacing:-0.025em; } .ds-timeline-list { position:relative; margin:16px 0 0; padding:0; list-style:none; } .ds-timeline-list::before { position:absolute; top:20px; bottom:20px; left:74px; width:1px; background:var(--color-vibe-rule, #d7e2dc); content:\"\"; } .ds-timeline-stage { position:relative; display:grid; grid-template-columns:52px 20px minmax(0, 1fr); align-items:center; gap:12px; padding:14px 0; font-size:14px; font-weight:600; line-height:20px; } .ds-timeline-stage + .ds-timeline-stage { margin-top:4px; } .ds-timeline-time { color:var(--color-vibe-muted, #587065); font-variant-numeric:tabular-nums; } .ds-timeline-marker { position:relative; display:grid; place-items:center; width:20px; height:20px; border-radius:50%; background:var(--color-vibe-canvas, #f3f7f4); box-shadow:0 0 0 4px var(--color-vibe-canvas, #f3f7f4); } .ds-timeline-start { color:var(--color-vibe-green, #17643f); } .ds-timeline-start svg { width:16px; height:16px; } .ds-timeline-complete svg { width:20px; height:20px; } :host-context(.dark) .ds-timeline { color:var(--color-vibe-paper, #f3f8f5); } :host-context(.dark) .ds-timeline-list::before { background:var(--color-vibe-rule-dark, #274236); } :host-context(.dark) .ds-timeline-time { color:var(--color-vibe-sage, #9fb9aa); } :host-context(.dark) .ds-timeline-marker { background:var(--color-vibe-night, #07140f); box-shadow:0 0 0 4px var(--color-vibe-night, #07140f); } :host-context(.dark) .ds-timeline-start { color:var(--color-vibe-mint, #45d395); }"
+    },
+    {
+      "name": "Inline request disclosure",
+      "kind": "custom",
+      "description": "Rule-separated request sections expand independently inside Chi tiết công việc. The latest opens automatically; older requests show a safe preview while collapsed. A single request has no hierarchy label, count or disclosure control. This self-contained native disclosure illustrates the button-controlled Angular pattern with sample content; actual expanded content contains the full recorded timeline, retained result and per-request facts.",
+      "html": "<details class=\"ds-request\"><summary class=\"ds-request-summary\"><span class=\"ds-request-copy\"><span class=\"ds-request-title\">Yêu cầu trước đó</span><span class=\"ds-request-meta\">10:12, Thứ Sáu, 4/9 · Đã hoàn tất</span><span class=\"ds-request-preview\">Đã cập nhật màn hình hoạt động.</span></span><svg class=\"ds-request-chevron\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></summary><section class=\"ds-request-content\" aria-labelledby=\"ds-request-result\"><h2 id=\"ds-request-result\">Kết quả Codex</h2><p class=\"ds-request-help\">Câu trả lời cuối của yêu cầu này.</p><p>Đã cập nhật màn hình hoạt động.</p></section></details>",
+      "css": ".ds-request { padding:20px 0; border-top:1px solid var(--color-vibe-rule, #d7e2dc); color:var(--color-vibe-ink, #10251c); font-family:var(--font-sans, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif); } .ds-request-summary { display:flex; min-height:44px; align-items:flex-start; justify-content:space-between; gap:16px; cursor:pointer; list-style:none; } .ds-request-summary::-webkit-details-marker { display:none; } .ds-request-copy { min-width:0; } .ds-request-title { display:block; font-size:16px; font-weight:700; line-height:24px; } .ds-request-meta { display:block; margin-top:4px; font-size:14px; line-height:20px; color:var(--color-vibe-muted, #587065); } .ds-request-preview { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; overflow-wrap:break-word; margin-top:8px; font-size:14px; line-height:24px; } .ds-request-chevron { flex-shrink:0; width:16px; height:16px; margin-top:4px; transition:transform 150ms; } .ds-request[open] .ds-request-chevron { transform:rotate(180deg); } .ds-request[open] .ds-request-preview { display:none; } .ds-request-summary:hover { text-decoration:none; } .ds-request-summary:focus-visible { outline:3px solid var(--color-vibe-mint, #45d395); outline-offset:3px; } .ds-request-content { margin-top:28px; font-size:14px; line-height:24px; } .ds-request-content h2 { margin:0; font-size:22px; font-weight:700; letter-spacing:-0.025em; } .ds-request-help { margin:6px 0 0; color:var(--color-vibe-muted, #587065); } :host-context(.dark) .ds-request { border-color:var(--color-vibe-rule-dark, #274236); color:var(--color-vibe-paper, #f3f8f5); } :host-context(.dark) .ds-request-meta, :host-context(.dark) .ds-request-help { color:var(--color-vibe-sage, #9fb9aa); } @media (prefers-reduced-motion:reduce) { .ds-request-chevron { transition:none; } } :host-context([data-motion=\"minimal\"]) .ds-request-chevron { transition:none; }"
     }
   ],
   "narrative": {
     "northStar": "Quiet signal",
-    "overview": "VibePing is an operational utility. The interface should feel calm, precise, and trustworthy when glanced at on a phone. Status and next action outrank decoration. It is not a marketing page, analytics dashboard, chat client, or cyberpunk control panel.\n\nPersonal extends the incumbent world through familiar project identities, ordinary Settings controls and a small daily recap. Always ready is represented on the phone as a factual Windows status section. This record describes the implemented and tested feature; it does not claim that Always ready has been enabled on the user's installed host.",
+    "overview": "VibePing is an operational utility. The interface should feel calm, precise, and trustworthy when glanced at on a phone. Status and next action outrank decoration. It is not a marketing page, analytics dashboard, chat client, or cyberpunk control panel.\r\n\r\nPersonal extends the incumbent world through familiar project identities, ordinary Settings controls and a small daily recap. Always ready is represented on the phone as a factual Windows status section. This record describes the implemented and tested feature; it does not claim that Always ready has been enabled on the user's installed host.",
     "keyCharacteristics": [
       "Tinted fields, sparse rules and restrained semantic color.",
       "Local system type with clear status, task and metadata hierarchy.",
-      "One persistent session identity, recorded time and retained final results.",
+      "One persistent work identity with separate requests, recorded time and retained final results.",
       "A whole-image mascot with bounded, state-aware motion.",
       "Plain Vietnamese, visible focus and explicit saved or unconfirmed states."
     ],
@@ -338,13 +345,18 @@
         "section": "components"
       },
       {
-        "name": "The Persistent Session Rule",
-        "body": "One Codex request keeps one card identity as it moves from observed work to a completion summary. A later request gets a separate card, even in the same task or project. Keep the task title first, followed by project, plain-language state and observed duration; completion retains failed-test count when present and a short final-answer excerpt when available.",
+        "name": "The Persistent Work Rule",
+        "body": "One Codex thread keeps one top-level identity across prompts, labeled Công việc. Each prompt is a Yêu cầu. New requests update the count and latest state; separate threads in the same project remain separate. Show the most recently updated running work or a current actionable work in the prominent card, without repeating it in the list. When idle, use a small Codex đang nghỉ block. Other rows are grouped under Đang làm việc, Cần chú ý and Gần đây only when populated. History without thread identity remains independently accessible under Hoạt động cũ.",
         "section": "components"
       },
       {
         "name": "The Observed Time Rule",
-        "body": "Show recorded stages and timestamps only. The prominent active card shows the three most recent stages in a compact time-and-label list. Duration uses a recorded start; missing starts remain explicit. When an unfinished session becomes stale or loses a current signal, freeze duration at the last observed signal and label the saved or unconfirmed state in text. Live motion must stop with that loss of freshness. Completion fixes duration at the recorded finish.",
+        "body": "Show recorded stages and timestamps only. The prominent active card shows the current request's real duration and latest stage. Missing starts are explained inside detail. Stale or disconnected work freezes duration at its last signal and stops live motion. Work detail can show recorded start and update times, but never presents their span as total work duration.",
+        "section": "components"
+      },
+      {
+        "name": "The Two-Level Reading Rule",
+        "body": "Activity opens Chi tiết công việc with the latest request's full timeline and Codex answer already visible. Older requests use Yêu cầu trước đó disclosure rows that expand in place, independently, without another route. The latest uses Yêu cầu gần nhất. A work with one request omits these labels and counters. Older pages load on demand. Existing event and notification links resolve to work detail with the exact requested answer expanded. Cached answers are labeled and offer retry.",
         "section": "components"
       },
       {
@@ -355,7 +367,7 @@
     ],
     "dos": [
       "**Do** keep status, task and next action ahead of decoration, with readable Vietnamese text accompanying every state color.",
-      "**Do** preserve session identity, observed timestamps, final-answer access and explicit cached-state labels across Personal integrations.",
+      "**Do** preserve work and request identities, observed timestamps, final-answer access and explicit cached-state labels across Personal integrations.",
       "**Do** use confirmed project identity in shared views, retaining failed drafts for retry.",
       "**Do** keep global notification types and quiet hours visible as the authority for project filtering.",
       "**Do** refresh Windows readiness on return and show dated previous evidence when current readiness is unknown.",

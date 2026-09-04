@@ -79,7 +79,7 @@ describe('Thread hierarchy', () => {
   it('historical failures are neutral after pass; current failures, waiting and lost signals need attention', () => {
     const event = turn('one', 'a');
     expect(needsAttention(event, now)).toBe(false);
-    expect(threadStatus(event, now)).toBe('Lượt gần nhất đã hoàn tất');
+    expect(threadStatus(event, now)).toBe('Đã hoàn tất');
     event.session!.lastTestState = 'failed';
     expect(needsAttention(event, now)).toBe(true);
     expect(threadStatus(event, now)).toBe('Cần chú ý');
@@ -96,8 +96,8 @@ describe('Thread hierarchy', () => {
 
   it('uses safe metadata titles only, never a result or operational fallback', () => {
     const event = turn('one', 'a', 6);
-    expect(threadTitle(event)).toBe('Phiên làm việc VibePing');
-    expect(turnTitle(event)).toBe('Lượt làm việc 6');
+    expect(threadTitle(event)).toMatch(/^Công việc VibePing · /);
+    expect(turnTitle(event)).toMatch(/^Công việc VibePing · /);
     event.session!.thread!.title = 'Hoàn thiện màn Hoạt động';
     expect(threadTitle(event)).toBe('Hoàn thiện màn Hoạt động');
     for (const resultExcerpt of ['verdict', 'disposition: ship', 'OK', '```\npass\n```']) {

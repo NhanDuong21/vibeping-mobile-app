@@ -29,7 +29,12 @@ const bootstrap = {
   usageLimits: { state: 'available', readAt: null, windows: [], cursor: '1' },
 };
 
-async function setup(saved: unknown = null, events: ActivityEventDto[] = [event], offline = false) {
+async function setup(
+  saved: unknown = null,
+  events: ActivityEventDto[] = [event],
+  offline = false,
+  waitForEvents = true,
+) {
   const listeners = new Map<string, EventListener>();
   const api = {
     bootstrap: vi
@@ -65,11 +70,66 @@ async function setup(saved: unknown = null, events: ActivityEventDto[] = [event]
   });
   const store = TestBed.inject(ActivityStore);
   store.start();
-  await vi.waitFor(() => expect(store.events()).toHaveLength(1));
+  if (waitForEvents) await vi.waitFor(() => expect(store.events()).toHaveLength(1));
   return { store, api, cache, listeners };
 }
 
 describe('Completed task results', () => {
+  it('waits for cache restoration before an offline inline request is read', async () => {
+    let restore!: (value: unknown) => void;
+    const cached = new Promise((resolve) => {
+      restore = resolve;
+    });
+    const { store, api } = await setup(cached, [], true, false);
+    api.event.mockReturnValue(throwError(() => new Error('offline')));
+    const reading = store.readDetail(event.id);
+    expect(api.event).not.toHaveBeenCalled();
+    restore({
+      savedAt: event.occurredAt,
+      currentWork: null,
+      usageLimits: bootstrap.usageLimits,
+      unreadCount: 0,
+      events: [answer],
+      nextCursor: null,
+      pendingReadIds: [],
+      pendingReadAll: false,
+    });
+    expect(await reading).toEqual({ event: { ...answer, isRead: true }, cached: true });
+    store.stop();
+  });
+
+  it('persists a fetched full answer even when its already-read summary has the same revision', async () => {
+    const { store, api, cache } = await setup(null, [{ ...event, isRead: true }]);
+    api.event.mockReturnValue(of(answer));
+    await store.readDetail(event.id);
+    expect(cache.write.mock.calls.at(-1)?.[0].events[0].result.text).toBe(answer.result.text);
+    store.stop();
+  });
+
+  it('restores viewed answers before a fast reconnect snapshot can overwrite the cache', async () => {
+    let restore!: (value: unknown) => void;
+    const cached = new Promise((resolve) => {
+      restore = resolve;
+    });
+    const { store, api, cache, listeners } = await setup(cached, [event], false, false);
+    listeners.get('connected')?.(new Event('connected'));
+    await Promise.resolve();
+    expect(api.bootstrap).not.toHaveBeenCalled();
+    restore({
+      savedAt: event.occurredAt,
+      currentWork: null,
+      usageLimits: bootstrap.usageLimits,
+      unreadCount: 0,
+      events: [answer],
+      nextCursor: null,
+      pendingReadIds: [],
+      pendingReadAll: false,
+    });
+    await vi.waitFor(() => expect(store.state()).toBe('ready'));
+    expect(cache.write.mock.calls.at(-1)?.[0].events[0].result.text).toBe(answer.result.text);
+    store.stop();
+  });
+
   it('migrates a viewed RC8 answer to its session and preserves old deep links after offline reload', async () => {
     const session: ActivityEventDto = {
       ...event,

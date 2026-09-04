@@ -1,5 +1,6 @@
 import type { ActivityEventDetailDto, ActivityEventDto } from '../../../core/api/api-client';
 import { dateGroup } from '../../../core/formatting/time';
+import { workName, workPreview } from './work-copy';
 
 export interface ActivityGroup {
   label: string;
@@ -50,7 +51,7 @@ export function activityTaskTitle(event: ActivityEventDto): string {
     'codex.turn.completed': 'Công việc trong Codex',
   };
   return event.session
-    ? 'Phiên làm việc VibePing'
+    ? 'Công việc VibePing'
     : (fallbacks[event.eventType] ?? 'Tín hiệu mới từ Codex');
 }
 
@@ -58,6 +59,12 @@ export function activityProject(event: ActivityEventDto): string {
   const parts = event.projectName.replaceAll('\\', '/').split('/');
   const name = cleanVisibleText(parts.at(-1) ?? '');
   return name.slice(0, 80) || 'Codex';
+}
+
+export function activityPreview(event: ActivityEventDto): string {
+  return event.resultExcerpt?.trim()
+    ? workPreview(event.resultExcerpt)
+    : workName(activityTaskTitle(event), event.occurredAt);
 }
 
 export function activityDescription(event: ActivityEventDto): string {
@@ -69,9 +76,9 @@ export function activityDescription(event: ActivityEventDto): string {
       'Codex cần bạn xác nhận trên laptop để tiếp tục công việc.',
     'codex.preview.ready': 'Codex đã mở bản xem trước trên laptop. Quay lại laptop để kiểm tra.',
     'codex.test.failed':
-      'Khi lượt làm việc này kết thúc, lần kiểm thử mã nguồn gần nhất VibePing ghi nhận báo chưa đạt. Đây là kết quả tại thời điểm thông báo; mở Codex trên laptop để xem chi tiết và các lần kiểm thử sau đó.',
+      'Khi yêu cầu này kết thúc, lần kiểm thử mã nguồn gần nhất VibePing ghi nhận báo chưa đạt. Đây là kết quả tại thời điểm thông báo; mở Codex trên laptop để xem chi tiết và các lần kiểm thử sau đó.',
     'codex.turn.completed':
-      'Codex đã kết thúc lượt trả lời này nhưng VibePing chưa có nội dung kết quả. Mở Codex trên laptop để xem.',
+      'Codex đã kết thúc yêu cầu này nhưng VibePing chưa có nội dung kết quả. Mở Codex trên laptop để xem.',
   };
   const fallback = descriptions[event.eventType];
   if (fallback) return fallback;
@@ -99,7 +106,7 @@ export function timelineLabel(stage: ActivityEventDetailDto['timeline'][number])
   const labels: Record<string, string> = {
     'codex.turn.started': 'Công việc bắt đầu',
     'codex.turn.resumed': 'Codex tiếp tục xử lý',
-    'codex.turn.stopped': 'Lượt làm việc đã dừng',
+    'codex.turn.stopped': 'Yêu cầu đã dừng',
     'codex.test.passed': 'Kiểm thử đã đạt',
     'codex.attention.permission_required': 'Codex chờ bạn',
     'codex.preview.ready': 'Bản xem trước sẵn sàng',

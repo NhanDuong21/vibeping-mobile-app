@@ -19,9 +19,9 @@ THESIS: A trustworthy private signal line, not a miniature developer dashboard.
 
 OWN-WORLD: Tinted off-white or green-black field, mint signal, green-gray metadata, sparse rules, 12–16 px corners only where a container is necessary.
 
-STORY: In 1.2, glance at one session per Codex thread, open its recent turns, then read one turn's original timeline and final answer. New prompts update that session. Distinct threads never merge by project. Personal project identities, notification rules and the daily recap retain their existing scope.
+STORY: In 1.3, glance at one Công việc per Codex thread and open its original timeline and final answer directly. The latest Yêu cầu is expanded; older requests expand in place. A single request has no hierarchy labels. New prompts update that work; distinct threads never merge by project. Notification links expand their exact request.
 
-FIRST VIEWPORT: Compact masthead with the existing cat, one session hero with name, project, latest-turn state, real duration, turn count and latest signal; allowance rows and compact session lists below. Session detail progressively reveals turns; turn detail preserves the full timeline and final answer. Project profiles, Settings and daily recap retain the incumbent form.
+FIRST VIEWPORT: Compact masthead with the existing cat. A prominent work card appears only for active work or an actionable state; idle uses a small status block. Allowance rows and compact work lists follow, with project, request count, status/time and one readable sentence. Internal review output stays inside the full result. No aggregate thread duration or repeated row CTA. Project profiles, Settings and daily recap retain the incumbent form.
 
 FORM: Established Quiet signal world; precise supplied composition, so no concept tournament. Seed key: brief-pinned-operate.
 

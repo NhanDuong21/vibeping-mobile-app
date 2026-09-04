@@ -72,7 +72,7 @@ test("quiet work expires honestly and foreground sync clears a missed ending", a
     document.dispatchEvent(new Event("visibilitychange")),
   );
   await expect(
-    page.getByRole("heading", { name: "VibePing đang lắng nghe" }),
+    page.getByRole("heading", { name: "Codex đang nghỉ" }),
   ).toBeVisible();
 });
 

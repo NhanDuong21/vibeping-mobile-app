@@ -98,11 +98,13 @@ Personal extends the incumbent world through familiar project identities, ordina
 
 - Tinted fields, sparse rules and restrained semantic color.
 - Local system type with clear status, task and metadata hierarchy.
-- One persistent session identity, recorded time and retained final results.
+- One persistent work identity with separate requests, recorded time and retained final results.
 - A whole-image mascot with bounded, state-aware motion.
 - Plain Vietnamese, visible focus and explicit saved or unconfirmed states.
 
 The accepted light and dark captures in `.impeccable/review/personal`, including the 320 px and 1024 px profiles and stale Windows state, support the recorded form. The finish verdict resolves both scored fixes. The native Windows tray was not visually captured; this document records its mobile status presentation only.
+
+The 1.3 light and dark captures in `.impeccable/review/work-details` record the compact idle/feed presentation, latest and previous request content, and single-request detail at phone widths, with a centered feed at 1024 px. The work-detail rules below follow the built source; capture fixture content does not establish product names or result copy.
 
 ## Colors
 
@@ -138,8 +140,8 @@ Light is the default for a calm, readable first launch. Light, dark, and system 
 ### Hierarchy
 
 - **Headline:** compact bold page and project names, wrapping when long.
-- **Title:** section headings and the prominent session title.
-- **Row title:** bold project and earlier-session labels.
+- **Title:** section headings and the prominent work title.
+- **Row title:** bold project, work and request-disclosure labels.
 - **Body:** supporting copy, state and duration; longer explanations use the relaxed body line height.
 - **Field:** native input and select values stay larger than their labels.
 - **Label:** short bold form labels and actions.
@@ -177,7 +179,7 @@ Fields show a bold label above the native input or select with an 8 px gap. Noti
 
 ### Project profile and notification rules
 
-Profiles follow the Settings form: back link, editable display name, original project name, two icon/accent selectors, project notification switches, bounded threshold selectors, full-width save action, then filtered session history. The display name is limited to 60 characters; the source name remains secondary context.
+Profiles follow the Settings form: back link, editable display name, original project name, two icon/accent selectors, project notification switches, bounded threshold selectors, full-width save action, then project work history. The display name is limited to 60 characters; the source name remains secondary context.
 
 **The Confirmed Identity Rule.** Shared project names, icons and accents change only after a successful save. Keep failed edits available to retry, show “Đã lưu hồ sơ dự án.” after success, and label cached profiles explicitly. The editor may show its draft; activity and other shared identity surfaces retain the confirmed profile until it is saved.
 
@@ -185,7 +187,7 @@ Global notification types remain master controls. A project receives a type only
 
 Completion thresholds offer every job, 2 minutes or 5 minutes. Waiting reminders offer off, once after 5 minutes or once after 10 minutes. Project selectors add “Theo cài đặt chung” for inheritance. Keep these bounded choices in ordinary selects; this is not a rule builder. The global explanation states that a missing start time still permits a completion notification and that return-needed work and final test failure follow their selected notification types and quiet hours.
 
-“Phiên của dự án” reuses the session card and detail path. Retain state, recorded duration, failure count when present and final-answer access. Cached history is labeled and offers retry; previous-page loading and failure have explicit actions.
+Project history reuses the compact work row and direct detail path. Retain current state and full final-answer access. Cached history is labeled and offers retry; previous-page loading and failure have explicit actions.
 
 ### Windows readiness
 
@@ -195,23 +197,23 @@ Completion thresholds offer every job, 2 minutes or 5 minutes. Waiting reminders
 
 The visible explanation points to the Windows package's “Bật Sẵn sàng” action and local tray. It states that stopping waits for a manual start or the next opted-in Windows sign-in. Native tray styling and appearance are outside this visual record.
 
-### Work session card and timeline
+### Work feed and inline request details
 
-**The Persistent Session Rule.** One Codex thread keeps one top-level identity across all prompts. A new prompt adds a turn within that session, updates the count and current state, and moves the session by its latest signal. Separate threads in the same project remain separate. The hero shows the most recently updated running session, or a recent session with its actual resting state; it never repeats in the list. Other rows are divided into Đang làm việc, Cần chú ý and Gần đây only when populated. History without thread identity remains independently accessible under Hoạt động cũ.
+**The Persistent Work Rule.** One Codex thread keeps one top-level identity across prompts, labeled Công việc. Each prompt is a Yêu cầu. New requests update the count and latest state; separate threads in the same project remain separate. Show the most recently updated running work or a current actionable work in the prominent card, without repeating it in the list. When idle, use a small Codex đang nghỉ block. Other rows are grouped under Đang làm việc, Cần chú ý and Gần đây only when populated. History without thread identity remains independently accessible under Hoạt động cũ.
 
-The prominent session uses the existing bordered surface with 16 px corners and 16 px padding, the local app icon, and a 22 px bold title. Earlier sessions use open, rule-separated rows with 16 px bold titles. State and duration use 14 px text; project and last-signal metadata use 12 px muted text. Long titles and metadata wrap, and the entire card remains a focusable detail link with at least a 44 px touch target.
+Active work retains the existing bordered surface, 16 px corners and padding, local icon and 22 px title. Recent work uses open, rule-separated rows with 16 px bold titles, project on one line, request count, state/time, one readable result sentence and a chevron. Long titles use at most two lines. The entire row is one focusable link with a 44 px minimum target; omit repeated CTA and signal metadata.
 
-**The Observed Time Rule.** Show recorded stages and timestamps only. The prominent active card shows the current turn's recorded start and latest stage. Duration uses a recorded start; missing starts are explained in turn detail, not as a feed status. When an unfinished turn becomes stale or loses a current signal, freeze duration at the last observed signal and label the saved or unconfirmed state in text. Live motion stops with loss of freshness. Completion fixes duration at the recorded finish. Session detail labels the span from the first retained signal to the latest; this is not accumulated work time.
+**The Observed Time Rule.** Show recorded stages and timestamps only. The prominent active card shows the current request's real duration and latest stage. Missing starts are explained inside detail. Stale or disconnected work freezes duration at its last signal and stops live motion. Work detail can show recorded start and update times, but never presents their span as total work duration.
 
-Session detail introduces the thread, a current-turn card and up to ten recent turns as open rows with light dividers. Older turns load on request. Turn detail preserves the accepted full timeline and final Codex answer, with a quiet “Lượt X trong Y” label and previous/next turn links. Use tabular timestamps, a thin connecting line, mint play for start, coral cross for failed tests, green check for passed tests, deep check for completion and amber stop for interruption. The line conveys sequence, never progress percentage. Privacy stays collapsed. Historical test failures are neutral after a successful resolution; warnings describe only unresolved latest-turn evidence.
+**The Two-Level Reading Rule.** Activity opens Chi tiết công việc with the latest request's full timeline and Codex answer already visible. Older requests use Yêu cầu trước đó disclosure rows that expand in place, independently, without another route. The latest uses Yêu cầu gần nhất. A work with one request omits these labels and counters. Older pages load on demand. Existing event and notification links resolve to work detail with the exact requested answer expanded. Cached answers are labeled and offer retry.
 
-Feed titles use retained safe thread names, with “Phiên làm việc VibePing” as the neutral fallback. Result previews are at most two lines and never become titles. Feed project names stay on one line, titles on at most two; long results remain fully available in turn detail. Existing bottom navigation, mascot, themes and allowance motion are retained.
+Full results preserve stored headings, lists, code and original content; a truncated stored answer explicitly directs the user to Codex for the rest. Timeline markers retain tabular timestamps, the thin connecting line and established semantic colors. Privacy remains collapsed. Resolved test failures no longer flag the work as needing attention; their original timeline markers remain visible. Result excerpts in both current and legacy feed rows select a readable sentence, exclude internal review output, code and paths, and fall back to Đã có kết quả từ Codex when none remains. Without an excerpt, request rows can use the last recorded stage and legacy events use their safe summary or title fallback. Safe retained names remain titles; missing or internal names become Công việc VibePing · HH:mm. The existing mascot, bottom navigation, themes and allowance motion remain in place.
 
 **The Fresh Detail Signal Rule.** Beside the detail's working state, show one decorative three-bar signal (24 px) only for the selected running session with fresh evidence under 120 seconds old. Full uses a gentle scaleY/opacity loop (2.4 seconds); Balanced, Minimal and system reduced motion keep the static mark. Cancel the loop when hidden or offscreen. Remove the mark for waiting, terminal, offline or stale states. Keep the status text still and authoritative, with the timeline and retained final answer in their existing reading order.
 
 ### Daily recap
 
-“Hôm nay” is four quiet definition-list rows below Activity: “Phiên đã theo dõi”, “Công việc hoàn tất”, “Lần kiểm thử chưa đạt” and “Thời gian ghi nhận”. Muted labels sit opposite right-aligned bold tabular values, with 12 px row gaps. It has no chart, score or dashboard card grid.
+“Hôm nay” is four quiet definition-list rows below Activity: “Yêu cầu đã theo dõi”, “Công việc hoàn tất”, “Lần kiểm thử chưa đạt” and “Thời gian ghi nhận”. Muted labels sit opposite right-aligned bold tabular values, with 12 px row gaps. It has no chart, score or dashboard card grid.
 
 Observed time runs from the recorded start to the last signal; overlapping intervals count once. Keep that explanation under the rows, prefix cached summaries with “Tổng kết đã lưu.”, and show loading or reconnection copy when no summary is available. The recap does not imply total working time beyond observed evidence.
 
@@ -240,7 +242,7 @@ Lock Screen previews inherit the same theme and use the local app icon with an a
 ### Do:
 
 - **Do** keep status, task and next action ahead of decoration, with readable Vietnamese text accompanying every state color.
-- **Do** preserve session identity, observed timestamps, final-answer access and explicit cached-state labels across Personal integrations.
+- **Do** preserve work and request identities, observed timestamps, final-answer access and explicit cached-state labels across Personal integrations.
 - **Do** use confirmed project identity in shared views, retaining failed drafts for retry.
 - **Do** keep global notification types and quiet hours visible as the authority for project filtering.
 - **Do** refresh Windows readiness on return and show dated previous evidence when current readiness is unknown.
@@ -258,4 +260,4 @@ Lock Screen previews inherit the same theme and use the local app icon with an a
 
 **Workflow discipline:** Every user-visible surface uses the project-local Impeccable skill. New work records product truth, shapes the task, establishes or inherits the visual world, then applies the craft floor. Gate 0 specifically uses shape, critique, harden, and adapt, with one bounded screenshot/fix pass and one confirmation pass. Product constraints override generic visual ambition.
 
-**Not canonized:** The uncaptured native tray appearance, fixture-specific names/counts and the inherited empty Activity heading in the review captures are not design-system rules. No visual defect is promoted into a reusable token by this update.
+**Not canonized:** The uncaptured native tray appearance, fixture-specific names/counts, captured internal result text and the inherited empty Activity heading in the review captures are not design-system rules. No visual defect is promoted into a reusable token by this update. The 1.3 refinement introduces no new palette, type scale, raster pixels or visual world.

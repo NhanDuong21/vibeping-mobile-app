@@ -103,7 +103,7 @@ test("live status still changes immediately after detail and tab navigation with
     ),
   );
   await expect(page.locator("app-live-status-card h1")).toHaveText(
-    "VibePing đang lắng nghe",
+    "Codex đang nghỉ",
   );
   await expect(page.locator("html")).toHaveAttribute("data-same-page", "yes");
 });
@@ -128,7 +128,7 @@ test("a missed stream update is recovered by the foreground snapshot without rel
   snapshot.currentWork = null;
   await page.clock.runFor(15_000);
   await expect(page.locator("app-live-status-card h1")).toHaveText(
-    "VibePing đang lắng nghe",
+    "Codex đang nghỉ",
   );
   await expect(page.locator("html")).toHaveAttribute("data-same-page", "yes");
 });

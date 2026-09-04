@@ -203,7 +203,7 @@ test("Personal keeps smart rules, project profiles and Windows readiness within 
     page.getByRole("heading", { name: "VibePing cá nhân" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Phiên của dự án" }),
+    page.getByRole("heading", { name: "Công việc của dự án" }),
   ).toBeVisible();
   await expect(
     page.getByLabel("Màu nhấn").locator("option:checked"),

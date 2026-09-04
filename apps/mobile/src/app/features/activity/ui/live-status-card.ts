@@ -1,7 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ProjectIdentity } from '../../personal';
-import { elapsedTime, relativeSignalTime, relativeTime } from '../../../core/formatting/time';
+import {
+  clock,
+  elapsedTime,
+  relativeSignalTime,
+  relativeTime,
+} from '../../../core/formatting/time';
 import { activityProject, activityTaskTitle } from '../application/activity-presentation';
 import { ActivityStore } from '../application/activity.store';
 import { MotionInView, SignalMotion } from '../../../core/motion/signal-motion';
@@ -16,6 +21,13 @@ import { WorkSessionCard } from './work-session-card';
 })
 export class LiveStatusCard {
   protected readonly activity = inject(ActivityStore);
+  protected readonly idle = computed(
+    () =>
+      !this.activity.focusedSession() &&
+      !this.activity.current() &&
+      ['ready', 'completed'].includes(this.activity.readiness().kind),
+  );
+  protected readonly clock = clock;
   protected readonly recent = computed(() => this.activity.events()[0] ?? null);
   protected readonly cue = computed(() =>
     eventMotionCue(this.activity.events().find((event) => event.id === this.activity.newEventId())),

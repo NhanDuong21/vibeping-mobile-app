@@ -6,7 +6,7 @@ import { relativeTime } from '../../../core/formatting/time';
 import {
   activityLabel,
   activityProject,
-  activityTaskTitle,
+  activityPreview,
 } from '../application/activity-presentation';
 import { ActivityStore } from '../application/activity.store';
 import { WorkSessionCard } from './work-session-card';
@@ -30,7 +30,7 @@ export class ActivityList {
   );
   protected readonly identity = threadIdentity;
   protected readonly label = activityLabel;
-  protected readonly taskTitle = activityTaskTitle;
+  protected readonly preview = activityPreview;
   protected readonly project = activityProject;
 
   protected time(value: string): string {

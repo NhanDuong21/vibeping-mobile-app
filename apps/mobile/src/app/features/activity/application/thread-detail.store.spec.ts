@@ -10,6 +10,7 @@ describe('Thread detail data', () => {
   function setup() {
     const events = signal<ActivityEventDto[]>([]);
     const api = { threadTurns: vi.fn() };
+    const readDetail = vi.fn();
     const cache = {
       read: vi.fn().mockResolvedValue(null),
       write: vi.fn().mockResolvedValue(undefined),
@@ -21,11 +22,17 @@ describe('Thread detail data', () => {
         { provide: MobileSnapshotStorage, useValue: cache },
         {
           provide: ActivityStore,
-          useValue: { events, threads: events, now: () => new Date(), isStale: () => false },
+          useValue: {
+            events,
+            threads: events,
+            readDetail,
+            now: () => new Date(),
+            isStale: () => false,
+          },
         },
       ],
     });
-    return { store: TestBed.inject(ThreadDetailStore), api, cache };
+    return { store: TestBed.inject(ThreadDetailStore), api, cache, readDetail };
   }
 
   it('rejects a late response for another thread and keeps retry available offline', async () => {
@@ -59,5 +66,47 @@ describe('Thread detail data', () => {
     await loading;
     expect(store.loadingMore()).toBe(false);
     expect(store.hasMore()).toBe(true);
+  });
+
+  it('includes an exact notification request outside the latest page, but rejects a different work', async () => {
+    const { store, api, readDetail } = setup();
+    const at = '2026-09-04T12:00:00Z';
+    const old: ActivityEventDto = {
+      id: 'old',
+      title: 'Công việc',
+      summary: 'Kết quả',
+      projectName: 'fixture',
+      occurredAt: at,
+      isRead: true,
+      eventType: 'codex.turn.completed',
+      session: {
+        eventIds: ['old'],
+        state: 'completed',
+        startedAt: at,
+        completedAt: at,
+        updatedAt: at,
+        failedTestCount: 0,
+        timeline: [],
+        thread: {
+          id: 'a',
+          title: 'Công việc',
+          turnCount: 12,
+          turnNumber: 1,
+          latestTurnId: 'latest',
+          firstSignalAt: at,
+          updatedAt: at,
+          failedTestCount: 0,
+          isRead: true,
+        },
+      },
+    };
+    api.threadTurns.mockReturnValue(of({ events: [], nextCursor: '3', unreadCount: 0 }));
+    readDetail.mockResolvedValue({ event: old, cached: false });
+    await store.open('a', 'old');
+    expect(store.target()).toBe('old');
+    expect(store.turns().map((event) => event.id)).toEqual(['old']);
+    expect(store.hasMore()).toBe(true);
+    await store.open('b', 'old');
+    expect(store.turns()).toEqual([]);
   });
 });

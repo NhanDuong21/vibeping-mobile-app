@@ -1,3 +1,9 @@
+@if (idle()) {
+  <section class="flex items-center gap-3 py-3" aria-label="Codex đang nghỉ">
+    <img src="/assets/logo-icon-192.png" alt="" width="36" height="36" class="size-9 shrink-0 object-contain" />
+    <div><h1 class="m-0 text-lg font-bold">Codex đang nghỉ</h1><p class="mt-1 text-sm text-vibe-muted dark:text-vibe-sage">@if (recent()?.session?.completedAt; as finish) { Công việc gần nhất hoàn tất lúc {{ clock(finish) }}. } @else { Không có việc đang chạy. }</p></div>
+  </section>
+} @else {
 <section
   appMotionInView
   [appSignalMotion]="cue()"
@@ -29,7 +35,7 @@
     <app-work-session-card [event]="session" [now]="activity.now()" [stale]="activity.isStale() || activity.readiness().kind === 'offline'"
       [prominent]="true" [reaction]="activity.newEventId() === session.id ? session.session?.updatedAt || session.occurredAt : null" />
     @if (activity.otherWorking()) {
-      <p class="px-4 pb-4 text-xs text-vibe-muted dark:text-vibe-sage">Còn {{ activity.otherWorking() }} phiên khác đang làm việc</p>
+      <p class="px-4 pb-4 text-xs text-vibe-muted dark:text-vibe-sage">Còn {{ activity.otherWorking() }} công việc khác đang làm việc</p>
     }
   } @else {
   <div class="relative p-4">
@@ -172,3 +178,5 @@
     ></div>
   }
 </section>
+
+}

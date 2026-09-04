@@ -9,7 +9,7 @@ import {
 
 test.use({ serviceWorkers: "block" });
 
-test("one card follows a session through completion, keeps its answer and opens a full timeline", async ({
+test("a completed legacy work moves into the feed, keeps its answer and opens a full timeline", async ({
   page,
 }, testInfo) => {
   await routeProduct(page);
@@ -144,10 +144,12 @@ test("one card follows a session through completion, keeps its answer and opens 
       }),
     );
   }, session);
-  await expect(card).toContainText("Đã hoàn tất");
-  await expect(card).toContainText("18 phút");
-  await expect(card).toContainText("1 lần kiểm thử chưa đạt");
-  await expect(card).toHaveAttribute("data-same-card", "yes");
+  await expect(card).toContainText("Hoàn tất lúc");
+  await expect(card).not.toContainText("18 phút");
+  await expect(card).not.toContainText("1 lần kiểm thử chưa đạt");
+  await expect(page.locator("app-live-status-card")).toContainText(
+    "Codex đang nghỉ",
+  );
   await expect(card).toHaveCount(1);
   await page.setViewportSize({ width: 430, height: 844 });
   await capture(page, testInfo, "430-session-completed");

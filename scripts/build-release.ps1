@@ -30,7 +30,7 @@ try {
     }
     $version = (& $binary --version | Out-String).Trim()
     Assert-LastCommand 'Đọc phiên bản VibePing'
-    if ($version -ne 'vibeping 1.2.0') {
+    if ($version -ne 'vibeping 1.3.0') {
         throw "Phiên bản release không đúng: $version"
     }
     Write-Host "Release build sẵn sàng: $version"

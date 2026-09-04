@@ -4,10 +4,9 @@ import { ProjectIdentity } from '../../personal';
 import type { ActivityEventDto } from '../../../core/api/api-client';
 import { clock } from '../../../core/formatting/time';
 import { SignalMotion } from '../../../core/motion/signal-motion';
-import { activityProject, timelineLabel } from '../application/activity-presentation';
+import { timelineLabel } from '../application/activity-presentation';
 import { sessionDuration, sessionStatus } from '../application/work-session-presentation';
 import {
-  failureNote,
   resultPreview,
   threadIdentity,
   threadStatus,
@@ -28,7 +27,6 @@ export class WorkSessionCard {
   readonly reaction = input<string | null>(null);
   readonly entrance = input<string | null>(null);
   protected readonly title = computed(() => threadTitle(this.event()));
-  protected readonly project = computed(() => activityProject(this.event()));
   protected readonly status = computed(() =>
     this.event().session?.thread
       ? threadStatus(this.event(), this.now(), this.stale())
@@ -39,7 +37,6 @@ export class WorkSessionCard {
   );
   protected readonly identity = computed(() => threadIdentity(this.event()));
   protected readonly preview = computed(() => resultPreview(this.event()));
-  protected readonly failures = computed(() => failureNote(this.event(), true));
   protected readonly link = computed(() =>
     this.event().session?.thread
       ? ['/activity/sessions', this.identity()]

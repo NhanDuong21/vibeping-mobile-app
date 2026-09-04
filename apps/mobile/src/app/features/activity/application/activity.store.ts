@@ -16,7 +16,7 @@ import { readinessView, type ReadinessSourceState, type ReadinessView } from './
 import { isLiveMotionEvent } from './event-motion';
 import { sessionIsWorking, sessionRevision } from './work-session-presentation';
 import { mergeSessionFeed, type CachedEvent } from './session-cache-migration';
-import { groupThreads, threadIdentity } from './thread-presentation';
+import { groupThreads, needsAttention, threadIdentity } from './thread-presentation';
 
 type ActivityState = ReadinessSourceState;
 type DetailState = 'idle' | 'loading' | 'ready' | 'missing';
@@ -50,6 +50,7 @@ export class ActivityStore {
   #syncSequence = 0;
   #workRevision = 0;
   #detailSequence = 0;
+  #restoring: Promise<void> | null = null;
 
   readonly state = this.#state.asReadonly();
   readonly current = computed(() => this.#bootstrap()?.currentWork ?? null);
@@ -59,9 +60,10 @@ export class ActivityStore {
   readonly threads = computed(() => groupThreads(this.#events()));
   readonly focusedSession = computed(() => {
     const threads = this.threads();
+    if (this.isStale()) return null;
     return (
       threads.find((event) => sessionIsWorking(event, this.now(), this.isStale())) ??
-      threads.find((event) => event.session) ??
+      threads.find((event) => needsAttention(event, this.now(), this.isStale())) ??
       null
     );
   });
@@ -131,7 +133,11 @@ export class ActivityStore {
   start(): void {
     if (this.#started) return;
     this.#started = true;
-    void this.#restoreThenSync();
+    this.#restoring = this.#restoreCache();
+    void this.#restoring.then(() => {
+      this.#restoring = null;
+      if (this.#started) void this.#sync();
+    });
     this.#live.start();
   }
 
@@ -188,30 +194,46 @@ export class ActivityStore {
     this.#selected.set(cached ? { ...cached, timeline: cached.timeline ?? [] } : null);
     if (cached) {
       this.#detailState.set('ready');
-      await this.#markReadLocally(cached.id);
     }
+    const read = await this.readDetail(id);
+    if (sequence !== this.#detailSequence) return;
+    this.#selected.set(read.event);
+    this.#detailState.set(read.event ? 'ready' : 'missing');
+  }
+
+  async readDetail(id: string): Promise<{ event: ActivityEventDetailDto | null; cached: boolean }> {
+    if (this.#restoring) await this.#restoring;
+    const cached = [...this.#events(), ...this.#legacyResults].find(
+      (event) => event.id === id || event.session?.eventIds.includes(id),
+    );
+    if (cached) await this.#markReadLocally(cached.id);
     try {
       const remote = await firstValueFrom(this.#api.event(id).pipe(timeout(10_000)));
-      if (sequence !== this.#detailSequence) return;
-      const event = this.#selected()?.isRead ? { ...remote, isRead: true } : remote;
-      this.#selected.set(event);
-      this.#mergeFeed([event]);
-      this.#detailState.set('ready');
-      if (!cached) await this.#markReadLocally(event.id);
-      await this.#persist();
+      this.#mergeFeed([remote]);
+      if (
+        !cached ||
+        cached.id !== remote.id ||
+        cached.session?.updatedAt !== remote.session?.updatedAt
+      )
+        await this.#markReadLocally(remote.id);
+      else await this.#persist();
+      return { event: { ...remote, isRead: true }, cached: false };
     } catch {
-      if (sequence === this.#detailSequence && !cached) this.#detailState.set('missing');
+      return {
+        event: cached ? { ...cached, timeline: cached.timeline ?? [], isRead: true } : null,
+        cached: true,
+      };
     }
   }
 
-  async #restoreThenSync(): Promise<void> {
+  async #restoreCache(): Promise<void> {
     const [cached] = await Promise.all([this.#cache.read(), this.#usage.restoreCached()]);
     if (!this.#started) return;
     if (cached && !this.#bootstrap()) this.#applyCache(cached);
-    await this.#sync();
   }
 
   async #sync(): Promise<void> {
+    if (this.#restoring) await this.#restoring;
     if (!this.#started) return;
     const sequence = ++this.#syncSequence;
     const workRevision = this.#workRevision;

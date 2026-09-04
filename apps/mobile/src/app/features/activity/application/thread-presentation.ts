@@ -1,4 +1,5 @@
 import type { ActivityEventDto } from '../../../core/api/api-client';
+import { workName, workPreview } from './work-copy';
 import { dateGroup } from '../../../core/formatting/time';
 import { activityTaskTitle, timelineLabel } from './activity-presentation';
 import { sessionIsWorking, sessionStatus } from './work-session-presentation';
@@ -8,13 +9,14 @@ export const threadIdentity = (event: ActivityEventDto): string =>
 export const threadTime = (event: ActivityEventDto): string =>
   event.session?.thread?.updatedAt ?? event.occurredAt;
 export const threadTitle = (event: ActivityEventDto): string =>
-  event.session?.thread
-    ? event.session.thread.title || 'Phiên làm việc VibePing'
-    : activityTaskTitle(event);
+  workName(
+    event.session?.thread?.title ??
+      event.session?.taskLabel ??
+      (event.session ? null : activityTaskTitle(event)),
+    threadTime(event),
+  );
 export const turnTitle = (event: ActivityEventDto): string =>
-  event.session?.thread
-    ? event.session.taskLabel || `Lượt làm việc ${event.session.thread.turnNumber}`
-    : activityTaskTitle(event);
+  workName(event.session?.taskLabel, event.occurredAt);
 
 /** Server totals describe the entire retained thread, even with only one turn cached. */
 export function groupThreads(events: ActivityEventDto[]): ActivityEventDto[] {
@@ -51,9 +53,7 @@ export function threadStatus(event: ActivityEventDto, now: Date, stale = false):
       return 'Không còn tín hiệu mới';
     return 'Cần chú ý';
   }
-  return event.session?.state === 'completed'
-    ? 'Lượt gần nhất đã hoàn tất'
-    : sessionStatus(event, now, stale);
+  return event.session?.state === 'completed' ? 'Đã hoàn tất' : sessionStatus(event, now, stale);
 }
 
 export function needsAttention(event: ActivityEventDto, now: Date, stale = false): boolean {
@@ -70,7 +70,7 @@ export function attentionNote(event: ActivityEventDto, now: Date): string {
   const turn = event.session;
   if (turn?.lastTestState === 'failed' || turn?.state === 'failed')
     return 'Lần kiểm thử gần nhất vẫn chưa đạt';
-  if (turn?.state === 'stopped') return 'Lượt đã dừng trước khi có kết quả cuối';
+  if (turn?.state === 'stopped') return 'Yêu cầu đã dừng trước khi có kết quả cuối';
   if (turn?.state === 'waiting') return 'Codex đang chờ bạn kiểm tra trên laptop';
   const minutes = Math.max(
     0,
@@ -115,17 +115,7 @@ export function resultPreview(event: ActivityEventDto): string {
     const stage = event.session?.timeline.at(-1);
     return stage ? timelineLabel(stage) : '';
   }
-  const line = excerpt
-    .split(/\n|(?<=[.!?])\s/)
-    .map((line) => line.replace(/^[-*#>\s]+/, '').trim())
-    .find(
-      (line) =>
-        line.length >= 20 &&
-        line.split(/\s+/).length >= 4 &&
-        !/^(verdict|disposition|status|result|ship|pass|fail)\b/i.test(line) &&
-        !/^[{[}|]|^[\w.-]+:\s*\S+$/.test(line),
-    );
-  return line?.slice(0, 180) || 'Đã có kết quả từ Codex';
+  return workPreview(excerpt);
 }
 
 export function failureNote(event: ActivityEventDto, wholeThread = false): string {
@@ -137,18 +127,4 @@ export function failureNote(event: ActivityEventDto, wholeThread = false): strin
   const resolved =
     event.session?.state === 'completed' && event.session?.lastTestState !== 'failed';
   return `${count} lần kiểm thử chưa đạt${resolved ? ' trước khi hoàn tất' : ''}`;
-}
-
-export function threadSpan(event: ActivityEventDto): string {
-  const thread = event.session?.thread;
-  if (!thread) return '';
-  const minutes = Math.floor(
-    (Date.parse(thread.updatedAt) - Date.parse(thread.firstSignalAt)) / 60_000,
-  );
-  if (!Number.isFinite(minutes) || minutes < 0) return '';
-  return minutes < 1
-    ? 'Dưới 1 phút'
-    : minutes < 60
-      ? `${minutes} phút`
-      : `${Math.floor(minutes / 60)} giờ${minutes % 60 ? ` ${minutes % 60} phút` : ''}`;
 }

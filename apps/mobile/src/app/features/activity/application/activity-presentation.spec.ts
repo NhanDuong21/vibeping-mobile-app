@@ -4,6 +4,8 @@ import {
   activityDescription,
   activityProject,
   activityTaskTitle,
+  activityPreview,
+  timelineLabel,
   groupActivityEvents,
 } from './activity-presentation';
 
@@ -18,6 +20,17 @@ const event: ActivityEventDto = {
 };
 
 describe('activity presentation', () => {
+  it('filters technical review output from legacy previews and uses current request terminology', () => {
+    expect(activityPreview({ ...event, resultExcerpt: 'disposition: ship' })).toBe(
+      'Đã có kết quả từ Codex',
+    );
+    expect(activityPreview({ ...event, summary: 'verdict: recapture' })).toMatch(
+      /^Công việc VibePing · /,
+    );
+    expect(timelineLabel({ eventType: 'codex.turn.stopped', occurredAt: event.occurredAt })).toBe(
+      'Yêu cầu đã dừng',
+    );
+  });
   it('explains legacy failed-test events as recorded project checks, with the right place to inspect them', () => {
     const failed = {
       ...event,
@@ -38,7 +51,7 @@ describe('activity presentation', () => {
     const richer = { ...event, summary: 'Hoàn thiện trải nghiệm Hoạt động' };
     expect(activityTaskTitle(richer)).toBe('Hoàn thiện trải nghiệm Hoạt động');
     expect(activityDescription(richer)).toBe(
-      'Codex đã kết thúc lượt trả lời này nhưng VibePing chưa có nội dung kết quả. Mở Codex trên laptop để xem.',
+      'Codex đã kết thúc yêu cầu này nhưng VibePing chưa có nội dung kết quả. Mở Codex trên laptop để xem.',
     );
     expect(activityTaskTitle({ ...event, summary: event.projectName })).toBe(
       'Công việc trong Codex',
@@ -54,7 +67,7 @@ describe('activity presentation', () => {
     expect(activityTaskTitle(unsafe)).toBe('Công việc trong Codex');
     expect(activityProject(unsafe)).toBe('vibeping-mobile-app');
     expect(activityDescription(unsafe)).toBe(
-      'Codex đã kết thúc lượt trả lời này nhưng VibePing chưa có nội dung kết quả. Mở Codex trên laptop để xem.',
+      'Codex đã kết thúc yêu cầu này nhưng VibePing chưa có nội dung kết quả. Mở Codex trên laptop để xem.',
     );
   });
 
