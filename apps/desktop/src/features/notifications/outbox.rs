@@ -30,6 +30,16 @@ impl NotificationStore {
                 transaction.commit().await?;
                 return Ok(None);
             }
+            if !crate::features::codex_attention::prepare_notification(
+                &mut transaction,
+                &value.id,
+                now,
+            )
+            .await?
+            {
+                transaction.commit().await?;
+                return Ok(None);
+            }
             if let Some(copy) = super::preview::copy_for_job(&mut transaction, &value.id).await? {
                 value.title = copy.title;
                 value.body = copy.body;

@@ -53,6 +53,7 @@ try {
   }
   assert(!occupied, "The isolated smoke port is already in use.");
   await start(oldBinary);
+  const oldManifest = await (await fetch(`${origin}/ngsw.json`)).json();
   browser = await chromium.launch();
   const context = await browser.newContext({
     ...devices["iPhone 13"],
@@ -83,10 +84,14 @@ try {
   assert.equal(health.version, expectedVersion);
   const manifest = await (await fetch(`${origin}/ngsw.json`)).json();
   assert.equal(manifest.appData.version, expectedVersion);
+  assert.notEqual(oldManifest.appData.version, expectedVersion);
+  // Backend-only releases can keep identical JS assets. The versioned manifest
+  // must still trigger a real service-worker update and explicit activation.
+  assert.notDeepEqual(manifest, oldManifest);
   const newMain = Object.keys(manifest.hashTable).find((path) =>
     /^\/main-.*\.js$/.test(path),
   );
-  assert(newMain && newMain !== oldMain);
+  assert(newMain);
   // Navigation uses the old cached shell while its worker downloads the new one.
   await page.goto(`${origin}/activity`);
   await expect(
@@ -96,6 +101,9 @@ try {
     page.getByText(`Phiên bản ${expectedVersion}`, { exact: true }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Cập nhật", exact: true }).click();
+  await expect(
+    page.getByText("Có bản VibePing mới", { exact: true }),
+  ).toBeHidden({ timeout: 30_000 });
   await expect(main).toHaveAttribute(
     "src",
     new RegExp(`^/?${newMain.slice(1)}$`),

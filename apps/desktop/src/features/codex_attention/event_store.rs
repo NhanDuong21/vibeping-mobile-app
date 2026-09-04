@@ -113,7 +113,12 @@ pub(super) async fn insert_event(
         )
         .await;
     }
-    if value.push {
+    if value.push
+        && (!super::notification_gate::is_completion(value.event_type)
+            || super::notification_gate::completion_source(transaction, Some(&ingress.turn_key))
+                .await?
+                != super::notification_gate::CompletionSource::Child)
+    {
         enqueue_pushes(transaction, &id, &dedupe, &copy, value, policy).await?;
     }
     Ok(Some(ActivityEvent {

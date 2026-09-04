@@ -28,7 +28,10 @@ async fn latest_real_activity_replaces_sample_and_task_survives_database_reopen(
         turn_key: "turn".into(),
         project_name: "project".into(),
         task_label: Some("Sửa màn Cài đặt".into()),
-        thread_identity: None,
+        thread_identity: Some(crate::features::codex_attention::ThreadIdentity {
+            root_key: "session".into(),
+            title: None,
+        }),
         result: None,
         signal: CodexSignal::Started,
         occurred_at: Utc::now(),
@@ -74,7 +77,10 @@ async fn queued_and_retry_jobs_use_latest_privacy_and_match_preview() {
         turn_key: "turn".into(),
         project_name: "project".into(),
         task_label: Some("Sửa màn Cài đặt".into()),
-        thread_identity: None,
+        thread_identity: Some(crate::features::codex_attention::ThreadIdentity {
+            root_key: "session".into(),
+            title: None,
+        }),
         result: crate::features::codex_attention::CodexResult::from_text(
             "Đã sửa bộ lọc hoạt động.\nKiểm thử đã qua.",
         ),
@@ -111,7 +117,7 @@ async fn queued_and_retry_jobs_use_latest_privacy_and_match_preview() {
         );
         store.finish(&job, "retry", Some(503)).await.unwrap();
     }
-    // If retention has removed the event, never send an old unrestricted body.
+    // If retention removed the event, its source can no longer be verified.
     sqlx::query(
         "UPDATE notification_jobs SET event_id = NULL, next_attempt_at = ?, lease_until = NULL",
     )
@@ -119,10 +125,7 @@ async fn queued_and_retry_jobs_use_latest_privacy_and_match_preview() {
     .execute(&pool)
     .await
     .unwrap();
-    assert_eq!(
-        store.claim_due().await.unwrap().unwrap().body,
-        "Mở VibePing để xem chi tiết."
-    );
+    assert!(store.claim_due().await.unwrap().is_none());
 }
 
 #[tokio::test]

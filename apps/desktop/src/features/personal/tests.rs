@@ -27,7 +27,10 @@ pub(super) fn signal(turn: &str, kind: CodexSignal, at: chrono::DateTime<Utc>) -
         turn_key: turn.into(),
         project_name: "vibeping".into(),
         task_label: None,
-        thread_identity: None,
+        thread_identity: Some(crate::features::codex_attention::ThreadIdentity {
+            root_key: format!("session-{turn}"),
+            title: None,
+        }),
         result: None,
         signal: kind,
         occurred_at: at,

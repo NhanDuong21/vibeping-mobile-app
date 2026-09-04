@@ -10,6 +10,8 @@ mod feed;
 pub mod http;
 mod installer;
 mod model;
+mod notification_gate;
+pub(crate) use notification_gate::prepare_notification;
 mod result_content;
 mod result_store;
 mod session_feed;
@@ -51,3 +53,6 @@ mod thread_tests;
 
 #[cfg(test)]
 mod thread_identity_tests;
+
+#[cfg(test)]
+mod notification_gate_tests;

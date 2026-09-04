@@ -1,6 +1,8 @@
-# VibePing — Công việc cùng đoạn chat 1.3.1
+# VibePing — Thông báo đúng công việc chính 1.3.2
 
 VibePing is a personal-production tool that notifies one user's iPhone when Codex finishes, needs attention, leaves final tests failing, has a preview ready, or approaches a usage allowance. Version 1.1.1 adds project profiles, personal notification rules, a living mascot, a small daily summary and an opted-in Windows companion. The persistent sessions, live cards, timelines and final Codex answers from 1.1 remain intact.
+
+Version 1.3.2 sends completion notifications only for a verified main conversation. Delegated-agent answers stay in the activity history without interrupting the phone. Unknown ancestry waits for reconciliation, and queued retries are checked again before delivery.
 
 Version 1.3.1 groups verified delegated-agent work under its parent conversation, including retained history and phone caches. The main request stays first, and all delegated results remain readable inline. Independent chats and user-created forks remain separate. Activity keeps two levels: a compact work feed and work detail with inline requests. The latest request opens directly to its original timeline and final answer; older requests expand in place. Idle status is compact, previews omit internal review output, and notification links open the exact request. Each conversation has one work identity; grouping uses explicit Codex agent ancestry rather than a shared project or fork origin.
 
@@ -57,7 +59,7 @@ pnpm run package:windows
 pnpm run e2e:release
 ```
 
-The ignored output is `artifacts/VibePing-Windows-x64-v1.3.1/`, its ZIP, and its SHA-256 file. The nine-file package needs no Node.js, pnpm, Rust, or Cargo installation on the user machine. See [1.3.1 release notes](docs/release-1.3.1.md) for conversation identity repairs and update instructions; Personal, Always ready and Codex results remain available. The phase ledger below records the original V1 foundation; physical iPhone acceptance remains separate from automated release checks.
+The ignored output is `artifacts/VibePing-Windows-x64-v1.3.2/`, its ZIP, and its SHA-256 file. The nine-file package needs no Node.js, pnpm, Rust, or Cargo installation on the user machine. See [1.3.2 release notes](docs/release-1.3.2.md) for completion notification repairs and update instructions; Personal, Always ready and Codex results remain available. The phase ledger below records the original V1 foundation; physical iPhone acceptance remains separate from automated release checks.
 
 Control the production process explicitly, or opt into Windows sign-in startup with `Bat San sang.bat` in the packaged release:
 
